@@ -1,0 +1,1 @@
+<div id="statistics">statistics</div>
