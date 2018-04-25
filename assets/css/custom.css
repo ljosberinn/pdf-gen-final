@@ -5,7 +5,8 @@
   display: none;
 }
 
-#arbeitszeit {
+#arbeitszeit,
+#tagessumme-helper {
   border: none;
 }
 

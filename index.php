@@ -40,7 +40,10 @@ if (isset($_GET['logout']) && !empty($_SESSION['personalnummer'])) {
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Hello Bulma!</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.0/css/bulma.min.css"/>
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.css">
   <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.js"></script>
+
 
     <?php
 
@@ -50,6 +53,7 @@ if (isset($_GET['logout']) && !empty($_SESSION['personalnummer'])) {
         'jquery-ui' => 'css',
         'jquery-ui' => 'js',
         'jquery-ui.theme' => 'css',
+        'jquery-ui.structure' => 'css',
       ];
 
       appendFiles($localFiles);

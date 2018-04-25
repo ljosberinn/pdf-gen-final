@@ -26,13 +26,54 @@ foreach ($tableColumnKeys as $tableColumnKey) {
 
     <div class="level">
 
-      <div class="level-item">
-        <span>Datum </span>
-          <div class="field">
-            <div class="control">
-              <input id="datepicker" name="datum" class="input" />
-            </div>
+      <div class="level-item level-left">
+        <div class="field">
+          <div class="control">
+            <label for="datum" class="label heading">Datum </label></p>
+            <input id="datepicker" name="datum" class="input" required />
           </div>
+        </div>
+      </div>
+
+      <div class="level-item level-left">
+        <div class="field">
+          <div class="control">
+            <label for="von" class="label heading">Von </label>
+            <input id="von" name="von" class="input" required />
+          </div>
+        </div>
+      </div>
+
+      <div class="level-item level-left">
+        <div class="field">
+          <div class="control">
+            <label for="bis" class="label heading">Bis </label>
+            <input id="bis" name="bis" class="input" required />
+          </div>
+        </div>
+      </div>
+
+      <div class="level-item level-left">
+        <div class="field">
+          <div class="control">
+            <label for="außer-haus" class="label heading">Außer Haus </label>
+            <input id="außer-haus" name="außer-haus" class="input" type="number" />
+          </div>
+        </div>
+      </div>
+
+      <div class="level-item level-right">
+        <label class="checkbox">
+          <input type="checkbox" name="frühstückspause" id="frühstückspause" checked>
+          Frühstückspause
+        </label>
+      </div>
+
+      <div class="level-item level-right">
+        <label class="checkbox">
+          <input type="checkbox" name="mittagspause" id="mittagspause" checked>
+          Mittagspause
+        </label>
       </div>
 
     </div>
@@ -60,7 +101,7 @@ foreach ($tableColumnKeys as $tableColumnKey) {
 
         <?php
 
-        for ($i = 1; $i <= 10; $i += 1) {
+        for ($i = 1; $i <= 5; $i += 1) {
 
             echo '
         <tr>
@@ -122,14 +163,46 @@ foreach ($tableColumnKeys as $tableColumnKey) {
 
       </tbody>
       <tfoot>
+        <tr id="tr-890">
+          <td>
+            <div class="field">
+              <div class="control">
+                <input id="kostenstelle-890" name="kostenstelle-890" class="input" readonly type="number" value="890" />
+              </div>
+            </div>
+          </td>
+          <td colspan="2"></td>
+          <td>
+            <div class="field">
+              <div class="control">
+                <input id="leistungsart-890" name="leistungsart-997" class="input" readonly type="text" value="997" />
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="field">
+              <div class="control">
+                <input id="minuten-890" name="minuten-997" class="input" min="0" type="number"  />
+              </div>
+            </div>
+          </td>
+          <td colspan="3"></td>
+        </tr>
         <tr>
-          <td colspan="4" class="has-text-centered">
+          <td colspan="3" class="has-text-centered">
             <button type="button" class="button is-warning" id="add-tr">Weitere Zeile hinzufügen</button>
           </td>
           <td>
             <div class="field">
               <div class="control">
-                <input class="input" type="number" id="tagessumme" readonly placeholder="Tagessumme" />
+                <input class="input has-text-right" type="text" id="tagessumme-helper" readonly value="Tagessumme:" />
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="field">
+              <div class="control">
+                <input class="input" type="number" id="tagessumme" readonly placeholder="<?php echo $_SESSION['arbeitszeit']; ?>" />
               </div>
             </div>
           </td>
@@ -139,19 +212,19 @@ foreach ($tableColumnKeys as $tableColumnKey) {
         </tr>
         <tr>
           <td colspan="7" class="has-text-centered">
-            <button type="button" class="button is-danger" id="remove-contents">
+            <button type="button" class="button is-danger" id="remove-contents" disabled>
               <span class="icon is-small">
                 <i class="fas fa-eraser"></i>
               </span>
               <span>Zeilen leeren</span>
             </button>
-            <button name="later" class="button is-info">
+            <button name="later" class="button is-info" id="later" disabled>
               <span class="icon is-small">
                 <i class="far fa-clock"></i>
               </span>
               <span>Für später speichern</span>
             </button>
-            <button name="now" class="button is-success">
+            <button name="now" class="button is-success" id="now" disabled>
               <span class="icon is-small">
                 <i class="fas fa-check"></i>
               </span>

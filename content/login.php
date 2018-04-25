@@ -1,15 +1,12 @@
-<div class="container m-t-lg m-b-lg m-l-lg m-r-lg">
+<div class="m-t-lg m-b-lg m-l-lg m-r-lg">
 
   <form method="POST" action="api/loginHandler.php">
     <div class="field">
       <label class="label">Personalnummer</label>
-      <div class="control has-icons-left has-icons-right">
+      <div class="control has-icons-left">
         <input class="input" type="number" placeholder="Personalnummer" name="personalnummer" value="" required>
         <span class="icon is-small is-left">
           <i class="fas fa-user"></i>
-        </span>
-        <span class="icon is-small is-right">
-          <i class="fas fa-check"></i>
         </span>
       </div>
 
