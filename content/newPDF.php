@@ -29,7 +29,7 @@ foreach ($tableColumnKeys as $tableColumnKey) {
       <div class="level-item level-left">
         <div class="field">
           <div class="control">
-            <label for="datum" class="label heading">Datum </label></p>
+            <label for="datepicker" class="label heading">Datum </label>
             <input id="datepicker" name="datum" class="input" required />
           </div>
         </div>
@@ -108,14 +108,14 @@ foreach ($tableColumnKeys as $tableColumnKey) {
           <td data-label="' .$tableColumnKeys[0]. '" title="' .$tableColumnKeys[0]. '">
             <div class="field">
               <div class="control">
-                <input id="' .$tableColumnKeys_lowerCase[0]. '-' .$i. '" name="' .$tableColumnKeys_lowerCase[0]. '-' .$i. '" min="0" pattern="^(?!0+$)\d+$" class="input" list="kostenstelle" type="number" placeholder="' .$i. '" />
+                <input id="' .$tableColumnKeys_lowerCase[0]. '-' .$i. '" name="' .$tableColumnKeys_lowerCase[0]. '-' .$i. '" min="0" class="input" list="kostenstelle" type="number" placeholder="' .$i. '" />
               </div>
             </div>
           </td>
           <td data-label="' .$tableColumnKeys[1]. '" title="' .$tableColumnKeys[1]. '">
             <div class="field">
               <div class="control">
-                <input id="' .$tableColumnKeys_lowerCase[1]. '-' .$i. '" name="' .$tableColumnKeys_lowerCase[1]. '-' .$i. '" class="input" type="number" min="0" pattern="^(?!0+$)\d+$" />
+                <input id="' .$tableColumnKeys_lowerCase[1]. '-' .$i. '" name="' .$tableColumnKeys_lowerCase[1]. '-' .$i. '" class="input" type="number" min="0" />
               </div>
             </div>
           </td>
@@ -129,28 +129,28 @@ foreach ($tableColumnKeys as $tableColumnKey) {
           <td data-label="' .$tableColumnKeys[3]. '" title="' .$tableColumnKeys[3]. '">
             <div class="field">
               <div class="control">
-                <input id="' .$tableColumnKeys_lowerCase[3]. '-' .$i. '" name="' .$tableColumnKeys_lowerCase[3]. '-' .$i. '" class="input" list="leistungsart" min="0" type="number"  pattern="^(?!0+$)\d+$" />
+                <input id="' .$tableColumnKeys_lowerCase[3]. '-' .$i. '" name="' .$tableColumnKeys_lowerCase[3]. '-' .$i. '" class="input" list="leistungsart" min="0" type="number" />
               </div>
             </div>
           </td>
           <td data-label="' .$tableColumnKeys[4]. '" title="' .$tableColumnKeys[4]. '">
             <div class="field">
               <div class="control">
-                <input id="' .$tableColumnKeys_lowerCase[4]. '-' .$i. '" name="' .$tableColumnKeys_lowerCase[4]. '-' .$i. '" class="input" type="number" min="0" pattern="^(?!0+$)\d+$"  />
+                <input id="' .$tableColumnKeys_lowerCase[4]. '-' .$i. '" name="' .$tableColumnKeys_lowerCase[4]. '-' .$i. '" class="input" type="number" min="0" />
               </div>
             </div>
           </td>
           <td data-label="' .$tableColumnKeys[5]. '" title="' .$tableColumnKeys[5]. '">
             <div class="field">
               <div class="control">
-                <input id="' .$tableColumnKeys_lowerCase[5]. '-' .$i. '" name="' .$tableColumnKeys_lowerCase[5]. '-' .$i. '" class="input" type="number" min="0" pattern="^(?!0+$)\d+$" />
+                <input id="' .$tableColumnKeys_lowerCase[5]. '-' .$i. '" name="' .$tableColumnKeys_lowerCase[5]. '-' .$i. '" class="input" type="number" min="0" />
               </div>
             </div>
           </td>
           <td data-label="' .$tableColumnKeys[6]. '" title="' .$tableColumnKeys[6]. '">
             <div class="field">
               <div class="control">
-                <input id="' .$tableColumnKeys_lowerCase[6]. '-' .$i. '" name="' .$tableColumnKeys_lowerCase[6]. '-' .$i. '" class="input" type="number" min="0" pattern="^(?!0+$)\d+$" />
+                <input id="' .$tableColumnKeys_lowerCase[6]. '-' .$i. '" name="' .$tableColumnKeys_lowerCase[6]. '-' .$i. '" class="input" type="number" min="0" />
               </div>
             </div>
           </td>
@@ -175,18 +175,18 @@ foreach ($tableColumnKeys as $tableColumnKey) {
           <td>
             <div class="field">
               <div class="control">
-                <input id="leistungsart-890" name="leistungsart-997" class="input" readonly type="text" value="997" />
+                <input id="leistungsart-890" name="leistungsart-890" class="input" readonly type="text" value="997" />
               </div>
             </div>
           </td>
           <td>
             <div class="field">
               <div class="control">
-                <input id="minuten-890" name="minuten-997" class="input" min="0" type="number"  />
+                <input id="minuten-890" name="minuten-890" class="input" min="0" type="number"  />
               </div>
             </div>
           </td>
-          <td colspan="3"></td>
+          <td colspan="2"></td>
         </tr>
         <tr>
           <td colspan="3" class="has-text-centered">
