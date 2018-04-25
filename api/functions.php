@@ -18,8 +18,6 @@
 /**
  * Defines general security headers preventing sniffing, x-framing and XSS-protection
  *
- * @method public setHeaders
- *
  * @return header
  */
 function setHeaders()
@@ -62,6 +60,13 @@ function appendFiles($files)
     }
 }
 
+/**
+ * Appends nav items to nav bar depending on specifications
+ *
+ * @param [array] $elementArray nav items to be appended
+ *
+ * @return void
+ */
 function appendNavItems($elementArray)
 {
     foreach ($elementArray as $navText => $specifications) {
@@ -104,12 +109,23 @@ function appendNavItems($elementArray)
     }
 }
 
+/**
+ * Returns a sanitized number
+ *
+ * @param [mixed] $supposedNumber string or int to be validated as int
+ *
+ * @return boolean returns true/false
+ */
 function validateInt($supposedNumber)
 {
     return filter_var($supposedNumber, FILTER_SANITIZE_NUMBER_INT);
 }
 
-
+/**
+ * Fetches Kostenstellen from DB and outputs them as option-elements
+ *
+ * @return void
+ */
 function returnKostenstellen()
 {
     include 'db.php';
@@ -128,6 +144,11 @@ function returnKostenstellen()
     }
 }
 
+/**
+ * Fetches Leistungsarten from DB and outputs them as option-elements
+ *
+ * @return void
+ */
 function returnLeistungsarten()
 {
     include 'db.php';
@@ -144,6 +165,19 @@ function returnLeistungsarten()
             <option value="' .$data['leistungsart']. '">' .$data['leistungsart']. ' – ' .$data['beschreibung']. '</option>';
         }
     }
+}
+
+/**
+ * Returns unix timestamp from datestring with seconds as 0
+ *
+ * @param [string] $date date as a string
+ *
+ * @return void
+ */
+function returnUnixTSFromDate($date)
+{
+    $parseDate = date_parse($date);
+    return mktime($parseDate['hour'], $parseDate['minute'], 0, $parseDate['month'], $parseDate['day'], $parseDate['year']);
 }
 
 
