@@ -18,32 +18,32 @@
 
         $navBarStartItems = [
           'Neuen Tageszettel erstellen' => [
-            'id' => 'nav-new',
-            'class' => 'navbar-item',
+            'id'          => 'nav-new',
+            'class'       => 'navbar-item',
             'data-target' => 'new-pdf',
-            'href' => '',
-            'login' => 'required',
+            'href'        => '',
+            'login'       => 'required',
           ],
           'Zwischenspeicher' => [
-            'id' => 'nav-temp',
-            'class' => 'navbar-item',
+            'id'          => 'nav-temp',
+            'class'       => 'navbar-item',
             'data-target' => 'temp-save',
-            'href' => '',
-            'login' => 'required',
+            'href'        => '',
+            'login'       => 'required',
           ],
           'Archiv' => [
-            'id' => 'nav-perm',
-            'class' => 'navbar-item',
+            'id'          => 'nav-perm',
+            'class'       => 'navbar-item',
             'data-target' => 'perm-save',
-            'href' => '',
-            'login' => 'required',
+            'href'        => '',
+            'login'       => 'required',
           ],
           'Statistiken' => [
-            'id' => 'nav-stats',
-            'class' => 'navbar-item',
+            'id'          => 'nav-stats',
+            'class'       => 'navbar-item',
             'data-target' => 'statistics',
-            'href' => '',
-            'login' => 'required',
+            'href'        => '',
+            'login'       => 'required',
           ],
         ];
 
@@ -58,25 +58,25 @@
 
         $navBarEndItems = [
           'Optionen' => [
-            'id' => '',
-            'class' => 'navbar-item',
+            'id'          => '',
+            'class'       => 'navbar-item',
             'data-target' => 'options',
-            'href' => '',
-            'login' => 'required',
+            'href'        => '',
+            'login'       => 'required',
           ],
           'Login' => [
-            'id' => '',
-            'class' => 'navbar-item',
+            'id'          => '',
+            'class'       => 'navbar-item',
             'data-target' => '',
-            'href' => '',
-            'login' => '',
+            'href'        => '',
+            'login'       => '',
           ],
           'Logout' => [
-            'id' => '',
-            'class' => 'navbar-item',
+            'id'          => '',
+            'class'       => 'navbar-item',
             'data-target' => '',
-            'href' => '?logout',
-            'login' => 'required',
+            'href'        => '?logout',
+            'login'       => 'required',
           ]
         ];
 

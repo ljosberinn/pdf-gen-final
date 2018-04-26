@@ -833,16 +833,13 @@ class FPDI extends FPDF_TPL
 
     public function placePause($indicator) {
 
-        switch($indicator) {
-        case 'OPA & OMI':
+        $xCoord = 175.68;
+
+        if ($indicator == 'OPA & OMI') {
             $xCoord = 165.725;
-            break;
-        case 'OPA': case 'OMI':
-            $xCoord = 175.68;
-            break;
         }
 
-        $this->SetXy($xCoord, 214.7675);
-        $this->MultiCell(53.55, 3.5, $incidator);
+        $this->SetXY($xCoord, 214.7675);
+        $this->MultiCell(53.55, 3.5, $indicator);
     }
 }

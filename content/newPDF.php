@@ -1,12 +1,12 @@
 <?php
 
 $tableColumns = [
-  'Kostenstelle' => '',
+  'Kostenstelle'   => '',
   'Auftragsnummer' => '',
-  'Kunde' => '',
-  'Leistungsart' => '',
-  'Minuten' => '',
-  'Anzahl' => '',
+  'Kunde'          => '',
+  'Leistungsart'   => '',
+  'Minuten'        => '',
+  'Anzahl'         => '',
   'Materialnummer' => '',
 ];
 
