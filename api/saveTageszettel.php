@@ -1,55 +1,5 @@
 <?php
 
-$_POST = [
-  'datum' => '25.04.2018',
-
-  'von' => '9:15',
-  'bis' => '17:15',
-
-  'außer-haus' => '',
-  'frühstückspause' => 'on',
-
-  'kostenstelle-1' => '112',
-  'auftragsnummer-1' => '',
-  'kunde-1' => 'Ausbildung',
-  'leistungsart-1' => '970',
-  'minuten-1' => '465',
-  'anzahl-1' => '',
-  'materialnummer-1' => '',
-  'kostenstelle-2' => '',
-  'auftragsnummer-2' => '',
-  'kunde-2' => '',
-  'leistungsart-2' => '',
-  'minuten-2' => '',
-  'anzahl-2' => '',
-  'materialnummer-2' => '',
-  'kostenstelle-3' => '',
-  'auftragsnummer-3' => '',
-  'kunde-3' => '',
-  'leistungsart-3' => '',
-  'minuten-3' => '',
-  'anzahl-3' => '',
-  'materialnummer-3' => '',
-  'kostenstelle-4' => '',
-  'auftragsnummer-4' => '',
-  'kunde-4' => '',
-  'leistungsart-4' => '',
-  'minuten-4' => '',
-  'anzahl-4' => '',
-  'materialnummer-4' => '',
-  'kostenstelle-5' => '',
-  'auftragsnummer-5' => '',
-  'kunde-5' => '',
-  'leistungsart-5' => '',
-  'minuten-5' => '',
-  'anzahl-5' => '',
-  'materialnummer-5' => '',
-  'kostenstelle-890' => '890',
-  'leistungsart-890' => '997',
-  'minuten-890' => '0',
-  'now' => ''
-];
-
 if (isset($_POST)) {
 
     session_start();
@@ -61,6 +11,12 @@ if (isset($_POST)) {
         $type = 'archiv';
     } else if (isset($_POST['later'])) {
         $type = 'zwischenspeicher';
+    }
+
+    if ($_POST['minuten-890'] != 0) {
+        $has890 = $_POST['minuten-890'];
+    } else {
+        $has890 = 0;
     }
 
     $getCreationStatement = getCreationStatement($type, $_SESSION['personalnummer']);
@@ -145,21 +101,21 @@ if (isset($_POST)) {
 
     $length = count($resultingData['minuten']);
 
-    $insertionStatement = buildInsertionStatement($_SESSION['personalnummer'], $type, $length);
+    $insertionStatement = buildInsertionStatement($_SESSION['personalnummer'], $type, $length, $has890);
 
     $insertionStatement = substr($insertionStatement, 0, -2). ') VALUES(' .$day. ', ' .$created. ', ' .$startTimestamp. ', ' .$endTimestamp. ', ' .$minutesWorked. ', ' .$frühstückspause. ', ' .$mittagspause. ', ' .$außerHaus. ', ';
 
-    $insertionStatement = appendDataToInsertionStatement($insertionStatement, $resultingData, $length);
+    $insertionStatement = appendDataToInsertionStatement($insertionStatement, $resultingData, $length, $has890);
 
     // insert data
 
     $insert = $conn->query($insertionStatement);
 
     if ($insert && $type == 'zwischenspeicher') {
-        header("Location: ../index.php?saved");
+        header("Location: ../?saved");
+    } else {
+        include 'createPDF.php';
     }
-
-
 
 }
 

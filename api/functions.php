@@ -249,7 +249,7 @@ function sanitizeInput($type, $input) {
  *
  * @return [string] $insertionStatement insertion statement basics
  */
-function buildInsertionStatement($personalnummer, $type, $length) {
+function buildInsertionStatement($personalnummer, $type, $length, $has890) {
 
     $insertionStatement = 'INSERT INTO `' .$_SESSION['personalnummer']. '_' .$type. '`
     (`day`, `created`, `startTimestamp`, `endTimestamp`, `minutesWorked`, `frühstückspause`, `mittagspause`, `außer-haus`, ';
@@ -257,6 +257,10 @@ function buildInsertionStatement($personalnummer, $type, $length) {
 
     for ($i = 1; $i <= $length; $i += 1) {
         $insertionStatement .= '`kostenstelle-' .$i. '`, `auftragsnummer-' .$i. '`, `kunde-' .$i. '`, `leistungsart-' .$i. '`, `minuten-' .$i. '`, `anzahl-' .$i . '`, `materialnummer-' .$i. '`, ';
+    }
+
+    if ($has890 > 0) {
+        $insertionStatement .= '`minuten-890`, ';
     }
 
     return $insertionStatement;
@@ -271,7 +275,7 @@ function buildInsertionStatement($personalnummer, $type, $length) {
  *
  * @return [string] $insertionStatement new insertion statement with data appended
  */
-function appendDataToInsertionStatement($insertionStatement, $data, $length) {
+function appendDataToInsertionStatement($insertionStatement, $data, $length, $has890) {
 
     $posten = [
       'kostenstelle',
@@ -302,7 +306,28 @@ function appendDataToInsertionStatement($insertionStatement, $data, $length) {
         }
     }
 
+    if ($has890 > 0) {
+        $insertionStatement .= $has890. ',';
+    }
+
     return substr($insertionStatement, 0, -1). ');';
+}
+
+/**
+ * Creates new FPDI object, imports template, font and returns object
+ *
+ * @return [object] $pdf FPDI object
+ */
+function returnPDFBasics() {
+    $pdf = new FPDI();
+    $pageCount = $pdf->setSourceFile('template.pdf');
+    $tplIdx = $pdf->importPage(1);
+    $pdf->AddFont('Roboto-Regular', '', 'Roboto-Regular.php');
+    $pdf->AddPage();
+    $pdf->SetFont('Roboto-Regular', '', 10);
+    $pdf->useTemplate($tplIdx, 0, 0, 210, 297);
+
+    return $pdf;
 }
 
 ?>

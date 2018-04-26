@@ -15,7 +15,7 @@ if(isset($_POST['personalnummer'])) {
         $searchForUser = $conn->query($searchForUserQuery);
 
         if ($searchForUser->num_rows == 1) {
-          while ($data = $searchForUser->fetch_assoc()) {
+            while ($data = $searchForUser->fetch_assoc()) {
 
                 session_start();
                 $_SESSION['personalnummer'] = $personalnummer;
@@ -23,7 +23,7 @@ if(isset($_POST['personalnummer'])) {
                 $_SESSION['arbeitszeit'] = $data['arbeitszeit'];
 
                 header('Location: ../index.php');
-          }
+            }
         }
 
 
