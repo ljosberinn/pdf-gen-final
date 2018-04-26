@@ -55,12 +55,15 @@ if (isset($_POST)) {
     session_start();
 
     include 'functions.php';
+    include 'db.php';
 
     if (isset($_POST['now'])) {
-        $table = $_SESSION['personalnummer']. '_archiv';
+        $type = 'archiv';
     } else if (isset($_POST['later'])) {
-        $table = $_SESSION['personalnummer']. '_zwischenspeicher';
+        $type = 'zwischenspeicher';
     }
+
+    $getCreationStatement = getCreationStatement($type, $_SESSION['personalnummer']);
 
     $created = time('now');
     $day = returnUnixTSFromDate($_POST['datum']);
@@ -70,10 +73,22 @@ if (isset($_POST)) {
 
     if ($_POST['frühstückspause'] == 'on') {
         $minutesWorked -= 15;
+        $frühstückspause = 1;
+    } else {
+        $frühstückspause = 0;
     }
 
     if ($_POST['mittagspause'] == 'on') {
         $minutesWorked -= 30;
+        $mittagspause = 1;
+    } else {
+        $mittagspause = 0;
+    }
+
+    $außerHaus = $_POST['außer-haus'];
+
+    if ($außerHaus == "") {
+        $außerHaus = 0;
     }
 
     $resultingData = [];
@@ -106,7 +121,10 @@ if (isset($_POST)) {
       'created',
       'startTimestamp',
       'endTimestamp',
-      'minutesWorked'
+      'minutesWorked',
+      'frühstückspause',
+      'mittagspause',
+      'außerHaus',
     ];
 
     foreach ($secondaryInformation as $var) {
@@ -117,12 +135,29 @@ if (isset($_POST)) {
         $resultingData[$var] = ${$var};
     }
 
-    echo '<pre>';
+    $conn = new mysqli($host, $user, $password, $database);
+    $conn->set_charset('utf8');
 
-    echo '<script>console.log(' .json_encode($resultingData, JSON_NUMERIC_CHECK). ');</script>';
+    // create new table if not existing
+    $createTable = $conn->query($getCreationStatement);
 
-    echo '</pre>';
+    // build data
 
+    $length = count($resultingData['minuten']);
+
+    $insertionStatement = buildInsertionStatement($_SESSION['personalnummer'], $type, $length);
+
+    $insertionStatement = substr($insertionStatement, 0, -2). ') VALUES(' .$day. ', ' .$created. ', ' .$startTimestamp. ', ' .$endTimestamp. ', ' .$minutesWorked. ', ' .$frühstückspause. ', ' .$mittagspause. ', ' .$außerHaus. ', ';
+
+    $insertionStatement = appendDataToInsertionStatement($insertionStatement, $resultingData, $length);
+
+    // insert data
+
+    $insert = $conn->query($insertionStatement);
+
+    if ($insert && $type == 'zwischenspeicher') {
+        header("Location: ../index.php?saved");
+    }
 
 
 

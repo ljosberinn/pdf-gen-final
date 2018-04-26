@@ -180,5 +180,129 @@ function returnUnixTSFromDate($date)
     return mktime($parseDate['hour'], $parseDate['minute'], 0, $parseDate['month'], $parseDate['day'], $parseDate['year']);
 }
 
+/**
+ * Returns individualised table creation statement
+ *
+ * @param [int] $personalnummer current session personalnummer
+ *
+ * @return [string] $statement sql statement
+ */
+function getCreationStatement($type, $personalnummer) {
+    $statement = 'CREATE TABLE IF NOT EXISTS `' .$personalnummer. '_' .$type. '` (
+        `day` int(10) NOT NULL,
+        `created` int(10) NOT NULL,
+        `startTimestamp` int(10) NOT NULL,
+        `endTimestamp` int(10) NOT NULL,
+        `minutesWorked` mediumint(4) NOT NULL,
+        `frühstückspause` tinyint(1) NOT NULL,
+        `mittagspause` tinyint(1) NOT NULL,
+        `außer-haus` mediumint(4) NOT NULL,';
+
+    for ($i = 1; $i <= 22; $i += 1) {
+        $statement .= '
+        `kostenstelle-' .$i. '` mediumint(3) NOT NULL,
+        `auftragsnummer-' .$i. '` int(10) NOT NULL,
+        `kunde-' .$i. '` varchar(255) NOT NULL,
+        `leistungsart-' .$i. '` mediumint(3) NOT NULL,
+        `minuten-' .$i. '` mediumint(4) NOT NULL,
+        `anzahl-' .$i. '` int(10) NOT NULL,
+        `materialnummer-' .$i. '` int(10) NOT NULL,';
+    }
+
+    $statement .= '
+        `kostenstelle-890` mediumint(3) NOT NULL DEFAULT "890",
+        `leistungsart-890` mediumint(3) NOT NULL DEFAULT "996",
+        `minuten-890` mediumint(3) NOT NULL,
+        UNIQUE KEY `day` (`day`)
+    )';
+
+    return $statement;
+}
+
+/**
+ * Returns 0 for supposedly numeric, but empty values and '' for string values
+ *
+ * @param [string] $type column name
+ * @param [string] $input value
+ *
+ * @return void
+ */
+function sanitizeInput($type, $input) {
+
+    if ($input == '') {
+      if ($type != 'kunde') {
+        return 0;
+      } else {
+        return $input;
+      }
+    } else {
+      return $input;
+    }
+}
+
+/**
+ * Returns individualized insertion statement based on input
+ *
+ * @param [integer] $personalnummer current session personalnummer
+ * @param [string]  $type           archiv or zwischenspeicher
+ * @param [integer] $length         amount of rows
+ *
+ * @return [string] $insertionStatement insertion statement basics
+ */
+function buildInsertionStatement($personalnummer, $type, $length) {
+
+    $insertionStatement = 'INSERT INTO `' .$_SESSION['personalnummer']. '_' .$type. '`
+    (`day`, `created`, `startTimestamp`, `endTimestamp`, `minutesWorked`, `frühstückspause`, `mittagspause`, `außer-haus`, ';
+
+
+    for ($i = 1; $i <= $length; $i += 1) {
+        $insertionStatement .= '`kostenstelle-' .$i. '`, `auftragsnummer-' .$i. '`, `kunde-' .$i. '`, `leistungsart-' .$i. '`, `minuten-' .$i. '`, `anzahl-' .$i . '`, `materialnummer-' .$i. '`, ';
+    }
+
+    return $insertionStatement;
+}
+
+/**
+ * Appends individual data to insertion statement
+ *
+ * @param [string]  $insertionStatement current insertionStatement returned from buildInsertionStatement()
+ * @param [array]   $data               grouped $_POST data
+ * @param [integer] $length             amount of rows
+ *
+ * @return [string] $insertionStatement new insertion statement with data appended
+ */
+function appendDataToInsertionStatement($insertionStatement, $data, $length) {
+
+    $posten = [
+      'kostenstelle',
+      'auftragsnummer',
+      'kunde',
+      'leistungsart',
+      'minuten',
+      'anzahl',
+      'materialnummer',
+    ];
+
+    for ($i = 0; $i <= ($length - 1); $i += 1) {
+
+        if ($data['minuten'][$i] != "") {
+
+            foreach ($posten as $var) {
+                ${$var} = sanitizeInput($var, $data[$var][$i]);
+            }
+
+            $insertionStatement .= '
+            ' .$kostenstelle. ',
+            ' .$auftragsnummer. ',
+            "' .$kunde. '",
+            ' .$leistungsart. ',
+            ' .$minuten. ',
+            ' .$anzahl. ',
+            ' .$materialnummer. ',';
+        }
+    }
+
+    return substr($insertionStatement, 0, -1). ');';
+}
 
 ?>
