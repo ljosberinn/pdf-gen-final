@@ -1,6 +1,20 @@
 let gearbeiteteMinuten = 0;
 let arbeitszeit = 0;
 
+function addAußerHausEventListener() {
+  const außerHausEl = $('#außer-haus')[0];
+
+  außerHausEl.addEventListener('input', function() {
+    const außerHausVal = extractInputVal(außerHausEl);
+    if (außerHausVal > 0) {
+      arbeitszeitCalculator();
+      arbeitszeit -= außerHausVal;
+      update890Row();
+      updateArbeitszeitValues();
+    }
+  });
+}
+
 /**
  *  Fügt eine neue Zeile hinzu
  *
@@ -227,13 +241,25 @@ function toggleTab(selectedNav, targetId) {
   switchActiveModule(targetId);
 }
 
+function extractInputVal(el) {
+  let val = 0;
+
+  val = parseInt($(el).val(), 10);
+
+  if (!isNaN(val)) {
+    return val;
+  } else {
+    return 0;
+  }
+}
+
 /**
  * Summiert Minuten
  *
  */
 function minutesCalculator() {
   const resultTarget = $('#tagessumme');
-  const elements = [$('#außer-haus')];
+  const elements = [];
   let result = 0;
 
   $.each($('[id^="minuten-"]'), (i, el) => {
@@ -242,13 +268,7 @@ function minutesCalculator() {
 
   $.each(elements, (i, el) => {
     if (el.id !== 'minuten-890') {
-      let val = 0;
-
-      val = parseInt($(el).val(), 10);
-
-      if (!isNaN(val)) {
-        result += val;
-      }
+      result += extractInputVal(el);
     }
   });
 
@@ -374,7 +394,7 @@ function minutesCalculatorEventListenerHelper(nextRowId) {
   if (nextRowId) {
     minutesCalculatorEventListener($(`#minuten-${nextRowId}`)[0]);
   } else {
-    const els = [$('#außer-haus')[0]];
+    const els = [];
 
     $.each($("[id^='minuten-']"), (i, el) => {
       els.push(el);
@@ -596,6 +616,8 @@ function addEventListeners() {
   );
 
   addPausenListener();
+
+  addAußerHausEventListener();
 
   minutesCalculatorEventListenerHelper();
 }
