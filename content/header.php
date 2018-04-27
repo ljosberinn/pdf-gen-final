@@ -38,6 +38,13 @@
             'href'        => '',
             'login'       => 'required',
           ],
+          'Urlaub' => [
+            'id'          => 'nav-vacation',
+            'class'       => 'navbar-item',
+            'data-target' => 'vacation',
+            'href'        => '',
+            'login'       => 'required',
+          ],
           'Statistiken' => [
             'id'          => 'nav-stats',
             'class'       => 'navbar-item',

@@ -183,11 +183,13 @@ function returnUnixTSFromDate($date)
 /**
  * Returns individualised table creation statement
  *
- * @param [int] $personalnummer current session personalnummer
+ * @param [string] $type           table type
+ * @param [int]    $personalnummer current session personalnummer
  *
  * @return [string] $statement sql statement
  */
-function getCreationStatement($type, $personalnummer) {
+function getCreationStatement($type, $personalnummer)
+{
     $statement = 'CREATE TABLE IF NOT EXISTS `' .$personalnummer. '_' .$type. '` (
         `day` int(10) NOT NULL,
         `created` int(10) NOT NULL,
@@ -206,12 +208,12 @@ function getCreationStatement($type, $personalnummer) {
         `leistungsart-' .$i. '` mediumint(3) NOT NULL,
         `minuten-' .$i. '` mediumint(4) NOT NULL,
         `anzahl-' .$i. '` int(10) NOT NULL,
-        `materialnummer-' .$i. '` int(10) NOT NULL,';
+        `materialnummer-' .$i. '` int(10) NOT NULL, ';
     }
 
     $statement .= '
         `kostenstelle-890` mediumint(3) NOT NULL DEFAULT "890",
-        `leistungsart-890` mediumint(3) NOT NULL DEFAULT "996",
+        `leistungsart-890` mediumint(3) NOT NULL DEFAULT "998",
         `minuten-890` mediumint(3) NOT NULL,
         UNIQUE KEY `day` (`day`)
     )';
@@ -222,21 +224,22 @@ function getCreationStatement($type, $personalnummer) {
 /**
  * Returns 0 for supposedly numeric, but empty values and '' for string values
  *
- * @param [string] $type column name
+ * @param [string] $type  column name
  * @param [string] $input value
  *
  * @return void
  */
-function sanitizeInput($type, $input) {
+function sanitizeInput($type, $input)
+{
 
     if ($input == '') {
-      if ($type != 'kunde') {
-        return 0;
-      } else {
-        return $input;
-      }
+        if ($type != 'kunde') {
+            return 0;
+        } else {
+            return $input;
+        }
     } else {
-      return $input;
+        return $input;
     }
 }
 
@@ -246,12 +249,14 @@ function sanitizeInput($type, $input) {
  * @param [integer] $personalnummer current session personalnummer
  * @param [string]  $type           archiv or zwischenspeicher
  * @param [integer] $length         amount of rows
+ * @param [int]     $has890         value of 23rd row
  *
  * @return [string] $insertionStatement insertion statement basics
  */
-function buildInsertionStatement($personalnummer, $type, $length, $has890) {
+function buildInsertionStatement($personalnummer, $type, $length, $has890)
+{
 
-    $insertionStatement = 'INSERT INTO `' .$_SESSION['personalnummer']. '_' .$type. '`
+    $insertionStatement = 'INSERT INTO `' .$personalnummer. '_' .$type. '`
     (`day`, `created`, `startTimestamp`, `endTimestamp`, `minutesWorked`, `frühstückspause`, `mittagspause`, `außer-haus`, ';
 
 
@@ -272,10 +277,12 @@ function buildInsertionStatement($personalnummer, $type, $length, $has890) {
  * @param [string]  $insertionStatement current insertionStatement returned from buildInsertionStatement()
  * @param [array]   $data               grouped $_POST data
  * @param [integer] $length             amount of rows
+ * @param [integer] $has890             value of 23rd row
  *
  * @return [string] $insertionStatement new insertion statement with data appended
  */
-function appendDataToInsertionStatement($insertionStatement, $data, $length, $has890) {
+function appendDataToInsertionStatement($insertionStatement, $data, $length, $has890)
+{
 
     $posten = [
       'kostenstelle',
@@ -318,7 +325,8 @@ function appendDataToInsertionStatement($insertionStatement, $data, $length, $ha
  *
  * @return [object] $pdf FPDI object
  */
-function returnPDFBasics() {
+function returnPDFBasics()
+{
     $pdf = new FPDI();
     $pageCount = $pdf->setSourceFile('template.pdf');
     $tplIdx = $pdf->importPage(1);
@@ -330,4 +338,44 @@ function returnPDFBasics() {
     return $pdf;
 }
 
+/**
+ * Returns average start time according to previous database entries
+ *
+ * @param [object]  $conn           database connection
+ * @param [integer] $personalnummer current $personalnummer
+ *
+ * @return [string] $startAvg average start time of the day
+ */
+function returnAverageStartTime($conn, $personalnummer)
+{
+    $getStartEndAverages = 'SELECT ROUND(AVG(`startTimestamp`-  `day`)) AS `start` FROM `' .$personalnummer. '_archiv`';
+    $startEndAverages = $conn->query($getStartEndAverages);
+
+    if ($startEndAverages->num_rows == 1) {
+        while ($data = $startEndAverages->fetch_assoc()) {
+
+            $hourNonFloored = $data['start'] / 3600;
+            $hour = floor($hourNonFloored);
+            $minutes = round(($hourNonFloored - $hour) * 60);
+
+            $checkStrlen = [
+              'hour',
+              'minutes',
+            ];
+
+            foreach ($checkStrlen as $varName) {
+                if (strlen(${$varName}) == 1) {
+                    ${$varName} = '0' .${$varName};
+                }
+            }
+
+            $startAvg = $hour. ':' .$minutes;
+
+        }
+    } else {
+        $startAvg = '08:00';
+    }
+
+    return $startAvg;
+}
 ?>

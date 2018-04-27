@@ -5,19 +5,89 @@ session_start();
 require 'fpdf181/fpdf.php';
 require 'fpdi161/fpdi.php';
 
+
 /**
  * Alle in dieser Datei erwähnten eigenen <public methods> (placeKostenstelle, placePersonalnummer, etc.) sind in /fpdi161/fpdi.php am Ende angefügt (ab Zeile 691)
  */
 
+if (isset($_POST['pdfId'])) {
+    include 'db.php';
+    include 'functions.php';
+
+    $conn = new mysqli($host, $user, $password, $database);
+    $conn->set_charset('utf8');
+
+    $getPDFDataQuery = 'SELECT * FROM `' .$_SESSION['personalnummer']. '_archiv` WHERE `day` = ' .$_POST['pdfId'];
+    $getPDFData = $conn->query($getPDFDataQuery);
+
+    $data = $resultingData = [];
+
+    if ($getPDFData->num_rows == 1) {
+        while ($dataset = $getPDFData->fetch_assoc()) {
+            array_push($data, $dataset);
+        }
+    }
+
+    $data = $data[0];
+
+    $posten = [
+      'kostenstelle',
+      'auftragsnummer',
+      'kunde',
+      'leistungsart',
+      'minuten',
+      'anzahl',
+      'materialnummer',
+    ];
+
+    foreach ($posten as $name) {
+        ${$name} = [];
+    }
+
+    for ($i = 1; $i <= 22; $i += 1) {
+
+        if (!empty($data['minuten-' .$i])) {
+            foreach ($posten as $var) {
+                if ($data[$var. '-' .$i] != 0) {
+                    array_push(${$var}, $data[$var. '-' .$i]);
+                }
+            }
+        }
+    }
+
+    foreach ($posten as $var) {
+        $resultingData[$var] = ${$var};
+    }
+
+    $secondaryInformation = [
+      'day',
+      'created',
+      'startTimestamp',
+      'endTimestamp',
+      'minutesWorked',
+      'frühstückspause',
+      'mittagspause',
+      'außerHaus',
+    ];
+
+    foreach ($secondaryInformation as $var) {
+        ${$var} = $data[$var];
+        $resultingData[$var] = ${$var};
+    }
+
+    $length = count($resultingData['minuten']);
+}
+
 $pdf = returnPDFBasics();
 
-$date = date('y-m-d', time('now'));
+$date = date('Y-m-d', $day);
 $description = $date. ' - ' .$_SESSION['name'];
 
 $basicMethods = [
-  'SetAuthor'           => $description,
+  'SetAuthor'           => $_SESSION['name'],
   'SetTitle'            => $description,
   'placeName'           => $_SESSION['name'],
+  'SetCreator'          => $_SESSION['name'],
   'placePersonalnummer' => $_SESSION['personalnummer'],
   'placeDate'           => $day,
   'placeStartEndTime'   => [$startTimestamp, $endTimestamp],
@@ -89,6 +159,10 @@ if ($frühstückspause == 0 || $mittagspause == 0) {
     $pdf->placePause($pausenString);
 }
 
-$pdf->output($description, 'I');
+if (isset($_POST['pdfId'])) {
+    $pdf->output($description. '.pdf', 'D');
+} else {
+    $pdf->output($description. '.pdf', 'I');
+}
 
 ?>

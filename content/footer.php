@@ -1,7 +1,12 @@
-<div class="container">
-  <div class="content has-text-centered">
+<?php
+
+if ($_SESSION['personalnummer']) {
+    echo '
     <p>
-      <strong></strong> by <a href="https://gerritalex.de"></a>.
+      Bei Fragen bitte an den Abteilungsleiter wenden.
     </p>
-  </div>
-</div>
+    <a href="https://gerritalex.de">admin@gerritalex.de</a>';
+}
+
+?>
+

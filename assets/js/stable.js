@@ -127,45 +127,27 @@ function returnMittagspauseValue() {
 }
 
 /**
- * Scannt erste #creation-tbody-Zeile nach Inhalten und gibt true zurück, falls alle benötigten Felder ausgefüllt sind
- *
- * @returns {boolean}
- */
-function scanFirstCreationTbodyRow() {
-  const idTemplates = ['kostenstelle-1', 'leistungsart-1', 'minuten-1', 'von', 'bis'];
-  let counter = 0;
-
-  $.each(idTemplates, (i, template) => {
-    if ($(`#${template}`).val() !== '') {
-      counter += 1;
-    }
-  });
-
-  if (counter === idTemplates.length) {
-    return true;
-  }
-
-  return false;
-}
-
-/**
  * Aktiviert oder deaktiviert Buttons abhängig von Werten der ersten #creation-tbody-Zeile
  *
  */
 function toggleSaveButtons() {
-  const hasRequiredValues = scanFirstCreationTbodyRow();
   const buttons = [$('#later'), $('#now')];
-  const isOverCap = gearbeiteteMinuten - arbeitszeit;
+  const inputs = [$('#von'), $('#bis')];
 
-  if (hasRequiredValues && isOverCap > 0) {
-    $.each(buttons, (i, button) => {
-      $(button).disable(true);
-    });
-  } else {
-    $.each(buttons, (i, button) => {
-      $(button).disable(!hasRequiredValues);
-    });
-  }
+  let hasRequiredValues = false;
+
+  $.each(inputs, (i, el) => {
+    const elVal = $(el).val();
+    if (elVal.indexOf(':') !== -1) {
+      hasRequiredValues = true;
+    } else {
+      hasRequiredValues = false;
+    }
+  });
+
+  $.each(buttons, (i, button) => {
+    $(button).disable(!hasRequiredValues);
+  });
 }
 
 /**
@@ -276,7 +258,6 @@ function minutesCalculator() {
 
   update890Row();
   updateTagessumme();
-  toggleSaveButtons();
 
   resultTarget.val(result);
 }
@@ -409,23 +390,6 @@ function minutesCalculatorEventListenerHelper(nextRowId) {
 }
 
 /**
- * Fügt der neu hinzugefügten Reihe die üblichen EventListener hinzu
- *
- * @param {number} nextRowId
- */
-function addTREventListeners(nextRowId) {
-  $.each($(`[id*="-${nextRowId}"]`), (i, el) => {
-    if (i !== 5) {
-      el.addEventListener('input', () => {
-        toggleContentRemoveButton();
-        toggleSaveButtons();
-      });
-    }
-  });
-  minutesCalculatorEventListenerHelper(nextRowId);
-}
-
-/**
  * Setzt Tabelle zurück
  *
  */
@@ -496,6 +460,7 @@ function initDateAndTimePicker() {
       minutesCalculator();
       updateArbeitszeitValues();
       toggleContentRemoveButton();
+      toggleSaveButtons();
     });
   });
 
@@ -599,15 +564,6 @@ function addEventListeners() {
     removeContent();
   });
 
-  $.each($('#creation-tbody input'), (i, el) => {
-    el.addEventListener('input', () => {
-      toggleContentRemoveButton();
-      if (el.id.indexOf('minuten') == -1) {
-        toggleSaveButtons();
-      }
-    });
-  });
-
   arbeitszeit = parseInt(
     $('#arbeitszeit')
       .val()
@@ -620,6 +576,10 @@ function addEventListeners() {
   addAußerHausEventListener();
 
   minutesCalculatorEventListenerHelper();
+
+  $('#perm-save-toggler')[0].addEventListener('click', () => {
+    unhidePermSaveTRs();
+  });
 }
 
 $(document).ready(() => {
@@ -629,3 +589,14 @@ $(document).ready(() => {
 
   initDateAndTimePicker();
 });
+
+function unhidePermSaveTRs() {
+  $.each($('#perm-save tr'), (i, el) => {
+    const tr = $(el);
+    if (tr.hasClass('hidden-tr')) {
+      tr.removeClass('hidden-tr');
+    }
+  });
+
+  $('#perm-save-tr').remove();
+}

@@ -1,7 +1,8 @@
 #temp-save,
 #perm-save,
 #statistics,
-#options {
+#options,
+.hidden-tr {
   display: none;
 }
 

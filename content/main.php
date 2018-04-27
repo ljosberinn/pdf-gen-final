@@ -12,6 +12,7 @@ if (empty($_SESSION['personalnummer'])) {
       'tempSave',
       'permSave',
       'statistics',
+      'vacation',
       'options',
     ];
 }

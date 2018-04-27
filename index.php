@@ -24,6 +24,7 @@ require 'api/functions.php';
 setHeaders();
 
 session_start();
+setlocale(LC_TIME, 'de_DE');
 
 if (isset($_GET['logout']) && !empty($_SESSION['personalnummer'])) {
     session_destroy();
@@ -68,21 +69,15 @@ if (isset($_GET['logout']) && !empty($_SESSION['personalnummer'])) {
     <?php
 
     $coreTags = [
-      'header' => [
-        'class' => '',
-      ],
-      'main' => [
-        'class' => 'container',
-      ],
-      'footer' => [
-        'class' => 'footer',
-      ],
+      'header' => '',
+      'main' => 'container',
+      'footer' => 'footer has-text-centered',
     ];
 
-    foreach ($coreTags as $tag => $specifications) {
+    foreach ($coreTags as $tag => $class) {
 
-        if (!empty($specifications['class'])) {
-            $class = 'class="' .$specifications['class']. '"';
+        if (!empty($class)) {
+            $class = 'class="' .$class. '"';
         } else {
             $class = '';
         }

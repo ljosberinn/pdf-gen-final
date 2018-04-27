@@ -21,6 +21,7 @@ if(isset($_POST['personalnummer'])) {
                 $_SESSION['personalnummer'] = $personalnummer;
                 $_SESSION['name'] = $data['name'];
                 $_SESSION['arbeitszeit'] = $data['arbeitszeit'];
+                $_SESSION['startAvg'] = returnAverageStartTime($conn, $personalnummer);
 
                 header('Location: ../index.php');
             }

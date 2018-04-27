@@ -39,7 +39,7 @@ foreach ($tableColumnKeys as $tableColumnKey) {
         <div class="field">
           <div class="control">
             <label for="von" class="label heading">Von </label>
-            <input id="von" name="von" class="input" required />
+            <input id="von" name="von" class="input" required value="<?php echo $_SESSION['startAvg']; ?>" />
           </div>
         </div>
       </div>
@@ -175,7 +175,7 @@ foreach ($tableColumnKeys as $tableColumnKey) {
           <td>
             <div class="field">
               <div class="control">
-                <input id="leistungsart-890" name="leistungsart-890" class="input" readonly type="text" value="997" />
+                <input id="leistungsart-890" name="leistungsart-890" class="input" readonly type="text" value="998" />
               </div>
             </div>
           </td>
