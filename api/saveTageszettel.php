@@ -2,120 +2,130 @@
 
 if (isset($_POST)) {
 
-    session_start();
+  session_start();
 
-    include 'functions.php';
-    include 'db.php';
+  include 'functions.php';
+  include 'db.php';
 
-    if (isset($_POST['now'])) {
-        $type = 'archiv';
-    } else if (isset($_POST['later'])) {
-        $type = 'zwischenspeicher';
+  if (isset($_POST['now'])) {
+    $type = 'archiv';
+  } else if (isset($_POST['later'])) {
+    $type = 'zwischenspeicher';
+  }
+
+  if ($_POST['minuten-890'] != 0) {
+    $has890 = $_POST['minuten-890'];
+  } else {
+    $has890 = 0;
+  }
+
+  $getCreationStatement = getCreationStatement($type, $_SESSION['personalnummer']);
+
+  $created = time('now');
+  $day = returnUnixTSFromDate($_POST['datum']);
+  $startTimestamp = returnUnixTSFromDate($_POST['datum']. ' ' .$_POST['von']);
+  $endTimestamp = returnUnixTSFromDate($_POST['datum']. ' ' .$_POST['bis']);
+  $minutesWorked = ($endTimestamp-$startTimestamp) / 60;
+
+  if ($_POST['frühstückspause'] == 'on') {
+    $minutesWorked -= 15;
+    $frühstückspause = 1;
+  } else {
+    $frühstückspause = 0;
+  }
+
+  if ($_POST['mittagspause'] == 'on') {
+    $minutesWorked -= 30;
+    $mittagspause = 1;
+  } else {
+    $mittagspause = 0;
+  }
+
+  $außerHaus = $_POST['außer-haus'];
+
+  if ($außerHaus == "") {
+    $außerHaus = 0;
+  }
+
+  $resultingData = [];
+
+  $posten = [
+    'kostenstelle',
+    'auftragsnummer',
+    'kunde',
+    'leistungsart',
+    'minuten',
+    'anzahl',
+    'materialnummer',
+  ];
+
+  foreach ($posten as $name) {
+    ${$name} = [];
+  }
+
+  for ($i = 1; $i <= 22; $i += 1) {
+
+    if (!empty($_POST["minuten-" .$i])) {
+      foreach ($posten as $var) {
+        array_push(${$var}, $_POST[$var. '-' .$i]);
+      }
     }
+  }
 
-    if ($_POST['minuten-890'] != 0) {
-        $has890 = $_POST['minuten-890'];
-    } else {
-        $has890 = 0;
-    }
+  $secondaryInformation = [
+    'day',
+    'created',
+    'startTimestamp',
+    'endTimestamp',
+    'minutesWorked',
+    'frühstückspause',
+    'mittagspause',
+    'außerHaus',
+  ];
 
-    $getCreationStatement = getCreationStatement($type, $_SESSION['personalnummer']);
+  foreach ($secondaryInformation as $var) {
+    array_push($posten, $var);
+  }
 
-    $created = time('now');
-    $day = returnUnixTSFromDate($_POST['datum']);
-    $startTimestamp = returnUnixTSFromDate($_POST['datum']. ' ' .$_POST['von']);
-    $endTimestamp = returnUnixTSFromDate($_POST['datum']. ' ' .$_POST['bis']);
-    $minutesWorked = ($endTimestamp-$startTimestamp) / 60;
+  foreach ($posten as $var) {
+    $resultingData[$var] = ${$var};
+  }
 
-    if ($_POST['frühstückspause'] == 'on') {
-        $minutesWorked -= 15;
-        $frühstückspause = 1;
-    } else {
-        $frühstückspause = 0;
-    }
+  $conn = new mysqli($host, $user, $password, $database);
+  $conn->set_charset('utf8');
 
-    if ($_POST['mittagspause'] == 'on') {
-        $minutesWorked -= 30;
-        $mittagspause = 1;
-    } else {
-        $mittagspause = 0;
-    }
+  // create new table if not existing
+  $createTable = $conn->query($getCreationStatement);
 
-    $außerHaus = $_POST['außer-haus'];
+  // build data
 
-    if ($außerHaus == "") {
-        $außerHaus = 0;
-    }
+  $length = count($resultingData['minuten']);
 
-    $resultingData = [];
+  $insertionStatement = buildInsertionStatement($_SESSION['personalnummer'], $type, $length, $has890);
 
-    $posten = [
-      'kostenstelle',
-      'auftragsnummer',
-      'kunde',
-      'leistungsart',
-      'minuten',
-      'anzahl',
-      'materialnummer',
-    ];
+  $insertionStatement = substr($insertionStatement, 0, -2). ') VALUES(' .$day. ', ' .$created. ', ' .$startTimestamp. ', ' .$endTimestamp. ', ' .$minutesWorked. ', ' .$frühstückspause. ', ' .$mittagspause. ', ' .$außerHaus. ', ';
 
-    foreach ($posten as $name) {
-        ${$name} = [];
-    }
+  $insertionStatement = appendDataToInsertionStatement($insertionStatement, $resultingData, $length, $has890);
 
-    for ($i = 1; $i <= 22; $i += 1) {
+  // kill previous data if existing
 
-        if (!empty($_POST["minuten-" .$i])) {
-            foreach ($posten as $var) {
-                array_push(${$var}, $_POST[$var. '-' .$i]);
-            }
-        }
-    }
+  $tables = ['archiv', 'zwischenspeicher'];
 
-    $secondaryInformation = [
-      'day',
-      'created',
-      'startTimestamp',
-      'endTimestamp',
-      'minutesWorked',
-      'frühstückspause',
-      'mittagspause',
-      'außerHaus',
-    ];
+  foreach($tables as $table) {
+    $deletionStatement =  "DELETE FROM `" .$_SESSION['personalnummer']. "_" .$table. "`  WHERE `day` = " .$day. "";
+    $deletion = $conn->query($deletionStatement);
+  }
 
-    foreach ($secondaryInformation as $var) {
-        array_push($posten, $var);
-    }
 
-    foreach ($posten as $var) {
-        $resultingData[$var] = ${$var};
-    }
+  // insert data
 
-    $conn = new mysqli($host, $user, $password, $database);
-    $conn->set_charset('utf8');
+  $insert = $conn->query($insertionStatement);
 
-    // create new table if not existing
-    $createTable = $conn->query($getCreationStatement);
-
-    // build data
-
-    $length = count($resultingData['minuten']);
-
-    $insertionStatement = buildInsertionStatement($_SESSION['personalnummer'], $type, $length, $has890);
-
-    $insertionStatement = substr($insertionStatement, 0, -2). ') VALUES(' .$day. ', ' .$created. ', ' .$startTimestamp. ', ' .$endTimestamp. ', ' .$minutesWorked. ', ' .$frühstückspause. ', ' .$mittagspause. ', ' .$außerHaus. ', ';
-
-    $insertionStatement = appendDataToInsertionStatement($insertionStatement, $resultingData, $length, $has890);
-
-    // insert data
-
-    $insert = $conn->query($insertionStatement);
-
-    if ($insert && $type == 'zwischenspeicher') {
-        header("Location: ../?saved");
-    } else {
-        include 'createPDF.php';
-    }
+  if ($insert && $type == 'zwischenspeicher') {
+    header("Location: ../?saved");
+  } else {
+    include 'createPDF.php';
+  }
 
 }
 

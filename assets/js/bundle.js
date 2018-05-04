@@ -1,17 +1,67 @@
 'use strict';
 
-$.each($('.edit-btn'), function(i, el) {
+function insertValueToSameElement(target, value) {
+  0 != value && $(target).val(value);
+}
+function addEditEventListener(el, mode) {
   el.addEventListener('click', function() {
-    var element = $(el),
-      pdfId = element.val();
     $.getJSON({
       url: 'api/editPDF.php',
+      data: { pdfId: $(el).val(), mode: mode },
       success: function success(response) {
-        console.log(response);
+        console.log(response),
+          $('#nav-new')[0].click(),
+          $('#datepicker').val(response.day),
+          $('#von').val(response.startTimestamp),
+          $('#bis').val(response.endTimestamp);
+        var _ref = [
+            [
+              'kostenstelle',
+              'auftragsnummer',
+              'kunde',
+              'leistungsart',
+              'minuten',
+              'anzahl',
+              'materialnummer',
+            ],
+            $('#frühstückspause'),
+            $('#mittagspause'),
+          ],
+          fieldNames = _ref[0],
+          frühstückspause = _ref[1],
+          mittagspause = _ref[2];
+        0 === response.mittagspause
+          ? mittagspause.prop('checked', !1)
+          : mittagspause.prop('checked', !0),
+          0 === response.frühstückspause
+            ? frühstückspause.prop('checked', !1)
+            : frühstückspause.prop('checked', !0),
+          response['außer-haus'] > 0 && $('#außer-haus').val(response['außer-haus']);
+        var _loop = function _loop(i) {
+          0 != response['minuten-' + i] &&
+            (i > 5 && addTR(),
+            $.each(fieldNames, function(k, fieldName) {
+              var target = fieldName + '-' + i;
+              insertValueToSameElement('#' + target, response[target]);
+            }));
+        };
+
+        for (var i = 1; i <= 22; i += 1) {
+          _loop(i);
+        }
+        var updateStaticFns = [
+          arbeitszeitCalculator,
+          updateArbeitszeitValues,
+          minutesCalculator,
+          toggleSaveButtons,
+        ];
+        $.each(updateStaticFns, function(i) {
+          updateStaticFns[i]();
+        });
       },
     });
   });
-});
+}
 ('use strict');
 
 var gearbeiteteMinuten = 0,
@@ -214,10 +264,11 @@ function addPausenListener() {
     pausenzeiten = [15, 30];
   $.each(checkboxes, function(i, el) {
     el.change(function() {
-      this.checked ? (arbeitszeit -= pausenzeiten[i]) : (arbeitszeit += pausenzeiten[i]),
-        minutesCalculator(),
-        arbeitszeitCalculator(),
-        updateArbeitszeitValues();
+      this.checked ? (arbeitszeit -= pausenzeiten[i]) : (arbeitszeit += pausenzeiten[i]);
+      var updateStaticFns = [minutesCalculator, arbeitszeitCalculator, updateArbeitszeitValues];
+      $.each(updateStaticFns, function(i) {
+        updateStaticFns[i]();
+      });
     });
   });
 }
@@ -266,11 +317,16 @@ function initDateAndTimePicker() {
   $.each([von, bis], function(i, el) {
     el.timepicker({ timeFormat: 'G:i', step: 5, forceRoundTime: !0 }),
       el.on('change', function() {
-        arbeitszeitCalculator(),
-          minutesCalculator(),
-          updateArbeitszeitValues(),
-          toggleContentRemoveButton(),
-          toggleSaveButtons();
+        var updateStaticFns = [
+          arbeitszeitCalculator,
+          minutesCalculator,
+          updateArbeitszeitValues,
+          toggleContentRemoveButton,
+          toggleSaveButtons,
+        ];
+        $.each(updateStaticFns, function(i) {
+          updateStaticFns[i]();
+        });
       });
   }),
     von.timepicker('option', { setTime: '08:00', scrollDefault: '08:05' }),
@@ -331,21 +387,32 @@ function addEventListeners() {
         .val()
         .replace(/von /, ''),
       10,
-    )),
-    addPausenListener(),
-    addAußerHausEventListener(),
-    minutesCalculatorEventListenerHelper(),
+    ));
+  var execFns = [
+    addPausenListener,
+    addAußerHausEventListener,
+    minutesCalculatorEventListenerHelper,
+  ];
+  $.each(execFns, function(i) {
+    execFns[i]();
+  }),
     $('#perm-save-toggler')[0].addEventListener('click', function() {
       unhidePermSaveTRs();
     }),
     $.each($('.perm-delete-btn'), function(i, el) {
-      addRemovalEventListener(el, 'permanent');
+      addDeletionEventListener(el, 'permanent');
     }),
     $.each($('.temp-delete-btn'), function(i, el) {
-      addRemovalEventListener(el, 'permanent');
+      addDeletionEventListener(el, 'temporary');
+    }),
+    $.each($('.perm-edit-btn'), function(i, el) {
+      addEditEventListener(el, 'permanent');
+    }),
+    $.each($('.temp-edit-btn'), function(i, el) {
+      addEditEventListener(el, 'temporary');
     });
 }
-function addRemovalEventListener(el, mode) {
+function addDeletionEventListener(el, mode) {
   el.addEventListener('click', function() {
     var element = $(el),
       _ref = [element.closest('tr'), element.val()],
@@ -391,5 +458,8 @@ jQuery.fn.extend({
   },
 }),
   $(document).ready(function() {
-    addEventListeners(), setDatepickerDefaultsDE(), initDateAndTimePicker();
+    var execFns = [addEventListeners, setDatepickerDefaultsDE, initDateAndTimePicker];
+    $.each(execFns, function(i) {
+      execFns[i]();
+    });
   });

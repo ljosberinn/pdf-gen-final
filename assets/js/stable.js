@@ -359,9 +359,11 @@ function addPausenListener() {
         arbeitszeit -= pausenzeiten[i];
       }
 
-      minutesCalculator();
-      arbeitszeitCalculator();
-      updateArbeitszeitValues();
+      const updateStaticFns = [minutesCalculator, arbeitszeitCalculator, updateArbeitszeitValues];
+
+      $.each(updateStaticFns, i => {
+        updateStaticFns[i]();
+      });
     });
   });
 }
@@ -456,11 +458,17 @@ function initDateAndTimePicker() {
     });
 
     el.on('change', () => {
-      arbeitszeitCalculator();
-      minutesCalculator();
-      updateArbeitszeitValues();
-      toggleContentRemoveButton();
-      toggleSaveButtons();
+      const updateStaticFns = [
+        arbeitszeitCalculator,
+        minutesCalculator,
+        updateArbeitszeitValues,
+        toggleContentRemoveButton,
+        toggleSaveButtons,
+      ];
+
+      $.each(updateStaticFns, i => {
+        updateStaticFns[i]();
+      });
     });
   });
 
@@ -571,26 +579,38 @@ function addEventListeners() {
     10,
   );
 
-  addPausenListener();
+  const execFns = [
+    addPausenListener,
+    addAußerHausEventListener,
+    minutesCalculatorEventListenerHelper,
+  ];
 
-  addAußerHausEventListener();
-
-  minutesCalculatorEventListenerHelper();
+  $.each(execFns, i => {
+    execFns[i]();
+  });
 
   $('#perm-save-toggler')[0].addEventListener('click', () => {
     unhidePermSaveTRs();
   });
 
   $.each($('.perm-delete-btn'), (i, el) => {
-    addRemovalEventListener(el, 'permanent');
+    addDeletionEventListener(el, 'permanent');
   });
 
   $.each($('.temp-delete-btn'), (i, el) => {
-    addRemovalEventListener(el, 'permanent');
+    addDeletionEventListener(el, 'temporary');
+  });
+
+  $.each($('.perm-edit-btn'), (i, el) => {
+    addEditEventListener(el, 'permanent');
+  });
+
+  $.each($('.temp-edit-btn'), (i, el) => {
+    addEditEventListener(el, 'temporary');
   });
 }
 
-function addRemovalEventListener(el, mode) {
+function addDeletionEventListener(el, mode) {
   el.addEventListener('click', () => {
     const element = $(el);
     const [tr, pdfId] = [element.closest('tr'), element.val()];
@@ -618,11 +638,11 @@ function addRemovalEventListener(el, mode) {
 }
 
 $(document).ready(() => {
-  addEventListeners();
+  const execFns = [addEventListeners, setDatepickerDefaultsDE, initDateAndTimePicker];
 
-  setDatepickerDefaultsDE();
-
-  initDateAndTimePicker();
+  $.each(execFns, i => {
+    execFns[i]();
+  });
 });
 
 function unhidePermSaveTRs() {

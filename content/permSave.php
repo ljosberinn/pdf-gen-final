@@ -3,10 +3,10 @@
 session_start();
 
 $tableColumns = [
-  'Datum'       => 'has-text-right',
-  'von - bis'      => 'has-text-centered',
-  'Pausen & außer Haus'      => '',
-  'Anwesenheit' => 'has-text-right',
+  'Datum'               => 'has-text-right',
+  'von - bis'           => 'has-text-centered',
+  'Pausen & außer Haus' => '',
+  'Anwesenheit'         => 'has-text-right',
 ];
 
 $tableColumnKeys = array_keys($tableColumns);
@@ -44,8 +44,10 @@ foreach ($tableColumns as $rowDescription => $class) {
 
 require 'api/db.php';
 
-$conn = new mysqli($host, $user, $password, $database);
-$conn->set_charset('utf8');
+if(!$conn) {
+  $conn = new mysqli($host, $user, $password, $database);
+  $conn->set_charset('utf8');
+}
 
 $getAllData = 'SELECT `day`, `startTimestamp`, `endTimestamp`, `frühstückspause`, `mittagspause`, `außer-haus`, `minutesWorked` FROM `' .$_SESSION['personalnummer']. '_archiv` ORDER BY `day` DESC';
 $allData = $conn->query($getAllData);
@@ -71,12 +73,12 @@ foreach ($data as $dataset) {
 
     $pausenAußerHaus = '';
 
-    if ($dataset['frühstückspause'] == 1) {
+    if ($dataset['frühstückspause'] == 0) {
         $pausenAußerHaus .= '<span class="tag is-info">OPA</span> ';
         $frühstückspause += 1;
     }
 
-    if ($dataset['mittagspause'] == 1) {
+    if ($dataset['mittagspause'] == 0) {
         $pausenAußerHaus .= '<span class="tag is-primary">OMI</span> ';
         $mittagspause += 1;
     }
