@@ -44,6 +44,7 @@ if (isset($_GET['logout']) && !empty($_SESSION['personalnummer'])) {
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/timepicker@1.11.12/jquery.timepicker.min.css">
   <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/timepicker@1.11.12/jquery.timepicker.min.js"></script>
+  <script src="https://unpkg.com/sweetalert2@7.19.3/dist/sweetalert2.all.min.js"></script>
 
 
     <?php
@@ -92,8 +93,7 @@ if (isset($_GET['logout']) && !empty($_SESSION['personalnummer'])) {
     }
 
     $lateScripts = [
-      'stable' => 'js',
-      'development' => 'js',
+      'bundle' => 'js',
     ];
 
     appendFiles($lateScripts);

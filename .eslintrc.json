@@ -7,9 +7,6 @@
     "jquery": true
   },
   "parserOptions": {
-    "ecmaFeatures": {
-      "jsx": true
-    },
     "sourceType": "module",
     "ecmaVersion": 6
   },
@@ -22,5 +19,7 @@
     "constructor-super": "warn",
     "valid-typeof": "warn"
   },
-  "globals": {}
+  "globals": {
+    "swal": true
+  }
 }

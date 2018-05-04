@@ -19,9 +19,18 @@ if (isset($_POST['pdfId'])
     $conn = new mysqli($host, $user, $password, $database);
     $conn->set_charset('utf8');
 
-    $deletionStatement = "DELETE FROM `" .$_SESSION['personalnummer']. "_" .$targetTable. "`  WHERE `day` = " .$_POST['pdfId']. "";
-    $deletion = $conn->query($deletionStatement);
+    $selectionStatement = "SELECT * FROM `" .$_SESSION['personalnummer']. "_" .$targetTable. "`  WHERE `day` = " .$_POST['pdfId']. "";
+    $selection = $conn->query($selectionStatement);
 
+    $result = [];
+
+    if ($selection->num_rows == 1) {
+        while ($data = $selection->fetch_assoc()) {
+          array_push($result, $data);
+        }
+    }
+
+    echo json_encode($result, JSON_NUMERIC_CHECK);
 } else {
     header('HTTP/1.0 403 Forbidden');
 }

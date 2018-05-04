@@ -580,6 +580,41 @@ function addEventListeners() {
   $('#perm-save-toggler')[0].addEventListener('click', () => {
     unhidePermSaveTRs();
   });
+
+  $.each($('.perm-delete-btn'), (i, el) => {
+    addRemovalEventListener(el, 'permanent');
+  });
+
+  $.each($('.temp-delete-btn'), (i, el) => {
+    addRemovalEventListener(el, 'permanent');
+  });
+}
+
+function addRemovalEventListener(el, mode) {
+  el.addEventListener('click', () => {
+    const element = $(el);
+    const [tr, pdfId] = [element.closest('tr'), element.val()];
+
+    swal({
+      title: 'Sicher?',
+      text: 'Dieser Tageszettel wird dauerhaft gelöscht.',
+      type: 'warning',
+      showCancelButton: true,
+      cancelButtonText: 'Abbrechen',
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'löschen',
+    }).then(result => {
+      if (result.value) {
+        $.post({
+          url: 'api/deletePDF.php',
+          data: { pdfId: pdfId, mode: mode },
+        });
+
+        tr.fadeOut('fast');
+      }
+    });
+  });
 }
 
 $(document).ready(() => {
@@ -599,4 +634,21 @@ function unhidePermSaveTRs() {
   });
 
   $('#perm-save-tr').remove();
+}
+
+/**
+ * Fügt der neu hinzugefügten Reihe die üblichen EventListener hinzu
+ *
+ * @param {number} nextRowId
+ */
+function addTREventListeners(nextRowId) {
+  $.each($(`[id*="-${nextRowId}"]`), (i, el) => {
+    if (i !== 5) {
+      el.addEventListener('input', () => {
+        toggleContentRemoveButton();
+        toggleSaveButtons();
+      });
+    }
+  });
+  minutesCalculatorEventListenerHelper(nextRowId);
 }

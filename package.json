@@ -1,0 +1,32 @@
+{
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.6.1"
+  },
+  "name": "pdf-gen-final",
+  "version": "1.0.0",
+  "description": "Tageszettelgenerator 3.0 - FINAL",
+  "main": "index.php",
+  "dependencies": {
+    "babel-cli": "^6.26.0",
+    "eslint": "^4.19.1",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-import": "^2.11.0",
+    "npx": "^10.2.0",
+    "babel-preset-minify": "^0.2.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ljosberinn/pdf-gen-final.git"
+  },
+  "keywords": ["pdf", "generator", "tageszettel"],
+  "author": "Gerrit Alex",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ljosberinn/pdf-gen-final/issues"
+  },
+  "homepage": "https://github.com/ljosberinn/pdf-gen-final#readme"
+}
