@@ -18,6 +18,8 @@ module.exports = {
     'no-unused-vars': 'warn',
     'constructor-super': 'warn',
     'valid-typeof': 'warn',
+    'arrow-parens': [2, 'as-needed'],
+    'max-len': ['warn', 150],
   },
   globals: {},
 };

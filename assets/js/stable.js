@@ -1,10 +1,273 @@
 let gearbeiteteMinuten = 0;
 let arbeitszeit = 0;
 
-function addAußerHausEventListener() {
-  const außerHausEl = $('#außer-haus')[0];
+/**
+ * Pflegt Daten des jeweiligen Zettels in Felder ein
+ *
+ * @param {object} response
+ */
+function insertEditData(response) {
+  document.getElementById('nav-new').click();
+  document.getElementById('datepicker').value = response.day;
+  document.getElementById('von').value = response.startTimestamp;
+  document.getElementById('bis').value = response.endTimestamp;
+  document.getElementById('mittagspause').checked = response.mittagspause !== 0;
+  document.getElementById('frühstückspause').checked = response.frühstückspause !== 0;
 
-  außerHausEl.addEventListener('input', function() {
+  const fieldNames = ['kostenstelle', 'auftragsnummer', 'kunde', 'leistungsart', 'minuten', 'anzahl', 'materialnummer'];
+
+  if (response['außer-haus'] > 0) document.getElementById('außer-haus').value = response['außer-haus'];
+
+  for (let i = 1; i <= 22; i += 1) {
+    if (parseInt(response[`minuten-${i}`]) !== 0) {
+      if (i > 5) addTR();
+
+      fieldNames.forEach(fieldName => {
+        const target = `${fieldName}-${i}`;
+        document.getElementById(target).value = response[target];
+      });
+    }
+  }
+
+  arbeitszeitCalculator();
+  updateArbeitszeitValues();
+  minutesCalculator();
+  toggleSaveButtons();
+}
+
+function postData(url, data) {
+  return fetch(url, {
+    body: JSON.stringify(data), // must match 'Content-Type' header
+    cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+    credentials: 'same-origin', // include, same-origin, *omit
+    headers: {
+      'user-agent': 'Mozilla/4.0 MDN Example',
+      'content-type': 'application/json',
+    },
+    method: 'POST', // *GET, POST, PUT, DELETE, etc.
+    mode: 'cors', // no-cors, cors, *same-origin
+    redirect: 'follow', // manual, *follow, error
+    referrer: 'no-referrer', // *client, no-referrer
+  }).then(response => response.json()); // parses response to JSON
+}
+
+/**
+ * Scannt alle #creation-tbody-Felder nach Inhalten und gibt "true" zurück falls etwas eingegeben wurde
+ *
+ * @returns {boolean}
+ */
+function scanInputs() {
+  let hasValue = false;
+
+  const els = [document.getElementById('von'), document.getElementById('bis'), document.getElementById('außer-haus')];
+
+  Array.from(document.querySelectorAll('#creation-tbody input')).forEach(el => els.push(el));
+
+  els.forEach(el => {
+    if (el.value !== '') {
+      hasValue = true;
+    }
+  });
+
+  return hasValue;
+}
+
+/**
+ * Aktiviert oder deaktiviert den "Zeilen leeren"-Button sobald etwas zum leeren vorhanden ist
+ *
+ */
+function toggleContentRemoveButton() {
+  document.getElementById('remove-contents').disabled = !scanInputs();
+}
+
+/**
+ * Färbt Tagessumme abhängig von gearbeiteteMinuten und Arbeitszeit ein
+ *
+ */
+function updateTagessumme() {
+  const tagessumme = document.getElementById('tagessumme').classList;
+
+  gearbeiteteMinuten > arbeitszeit ? tagessumme.add('is-danger') : tagessumme.remove('is-danger');
+}
+
+/**
+ * Aktualisiert den Posten 890
+ *
+ */
+function update890Row() {
+  const minuten890 = arbeitszeit - gearbeiteteMinuten;
+
+  const row890 = $(document.getElementById('tr-890'));
+  const min890 = document.getElementById('minuten-890');
+
+  if (minuten890 === 0) {
+    row890.fadeOut();
+  } else {
+    row890.fadeIn();
+    minuten890 < 0 ? min890.classList.add('is-danger') : min890.classList.remove('is-danger');
+  }
+
+  min890.value = minuten890;
+}
+
+/**
+ *  Gibt den Wert des Elements zurück; 0 falls 0 | NaN
+ *
+ * @param {HTMLElement} el
+ */
+function extractInputVal(el) {
+  let val = 0;
+
+  val = parseInt(el.value);
+
+  if (!isNaN(val)) {
+    return val;
+  }
+  return 0;
+}
+
+/**
+ * Summiert Minuten
+ *
+ */
+function minutesCalculator() {
+  const resultTarget = document.getElementById('tagessumme');
+  let result = 0;
+
+  Array.from(document.querySelectorAll('[id^="minuten-"]')).forEach(el => {
+    if (el.id !== 'minuten-890') result += extractInputVal(el);
+  });
+
+  gearbeiteteMinuten = result;
+
+  update890Row();
+  updateTagessumme();
+
+  resultTarget.value = result;
+}
+
+/**
+ *  Fügt den eigentlichen EventListener hinzu
+ *
+ * @param {object} el [zu verarbeitendes Element]
+ */
+function minutesCalculatorEventListener(el) {
+  el.addEventListener('input', () => {
+    minutesCalculator();
+    toggleContentRemoveButton();
+  });
+}
+
+/**
+ *  Sucht Zeilen ohne EventListener raus und übergibt das jeweilige Element
+ *
+ * @param {number} nextRowId [falls gesetzt, fügt nur der hinzugefügten Zeile einen neuen EventListener hinzu]
+ */
+function minutesCalculatorEventListenerHelper(nextRowId) {
+  if (nextRowId) {
+    minutesCalculatorEventListener(document.getElementById(`#minuten-${nextRowId}`));
+  } else {
+    Array.from(document.querySelectorAll('[id^="minuten-"]')).forEach(el => {
+      if (el.id !== 'minuten-890') minutesCalculatorEventListener(el);
+    });
+  }
+}
+/**
+ * Aktiviert oder deaktiviert Buttons abhängig von Werten der ersten #creation-tbody-Zeile
+ *
+ */
+function toggleSaveButtons() {
+  const buttons = [document.getElementById('later'), document.getElementById('now')];
+  const inputs = [document.getElementById('von'), document.getElementById('bis')];
+
+  let hasRequiredValues = false;
+
+  inputs.forEach(el => (hasRequiredValues = el.value.indexOf(':') !== -1));
+
+  buttons.forEach(button => (button.disabled = !hasRequiredValues));
+}
+
+/**
+ * Fügt der neu hinzugefügten Reihe die üblichen EventListener hinzu
+ *
+ * @param {number} nextRowId
+ */
+function addTREventListeners(nextRowId) {
+  const elements = Array.from(document.querySelectorAll(`[id*="-${nextRowId}"]`));
+
+  elements.forEach(el => {
+    if (elements.indexOf(el) !== 5) {
+      el.addEventListener('input', () => {
+        toggleContentRemoveButton();
+        toggleSaveButtons();
+      });
+    }
+  });
+
+  minutesCalculatorEventListenerHelper(nextRowId);
+}
+
+/**
+ * Aktualisiert Anzeige der derzeitigen Arbeitszeit
+ *
+ */
+function updateArbeitszeitValues() {
+  document.getElementById('arbeitszeit').value = `von ${arbeitszeit}`;
+  document.getElementById('tagessumme').placeholder = arbeitszeit;
+}
+
+/**
+ * Prüft, ob Frühstückspause angeklickt ist und gibt Wert in Minuten zurück
+ *
+ * @returns {number} Wert in Minuten
+ */
+function returnFrühstückspauseValue() {
+  const checkbox = document.getElementById('frühstückspause');
+
+  if (checkbox.checked) {
+    return 15;
+  }
+
+  return 0;
+}
+
+/**
+ * Prüft, ob Mittagspause angeklickt ist und gibt Wert in Minuten zurück
+ *
+ * @returns {number} Wert in Minuten
+ */
+function returnMittagspauseValue() {
+  const checkbox = document.getElementById('mittagspause');
+
+  if (checkbox.checked) {
+    return 30;
+  }
+
+  return 0;
+}
+
+/**
+ * Berechnet Arbeitszeit neu
+ *
+ */
+function arbeitszeitCalculator() {
+  const vonValue = document.getElementById('von').value.split(':');
+  const bisValue = document.getElementById('bis').value.split(':');
+
+  const stundenToMinutes = (parseInt(bisValue[0]) - parseInt(vonValue[0])) * 60;
+  const minutenToMinutes = parseInt(bisValue[1]) - parseInt(vonValue[1]);
+
+  const newArbeitszeit = stundenToMinutes + minutenToMinutes - returnFrühstückspauseValue() - returnMittagspauseValue();
+
+  if (!isNaN(newArbeitszeit)) {
+    arbeitszeit = newArbeitszeit;
+  }
+}
+
+function addAußerHausEventListener() {
+  const außerHausEl = document.getElementById('außer-haus');
+
+  außerHausEl.addEventListener('input', () => {
     const außerHausVal = extractInputVal(außerHausEl);
     if (außerHausVal > 0) {
       arbeitszeitCalculator();
@@ -20,9 +283,9 @@ function addAußerHausEventListener() {
  *
  */
 function addTR() {
-  const tbody = $('#creation-tbody');
+  const tbody = document.querySelector('#creation-tbody');
 
-  const currentTRCount = $('#creation-tbody tr').length;
+  const currentTRCount = Array.from(document.querySelectorAll('#creation-tbody tr')).length;
   const nextRowId = currentTRCount + 1;
 
   const template = `
@@ -88,112 +351,16 @@ function addTR() {
   addTREventListeners(nextRowId);
 }
 
-jQuery.fn.extend({
-  disable(state) {
-    return this.each(function() {
-      this.disabled = state;
-    });
-  },
-});
-
-/**
- * Prüft, ob Frühstückspause angeklickt ist und gibt Wert in Minuten zurück
- *
- * @returns {number} Wert in Minuten
- */
-function returnFrühstückspauseValue() {
-  const checkbox = $('#frühstückspause');
-
-  if (checkbox.is(':checked')) {
-    return 15;
-  }
-
-  return 0;
-}
-
-/**
- * Prüft, ob Mittagspause angeklickt ist und gibt Wert in Minuten zurück
- *
- * @returns {number} Wert in Minuten
- */
-function returnMittagspauseValue() {
-  const checkbox = $('#mittagspause');
-
-  if (checkbox.is(':checked')) {
-    return 30;
-  }
-
-  return 0;
-}
-
-/**
- * Aktiviert oder deaktiviert Buttons abhängig von Werten der ersten #creation-tbody-Zeile
- *
- */
-function toggleSaveButtons() {
-  const buttons = [$('#later'), $('#now')];
-  const inputs = [$('#von'), $('#bis')];
-
-  let hasRequiredValues = false;
-
-  $.each(inputs, (i, el) => {
-    const elVal = $(el).val();
-    if (elVal.indexOf(':') !== -1) {
-      hasRequiredValues = true;
-    } else {
-      hasRequiredValues = false;
-    }
-  });
-
-  $.each(buttons, (i, button) => {
-    $(button).disable(!hasRequiredValues);
-  });
-}
-
-/**
- * Scannt alle #creation-tbody-Felder nach Inhalten und gibt "true" zurück falls etwas eingegeben wurde
- *
- * @returns {boolean}
- */
-function scanInputs() {
-  let hasValue = false;
-
-  const els = [$('#von')[0], $('#bis')[0], $('#außer-haus')[0]];
-
-  $.each($('#creation-tbody input'), (i, el) => {
-    els.push(el);
-  });
-
-  $.each(els, (i, el) => {
-    if ($(el).val() !== '') {
-      hasValue = true;
-    }
-  });
-
-  return hasValue;
-}
-
-/**
- * Aktiviert oder deaktiviert den "Zeilen leeren"-Button sobald etwas zum leeren vorhanden ist
- *
- */
-function toggleContentRemoveButton() {
-  const hasValues = scanInputs();
-  $('#remove-contents').disable(!hasValues);
-}
-
 /**
  * Verändert aktuell angewähltes Navigationselement
  *
  * @param {string} selectedNav
  */
 function switchActiveNavigationLink(selectedNav) {
-  $('.navbar-item[data-target]').each((i, navLink) => {
-    if (selectedNav === navLink.id) {
-      $(navLink).addClass('is-active');
-    } else {
-      $(navLink).removeClass('is-active');
-    }
+  Array.from(document.querySelectorAll('.navbar-item[data-target]')).forEach(navLink => {
+    const target = document.getElementById(navLink.dataset.target).classList;
+
+    selectedNav === navLink.id ? target.add('is-active') : target.contains('is-active') ? target.remove('is-active') : void 0;
   });
 }
 
@@ -203,13 +370,7 @@ function switchActiveNavigationLink(selectedNav) {
  * @param {string} targetId
  */
 function switchActiveModule(targetId) {
-  $('main > div').each((i, moduleEl) => {
-    if (targetId === moduleEl.id) {
-      $(moduleEl).css('display', 'block');
-    } else {
-      $(moduleEl).css('display', 'none');
-    }
-  });
+  Array.from(document.querySelectorAll('main > div')).forEach(moduleEl => (moduleEl.style.display = targetId === moduleEl.id ? 'block' : 'none'));
 }
 
 /**
@@ -223,172 +384,25 @@ function toggleTab(selectedNav, targetId) {
   switchActiveModule(targetId);
 }
 
-function extractInputVal(el) {
-  let val = 0;
-
-  val = parseInt($(el).val(), 10);
-
-  if (!isNaN(val)) {
-    return val;
-  } else {
-    return 0;
-  }
-}
-
-/**
- * Summiert Minuten
- *
- */
-function minutesCalculator() {
-  const resultTarget = $('#tagessumme');
-  const elements = [];
-  let result = 0;
-
-  $.each($('[id^="minuten-"]'), (i, el) => {
-    elements.push(el);
-  });
-
-  $.each(elements, (i, el) => {
-    if (el.id !== 'minuten-890') {
-      result += extractInputVal(el);
-    }
-  });
-
-  gearbeiteteMinuten = result;
-
-  update890Row();
-  updateTagessumme();
-
-  resultTarget.val(result);
-}
-
-/**
- *  Fügt den eigentlichen EventListener hinzu
- *
- * @param {object} el [zu verarbeitendes Element]
- */
-function minutesCalculatorEventListener(el) {
-  el.addEventListener('input', () => {
-    minutesCalculator();
-    toggleContentRemoveButton();
-  });
-}
-
-/**
- * Definiert deutsche Grundvariablen für den jQueryUI Datepicker
- *
- */
-function setDatepickerDefaultsDE() {
-  $.datepicker.setDefaults({
-    showWeek: true,
-    firstDay: 1,
-    changeMonth: true,
-    changeYear: true,
-    dateFormat: 'dd.mm.y',
-  });
-
-  $.datepicker.regional.de = {
-    clearText: 'löschen',
-    clearStatus: 'aktuelles Datum löschen',
-    closeText: 'schließen',
-    closeStatus: 'ohne Änderungen schließen',
-    prevText: '<zurück',
-    prevStatus: 'letzten Monat zeigen',
-    nextText: 'Vor>',
-    nextStatus: 'nächsten Monat zeigen',
-    currentText: 'heute',
-    currentStatus: '',
-    monthNames: [
-      'Januar',
-      'Februar',
-      'März',
-      'April',
-      'Mai',
-      'Juni',
-      'Juli',
-      'August',
-      'September',
-      'Oktober',
-      'November',
-      'Dezember',
-    ],
-    monthNamesShort: [
-      'Jan',
-      'Feb',
-      'Mär',
-      'Apr',
-      'Mai',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Okt',
-      'Nov',
-      'Dez',
-    ],
-    monthStatus: 'anderen Monat anzeigen',
-    yearStatus: 'anderes Jahr anzeigen',
-    weekHeader: 'Wo',
-    weekStatus: 'Woche des Monats',
-    dayNames: ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'],
-    dayNamesShort: ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'],
-    dayNamesMin: ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'],
-    dayStatus: 'Setze DD als ersten Wochentag',
-    dateStatus: 'Wähle D, M d',
-    dateFormat: 'dd.mm.yy',
-    firstDay: 1,
-    initStatus: 'Wähle ein Datum',
-    isRTL: false,
-  };
-  $.datepicker.setDefaults($.datepicker.regional.de);
-}
-
 /**
  * Fügt den Checkboxen den EventListener hinzu
  *
  */
 function addPausenListener() {
-  const checkboxes = [$('#frühstückspause'), $('#mittagspause')];
+  const checkboxes = [document.getElementById('frühstückspause'), document.getElementById('mittagspause')];
   const pausenzeiten = [15, 30];
 
-  $.each(checkboxes, (i, el) => {
-    el.change(function() {
-      if (!this.checked) {
-        arbeitszeit += pausenzeiten[i];
-      } else {
-        arbeitszeit -= pausenzeiten[i];
-      }
+  checkboxes.forEach(el => {
+    el.addEventListener('change', function () {
+      const i = checkboxes.indexOf(el);
 
-      const updateStaticFns = [minutesCalculator, arbeitszeitCalculator, updateArbeitszeitValues];
+      !this.checked ? (arbeitszeit += pausenzeiten[i]) : (arbeitszeit -= pausenzeiten[i]);
 
-      $.each(updateStaticFns, i => {
-        updateStaticFns[i]();
-      });
+      minutesCalculator();
+      arbeitszeitCalculator();
+      updateArbeitszeitValues();
     });
   });
-}
-
-/**
- *  Sucht Zeilen ohne EventListener raus und übergibt das jeweilige Element
- *
- * @param {number} nextRowId [falls gesetzt, fügt nur der hinzugefügten Zeile einen neuen EventListener hinzu]
- */
-function minutesCalculatorEventListenerHelper(nextRowId) {
-  if (nextRowId) {
-    minutesCalculatorEventListener($(`#minuten-${nextRowId}`)[0]);
-  } else {
-    const els = [];
-
-    $.each($("[id^='minuten-']"), (i, el) => {
-      els.push(el);
-    });
-
-    $.each(els, (i, el) => {
-      if (el.id !== 'minuten-890') {
-        minutesCalculatorEventListener(el);
-      }
-    });
-  }
 }
 
 /**
@@ -396,15 +410,16 @@ function minutesCalculatorEventListenerHelper(nextRowId) {
  *
  */
 function removeContent() {
-  const elArray = [$('#von'), $('#bis'), $('#minuten-890'), $('#außer-haus')];
+  const elArray = [
+    document.getElementById('von'),
+    document.getElementById('bis'),
+    document.getElementById('minuten-890'),
+    document.getElementById('außer-haus'),
+  ];
 
-  $.each($('#creation-tbody input'), (i, el) => {
-    elArray.push($(el));
-  });
+  Array.from(document.querySelectorAll('#creation-tbody input')).forEach(el => elArray.push(el));
 
-  $.each(elArray, (i, el) => {
-    el.val('');
-  });
+  elArray.forEach(el => (el.value = ''));
 
   toggleContentRemoveButton();
   toggleSaveButtons();
@@ -425,195 +440,36 @@ function returnFeierabend() {
 }
 
 /**
- * Färbt Tagessumme abhängig von gearbeiteteMinuten und Arbeitszeit ein
- *
- */
-function updateTagessumme() {
-  const tagessumme = $('#tagessumme');
-  if (gearbeiteteMinuten > arbeitszeit) {
-    tagessumme.addClass('is-danger');
-  } else {
-    tagessumme.removeClass('is-danger');
-  }
-}
-
-/**
  * Initiiert Date & Timepicker
  *
  */
 function initDateAndTimePicker() {
-  const datepicker = $('#datepicker');
-  datepicker.datepicker();
-  datepicker.datepicker('setDate', 'now');
+  const von = document.getElementById('von');
+  const bis = document.getElementById('bis');
 
-  const von = $('#von');
-  const bis = $('#bis');
-  const feierabend = returnFeierabend();
-
-  $.each([von, bis], (i, el) => {
-    el.timepicker({
-      timeFormat: 'G:i',
-      step: 5,
-      forceRoundTime: true,
+  [von, bis].forEach(el => {
+    el.addEventListener('focus', () => {
+      arbeitszeitCalculator();
+      minutesCalculator();
+      updateArbeitszeitValues();
+      toggleContentRemoveButton();
+      toggleSaveButtons();
     });
-
-    el.on('change', () => {
-      const updateStaticFns = [
-        arbeitszeitCalculator,
-        minutesCalculator,
-        updateArbeitszeitValues,
-        toggleContentRemoveButton,
-        toggleSaveButtons,
-      ];
-
-      $.each(updateStaticFns, i => {
-        updateStaticFns[i]();
-      });
-    });
-  });
-
-  von.timepicker('option', {
-    setTime: '08:00',
-    scrollDefault: '08:05',
-  });
-
-  bis.timepicker('option', {
-    setTime: feierabend,
-    scrollDefault: feierabend,
   });
 }
 
-/**
- * Aktualisiert den Posten 890
- *
- */
-function update890Row() {
-  const minuten890 = arbeitszeit - gearbeiteteMinuten;
-
-  if (minuten890 === 0) {
-    $('#tr-890').fadeOut();
-  } else {
-    $('#tr-890').fadeIn();
-
-    if (minuten890 < 0) {
-      $('#minuten-890').addClass('is-danger');
-    } else {
-      $('#minuten-890').removeClass('is-danger');
-    }
-  }
-
-  $('#minuten-890').val(minuten890);
-}
-/**
- * Aktualisiert Anzeige der derzeitigen Arbeitszeit
- *
- */
-function updateArbeitszeitValues() {
-  $('#arbeitszeit').val(`von ${arbeitszeit}`);
-  $('#tagessumme').prop('placeholder', arbeitszeit);
-}
-
-/**
- * Berechnet Arbeitszeit neu
- *
- */
-function arbeitszeitCalculator() {
-  const vonValue = $('#von')
-    .val()
-    .split(':');
-  const bisValue = $('#bis')
-    .val()
-    .split(':');
-
-  const stundenToMinutes = (parseInt(bisValue[0], 10) - parseInt(vonValue[0], 10)) * 60;
-  const minutenToMinutes = parseInt(bisValue[1], 10) - parseInt(vonValue[1], 10);
-
-  const newArbeitszeit =
-    stundenToMinutes + minutenToMinutes - returnFrühstückspauseValue() - returnMittagspauseValue();
-
-  if (!isNaN(newArbeitszeit)) {
-    arbeitszeit = newArbeitszeit;
-  }
-}
-
-/**
- * Fügt alle relevanten EventListener hinzu
- *
- */
-function addEventListeners() {
-  // Get all "navbar-burger" elements
-  const navbarBurgers = Array.prototype.slice.call($('.navbar-burger'), 0);
-
-  // Check if there are any navbar burgers
-  if (navbarBurgers.length > 0) {
-    // Add a click event on each of them
-    $.each(navbarBurgers, (i, el) => {
-      el.addEventListener('click', () => {
-        const target = el.dataset.target;
-        const target2 = $(`#${target}`);
-
-        $(el).toggleClass('is-active');
-        $(target2).toggleClass('is-active');
-      });
-    });
-  }
-
-  $.each($('.navbar-item[data-target]'), (i, el) => {
-    el.addEventListener('click', () => {
-      toggleTab(el.id, el.dataset.target);
-    });
+function unhidePermSaveTRs() {
+  Array.from(document.querySelectorAll('#perm-save tr')).forEach(tr => {
+    if (tr.classList.contains('hidden-tr')) tr.classList.remove('hidden-tr');
   });
 
-  $('#add-tr')[0].addEventListener('click', () => {
-    addTR();
-  });
-
-  $('#remove-contents')[0].addEventListener('click', () => {
-    removeContent();
-  });
-
-  arbeitszeit = parseInt(
-    $('#arbeitszeit')
-      .val()
-      .replace(/von /, ''),
-    10,
-  );
-
-  const execFns = [
-    addPausenListener,
-    addAußerHausEventListener,
-    minutesCalculatorEventListenerHelper,
-  ];
-
-  $.each(execFns, i => {
-    execFns[i]();
-  });
-
-  $('#perm-save-toggler')[0].addEventListener('click', () => {
-    unhidePermSaveTRs();
-  });
-
-  $.each($('.perm-delete-btn'), (i, el) => {
-    addDeletionEventListener(el, 'permanent');
-  });
-
-  $.each($('.temp-delete-btn'), (i, el) => {
-    addDeletionEventListener(el, 'temporary');
-  });
-
-  $.each($('.perm-edit-btn'), (i, el) => {
-    addEditEventListener(el, 'permanent');
-  });
-
-  $.each($('.temp-edit-btn'), (i, el) => {
-    addEditEventListener(el, 'temporary');
-  });
+  document.getElementById('perm-save-tr').remove();
 }
 
 function addDeletionEventListener(el, mode) {
   el.addEventListener('click', () => {
-    const element = $(el);
-    const [tr, pdfId] = [element.closest('tr'), element.val()];
+    const tr = $(el).closest('tr');
+    const pdfId = el.value;
 
     swal({
       title: 'Sicher?',
@@ -626,49 +482,78 @@ function addDeletionEventListener(el, mode) {
       confirmButtonText: 'löschen',
     }).then(result => {
       if (result.value) {
+        postData('api/deletePDF.php', { pdfId, mode });
+        $(tr).fadeOut('fast');
+        /*
         $.post({
           url: 'api/deletePDF.php',
-          data: { pdfId: pdfId, mode: mode },
+          data: { pdfId, mode },
         });
-
-        tr.fadeOut('fast');
+        */
       }
     });
   });
 }
 
-$(document).ready(() => {
-  const execFns = [addEventListeners, setDatepickerDefaultsDE, initDateAndTimePicker];
-
-  $.each(execFns, i => {
-    execFns[i]();
+/**
+ * Holt alte Daten ab
+ *
+ * @param {HTMLElement} el
+ * @param {string} mode
+ */
+function addEditEventListener(el, mode) {
+  el.addEventListener('click', () => {
+    fetch(`api/editPDF.php?pdfId=${el.value}&mode=${mode}`, { credentials: 'same-origin' })
+      .then(response => response.json())
+      .then(response => insertEditData(response));
   });
-});
-
-function unhidePermSaveTRs() {
-  $.each($('#perm-save tr'), (i, el) => {
-    const tr = $(el);
-    if (tr.hasClass('hidden-tr')) {
-      tr.removeClass('hidden-tr');
-    }
-  });
-
-  $('#perm-save-tr').remove();
 }
 
 /**
- * Fügt der neu hinzugefügten Reihe die üblichen EventListener hinzu
+ * Fügt alle relevanten EventListener hinzu
  *
- * @param {number} nextRowId
  */
-function addTREventListeners(nextRowId) {
-  $.each($(`[id*="-${nextRowId}"]`), (i, el) => {
-    if (i !== 5) {
-      el.addEventListener('input', () => {
-        toggleContentRemoveButton();
-        toggleSaveButtons();
+function addEventListeners() {
+  // Get all "navbar-burger" elements
+  const navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
+
+  // Check if there are any navbar burgers
+  if (navbarBurgers.length > 0) {
+    // Add a click event on each of them
+    navbarBurgers.forEach(el => {
+      el.addEventListener('click', () => {
+        const target = el.dataset.target;
+        target.classList.toggle('is-active');
+        document.getElementById(target).classList.toggle('is-active');
       });
-    }
+    });
+  }
+
+  Array.from(document.querySelectorAll('.navbar-item[data-target')).forEach(el => {
+    el.addEventListener('click', () => {
+      toggleTab(el.id, el.dataset.target);
+    });
   });
-  minutesCalculatorEventListenerHelper(nextRowId);
+
+  document.getElementById('add-tr').addEventListener('click', addTR);
+  document.getElementById('remove-contents').addEventListener('click', removeContent);
+
+  arbeitszeit = parseInt(document.getElementById('arbeitszeit').value.replace(/von /, ''));
+
+  addPausenListener();
+  addAußerHausEventListener();
+  minutesCalculatorEventListenerHelper();
+
+  document.getElementById('perm-save-toggler').addEventListener('click', unhidePermSaveTRs);
+
+  Array.from(document.querySelectorAll('.perm-delete-btn')).forEach(el => addDeletionEventListener(el, 'permanent'));
+  Array.from(document.querySelectorAll('.temp-delete-btn')).forEach(el => addDeletionEventListener(el, 'temporary'));
+
+  Array.from(document.querySelectorAll('.perm-edit-btn')).forEach(el => addEditEventListener(el, 'permanent'));
+  Array.from(document.querySelectorAll('.temp-edit-btn')).forEach(el => addEditEventListener(el, 'temporary'));
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+  addEventListeners();
+  initDateAndTimePicker();
+});

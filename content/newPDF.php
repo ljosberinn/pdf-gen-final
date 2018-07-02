@@ -30,7 +30,21 @@ foreach ($tableColumnKeys as $tableColumnKey) {
         <div class="field">
           <div class="control">
             <label for="datepicker" class="label heading">Datum </label>
-            <input id="datepicker" name="datum" class="input" required />
+            <input id="datepicker" name="datum" class="input" required list="datelist"/>
+            <datalist id="datelist">
+            <?php
+
+            setlocale(LC_ALL, 'german');
+            $now = new DateTimeImmutable();
+            $oneWeekBack = $now->modify('-1 week');
+
+            for ($i = 0; $i < 14; $i += 1) {
+                $plusOneDay = $oneWeekBack->modify('+' .$i. ' day')->format('D, d.m.Y');
+                echo '<option value="'.$plusOneDay.'" />';
+            }
+
+            ?>
+            </datalist>
           </div>
         </div>
       </div>
