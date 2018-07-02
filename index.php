@@ -24,7 +24,6 @@ require 'api/functions.php';
 setHeaders();
 
 session_start();
-setlocale(LC_TIME, 'de_DE');
 
 if (isset($_GET['logout']) && !empty($_SESSION['personalnummer'])) {
     session_destroy();

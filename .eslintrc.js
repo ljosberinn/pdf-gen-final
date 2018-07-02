@@ -1,6 +1,5 @@
 module.exports = {
   extends: 'airbnb-base',
-
   env: {
     browser: true,
     es6: true,
@@ -19,7 +18,9 @@ module.exports = {
     'constructor-super': 'warn',
     'valid-typeof': 'warn',
     'arrow-parens': [2, 'as-needed'],
-    'max-len': ['warn', 150],
+    'max-len': ['warn', 250],
   },
-  globals: {},
+  globals: {
+    swal: true
+  }
 };

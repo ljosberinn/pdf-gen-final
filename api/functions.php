@@ -18,7 +18,7 @@
 /**
  * Defines general security headers preventing sniffing, x-framing and XSS-protection
  *
- * @return header
+ * @return [headerOption]
  */
 function setHeaders()
 {
@@ -39,7 +39,7 @@ function setHeaders()
  *
  * @method public appendJSFiles
  *
- * @param array $files [$ownJSFiles, relative links to file]
+ * @param [array] $files [$ownJSFiles, relative links to file]
  *
  * @return string [script link]
  */
@@ -50,13 +50,16 @@ function appendFiles($files)
         $link = 'assets/' .$type. '/' .$filename. '.' .$type;
         $link .= '?' .filemtime($link);
 
+        echo $type === 'js' ? '<script src="' .$link. '"></script>' : '<link rel="stylesheet" href="' .$link. '" />';
+
+        /*
         if ($type == 'js') {
             echo '
             <script src="' .$link. '"></script>';
         } else if ($type == 'css') {
             echo '
             <link rel="stylesheet" href="' .$link. '" />';
-        }
+        }*/
     }
 }
 
@@ -78,32 +81,21 @@ function appendNavItems($elementArray)
             continue;
         }
 
-        if (!empty($specifications['class'])) {
-            $class = 'class="' .$specifications['class']. '"';
-        } else {
-            $class = '';
+        /*
+        foreach (['class', 'href', 'data-target', 'id'] as $attribute) {
+            ${str_replace('-', '', $attribute)} = !empty($specifications[$attribute]) ? '' .$attribute. '="' .$specifications[$attribute]. '"': '';
         }
+        */
 
-        if (!empty($specifications['href'])) {
-            $href = 'href="' .$specifications['href']. '"';
-        } else {
-            $href = '';
-        }
 
-        if (!empty($specifications['data-target'])) {
-            $target = 'data-target="' .$specifications['data-target']. '"';
-        } else {
-            $target = '';
-        }
+        $class = !empty($specifications['class']) ? 'class="' .$specifications['class']. '"' : '';
+        $href = !empty($specifications['href']) ? 'href="' .$specifications['href']. '"' : '';
+        $target = !empty($specifications['data-target']) ? 'data-target="' .$specifications['data-target'] : '';
+        $id = !empty($specifications['id']) ? 'id="' .$specifications['id']. '"' : '';
 
-        if (!empty($specifications['id'])) {
-            $id = 'id="' .$specifications['id']. '"';
-        } else {
-            $id = '';
-        }
 
         echo '
-        <a ' .$href. ' ' .$target. ' ' .$id. ' ' .$class. '>
+        <a ' .$href. ' ' .$datatarget. ' ' .$id. ' ' .$class. '>
             ' .$navText. '
         </a>';
     }
@@ -172,7 +164,7 @@ function returnLeistungsarten()
  *
  * @param [string] $date date as a string
  *
- * @return void
+ * @return [number]
  */
 function returnUnixTSFromDate($date)
 {
@@ -231,16 +223,8 @@ function getCreationStatement($type, $personalnummer)
  */
 function sanitizeInput($type, $input)
 {
-
-    if ($input == '') {
-        if ($type != 'kunde') {
-            return 0;
-        } else {
-            return $input;
-        }
-    } else {
-        return $input;
-    }
+    if ($input == '') return $type !== 'kunde' ? 0 : $input;
+    else return $input;
 }
 
 /**
@@ -264,9 +248,7 @@ function buildInsertionStatement($personalnummer, $type, $length, $has890)
         $insertionStatement .= '`kostenstelle-' .$i. '`, `auftragsnummer-' .$i. '`, `kunde-' .$i. '`, `leistungsart-' .$i. '`, `minuten-' .$i. '`, `anzahl-' .$i . '`, `materialnummer-' .$i. '`, ';
     }
 
-    if ($has890 > 0) {
-        $insertionStatement .= '`minuten-890`, ';
-    }
+    if ($has890 > 0) $insertionStatement .= '`minuten-890`, ';
 
     return $insertionStatement;
 }
@@ -313,9 +295,7 @@ function appendDataToInsertionStatement($insertionStatement, $data, $length, $ha
         }
     }
 
-    if ($has890 > 0) {
-        $insertionStatement .= $has890. ',';
-    }
+    if ($has890 > 0) $insertionStatement .= $has890. ',';
 
     return substr($insertionStatement, 0, -1). ');';
 }
@@ -378,4 +358,48 @@ function returnAverageStartTime($conn, $personalnummer)
 
     return $startAvg;
 }
+
+/**
+ *  Localizes new DateTimeImmutable object
+
+ * @method public manualDateLocalization
+ *
+ * @param object $ts [new DateTimeImmutable() object]
+ *
+ * @return object $ts [str replaced $ts]
+ */
+function manualDateLocalization($ts)
+{
+    $arr = [
+        'Mon' => 'Mo',
+        'Tue' => 'Di',
+        'Wed' => 'Mi',
+        'Thu' => 'Do',
+        'Fri' => 'Fr',
+        'Sat' => 'Sa',
+        'Sun' => 'So',
+    ];
+
+    foreach ($arr as $en => $de) {
+        $ts = str_replace($en, $de, $ts);
+    }
+
+    return $ts;
+}
+
+function roundMinutes($commaSeparatedHourMinuteStamp)
+{
+    $arr = explode(':', $commaSeparatedHourMinuteStamp);
+
+    $minutes = $arr[1];
+
+    if ($minutes % 5 === 0) {
+        return $commaSeparatedHourMinuteStamp;
+    } else {
+        $minuteValues = str_split($minutes);
+        return $arr[0] . ':' . $minuteValues[0] . '' . ($minuteValues[1] < 3 ? 0 : 5);
+    }
+}
+
 ?>
+

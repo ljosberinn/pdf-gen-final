@@ -17,6 +17,8 @@ foreach ($tableColumnKeys as $tableColumnKey) {
     array_push($tableColumnKeys_lowerCase, strtolower($tableColumnKey));
 }
 
+$now = new DateTimeImmutable();
+
 ?>
 
 
@@ -30,17 +32,15 @@ foreach ($tableColumnKeys as $tableColumnKey) {
         <div class="field">
           <div class="control">
             <label for="datepicker" class="label heading">Datum </label>
-            <input id="datepicker" name="datum" class="input" required list="datelist"/>
+            <input id="datepicker" name="datum" class="input" required list="datelist" value="<?php echo manualDateLocalization($now->format('D, d.m.Y')); ?>"/>
             <datalist id="datelist">
             <?php
 
-            setlocale(LC_ALL, 'german');
-            $now = new DateTimeImmutable();
             $oneWeekBack = $now->modify('-1 week');
 
             for ($i = 0; $i < 14; $i += 1) {
                 $plusOneDay = $oneWeekBack->modify('+' .$i. ' day')->format('D, d.m.Y');
-                echo '<option value="'.$plusOneDay.'" />';
+                echo '<option value="'.manualDateLocalization($plusOneDay).'" />';
             }
 
             ?>
@@ -53,7 +53,14 @@ foreach ($tableColumnKeys as $tableColumnKey) {
         <div class="field">
           <div class="control">
             <label for="von" class="label heading">Von </label>
-            <input id="von" name="von" class="input" required value="<?php echo $_SESSION['startAvg']; ?>" />
+            <input id="von" name="von" class="input" required value="<?php echo $_SESSION['startAvg']; ?>" list="von-list" />
+            <datalist id="von-list">
+            <?php
+
+
+
+            ?>
+            </datalist>
           </div>
         </div>
       </div>
@@ -62,7 +69,12 @@ foreach ($tableColumnKeys as $tableColumnKey) {
         <div class="field">
           <div class="control">
             <label for="bis" class="label heading">Bis </label>
-            <input id="bis" name="bis" class="input" required />
+            <input id="bis" name="bis" class="input" required list="bis-list" />
+            <datalist id="bis-list">
+            <?php
+
+            ?>
+            </datalist>
           </div>
         </div>
       </div>
@@ -98,14 +110,14 @@ foreach ($tableColumnKeys as $tableColumnKey) {
             <?php
 
             foreach ($tableColumns as $th => $classes) {
-                if (!empty($classes)) {
-                    $class = 'class="' .$classes. '"';
-                } else {
-                    $class = "";
-                }
+              if (!empty($classes)) {
+                $class = 'class="' .$classes. '"';
+              } else {
+                $class = "";
+              }
 
-                echo '
-                <th ' .$class. '>' .$th. '</th>';
+              echo '
+              <th ' .$class. '>' .$th. '</th>';
             }
 
             ?>

@@ -1,40 +1,6 @@
 let gearbeiteteMinuten = 0;
 let arbeitszeit = 0;
 
-/**
- * Pflegt Daten des jeweiligen Zettels in Felder ein
- *
- * @param {object} response
- */
-function insertEditData(response) {
-  document.getElementById('nav-new').click();
-  document.getElementById('datepicker').value = response.day;
-  document.getElementById('von').value = response.startTimestamp;
-  document.getElementById('bis').value = response.endTimestamp;
-  document.getElementById('mittagspause').checked = response.mittagspause !== 0;
-  document.getElementById('frühstückspause').checked = response.frühstückspause !== 0;
-
-  const fieldNames = ['kostenstelle', 'auftragsnummer', 'kunde', 'leistungsart', 'minuten', 'anzahl', 'materialnummer'];
-
-  if (response['außer-haus'] > 0) document.getElementById('außer-haus').value = response['außer-haus'];
-
-  for (let i = 1; i <= 22; i += 1) {
-    if (parseInt(response[`minuten-${i}`]) !== 0) {
-      if (i > 5) addTR();
-
-      fieldNames.forEach(fieldName => {
-        const target = `${fieldName}-${i}`;
-        document.getElementById(target).value = response[target];
-      });
-    }
-  }
-
-  arbeitszeitCalculator();
-  updateArbeitszeitValues();
-  minutesCalculator();
-  toggleSaveButtons();
-}
-
 function postData(url, data) {
   return fetch(url, {
     body: JSON.stringify(data), // must match 'Content-Type' header
@@ -97,7 +63,7 @@ function updateTagessumme() {
 function update890Row() {
   const minuten890 = arbeitszeit - gearbeiteteMinuten;
 
-  const row890 = $(document.getElementById('tr-890'));
+  const row890 = document.getElementById('tr-890');
   const min890 = document.getElementById('minuten-890');
 
   if (minuten890 === 0) {
@@ -186,7 +152,6 @@ function toggleSaveButtons() {
 
   buttons.forEach(button => (button.disabled = !hasRequiredValues));
 }
-
 /**
  * Fügt der neu hinzugefügten Reihe die üblichen EventListener hinzu
  *
@@ -279,6 +244,8 @@ function addAußerHausEventListener() {
 }
 
 /**
+
+/**
  *  Fügt eine neue Zeile hinzu
  *
  */
@@ -352,6 +319,40 @@ function addTR() {
 }
 
 /**
+ * Pflegt Daten des jeweiligen Zettels in Felder ein
+  *
+ * @param { object } response
+  */
+function insertEditData(response) {
+  document.getElementById('nav-new').click();
+  document.getElementById('datepicker').value = response.day;
+  document.getElementById('von').value = response.startTimestamp;
+  document.getElementById('bis').value = response.endTimestamp;
+  document.getElementById('mittagspause').checked = response.mittagspause !== 0;
+  document.getElementById('frühstückspause').checked = response.frühstückspause !== 0;
+
+  const fieldNames = ['kostenstelle', 'auftragsnummer', 'kunde', 'leistungsart', 'minuten', 'anzahl', 'materialnummer'];
+
+  if (response['außer-haus'] > 0) document.getElementById('außer-haus').value = response['außer-haus'];
+
+  for (let i = 1; i <= 22; i += 1) {
+    if (parseInt(response[`minuten-${i}`]) !== 0) {
+      if (i > 5) addTR();
+
+      fieldNames.forEach(fieldName => {
+        const target = `${fieldName}-${i}`;
+        document.getElementById(target).value = response[target];
+      });
+    }
+  }
+
+  arbeitszeitCalculator();
+  updateArbeitszeitValues();
+  minutesCalculator();
+  toggleSaveButtons();
+}
+
+/**
  * Verändert aktuell angewähltes Navigationselement
  *
  * @param {string} selectedNav
@@ -410,12 +411,7 @@ function addPausenListener() {
  *
  */
 function removeContent() {
-  const elArray = [
-    document.getElementById('von'),
-    document.getElementById('bis'),
-    document.getElementById('minuten-890'),
-    document.getElementById('außer-haus'),
-  ];
+  const elArray = [document.getElementById('von'), document.getElementById('bis'), document.getElementById('minuten-890'), document.getElementById('außer-haus')];
 
   Array.from(document.querySelectorAll('#creation-tbody input')).forEach(el => elArray.push(el));
 

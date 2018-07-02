@@ -1,6 +1,6 @@
 <?php
 
-if(isset($_POST['personalnummer'])) {
+if (isset($_POST['personalnummer'])) {
 
     include 'functions.php';
 
@@ -15,27 +15,23 @@ if(isset($_POST['personalnummer'])) {
         $searchForUser = $conn->query($searchForUserQuery);
 
         if ($searchForUser->num_rows == 1) {
+
             while ($data = $searchForUser->fetch_assoc()) {
 
                 session_start();
                 $_SESSION['personalnummer'] = $personalnummer;
                 $_SESSION['name'] = $data['name'];
                 $_SESSION['arbeitszeit'] = $data['arbeitszeit'];
-                $_SESSION['startAvg'] = returnAverageStartTime($conn, $personalnummer);
+                $_SESSION['startAvg'] = roundMinutes(returnAverageStartTime($conn, $personalnummer));
 
                 header('Location: ../index.php');
             }
+        } else {
+            header('Location: ../?loginError');
         }
-
-
     } else {
         header('Location: ../?loginError');
     }
-
-
-
-
-
 }
 
 ?>
