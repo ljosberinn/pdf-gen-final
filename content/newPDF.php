@@ -19,6 +19,14 @@ foreach ($tableColumnKeys as $tableColumnKey) {
 
 $now = new DateTimeImmutable();
 
+$oneWeekBack = $now->modify('-1 week');
+$dateOptions = [];
+
+for ($i = 0; $i < 14; $i += 1) {
+    $plusOneDay = $oneWeekBack->modify('+' .$i. ' day')->format('D, d.m.Y');
+    array_push($dateOptions, '<option value="'.manualDateLocalization($plusOneDay).'" />');
+}
+
 ?>
 
 
@@ -36,11 +44,8 @@ $now = new DateTimeImmutable();
             <datalist id="datelist">
             <?php
 
-            $oneWeekBack = $now->modify('-1 week');
-
-            for ($i = 0; $i < 14; $i += 1) {
-                $plusOneDay = $oneWeekBack->modify('+' .$i. ' day')->format('D, d.m.Y');
-                echo '<option value="'.manualDateLocalization($plusOneDay).'" />';
+            foreach ($dateOptions as $option) {
+              echo $option;
             }
 
             ?>
@@ -54,13 +59,6 @@ $now = new DateTimeImmutable();
           <div class="control">
             <label for="von" class="label heading">Von </label>
             <input id="von" name="von" class="input" required value="<?php echo $_SESSION['startAvg']; ?>" list="von-list" />
-            <datalist id="von-list">
-            <?php
-
-
-
-            ?>
-            </datalist>
           </div>
         </div>
       </div>
@@ -69,12 +67,7 @@ $now = new DateTimeImmutable();
         <div class="field">
           <div class="control">
             <label for="bis" class="label heading">Bis </label>
-            <input id="bis" name="bis" class="input" required list="bis-list" />
-            <datalist id="bis-list">
-            <?php
-
-            ?>
-            </datalist>
+            <input id="bis" name="bis" class="input" required list="bis-list" value="<?php echo $_SESSION['endAvg']; ?>" />
           </div>
         </div>
       </div>

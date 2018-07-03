@@ -442,6 +442,14 @@ function addEditEventListener(el, mode) {
 }
 
 /**
+ * Setzt Datepicker.value auf leer damit alle Datalist-Einträge auswählbar werden
+ *
+ */
+function silenceDatepicker() {
+  this.value = '';
+}
+
+/**
  * Fügt alle relevanten EventListener hinzu
  *
  */
@@ -467,6 +475,7 @@ function addEventListeners() {
     });
   });
 
+  document.getElementById('datepicker').addEventListener('click', silenceDatepicker);
   document.getElementById('add-tr').addEventListener('click', addTR);
   document.getElementById('remove-contents').addEventListener('click', removeContent);
 

@@ -389,5 +389,14 @@ function roundMinutes($commaSeparatedHourMinuteStamp)
     }
 }
 
+function secondsToTime($minutes)
+{
+    $dtF = new \DateTime('@0');
+    $dtT = new \DateTime("@$minutes");
+    $result = $dtF->diff($dtT);
+    return $result->h . ':' . $result->i;
+}
+
+
 ?>
 

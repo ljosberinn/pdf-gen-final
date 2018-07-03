@@ -25,6 +25,12 @@ if (isset($_POST['personalnummer'])) {
                 $_SESSION['name'] = $data['name'];
                 $_SESSION['arbeitszeit'] = $data['arbeitszeit'];
                 $_SESSION['startAvg'] = roundMinutes(returnAverageStartTime($conn, $personalnummer));
+                $_SESSION['urlaubstage'] = $data['urlaubstage'];
+
+                $startData = explode(':', $_SESSION['startAvg']);
+                $workEndSeconds = (validateInt($startData[0]) * 60 + validateInt($startData[1]) + $_SESSION['arbeitszeit'] + 45) * 60;
+                $_SESSION['endAvg'] = roundMinutes(secondsToTime($workEndSeconds));
+
 
                 header('Location: ../index.php');
             }
