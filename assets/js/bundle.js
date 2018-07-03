@@ -8,7 +8,7 @@ var arbeitszeit = 0;
  *
  * @returns {boolean}
  */
-function scanInputs() {
+var scanInputs = function scanInputs() {
   var hasValue = false;
 
   var els = [document.getElementById('von'), document.getElementById('bis'), document.getElementById('außer-haus')];
@@ -24,31 +24,31 @@ function scanInputs() {
   });
 
   return hasValue;
-}
+};
 
 /**
  * Aktiviert oder deaktiviert den "Zeilen leeren"-Button sobald etwas zum leeren vorhanden ist
  *
  */
-function toggleContentRemoveButton() {
+var toggleContentRemoveButton = function toggleContentRemoveButton() {
   document.getElementById('remove-contents').disabled = !scanInputs();
-}
+};
 
 /**
  * Färbt Tagessumme abhängig von gearbeiteteMinuten und Arbeitszeit ein
  *
  */
-function updateTagessumme() {
+var updateTagessumme = function updateTagessumme() {
   var tagessumme = document.getElementById('tagessumme').classList;
 
   gearbeiteteMinuten > arbeitszeit ? tagessumme.add('is-danger') : tagessumme.remove('is-danger');
-}
+};
 
 /**
  * Aktualisiert den Posten 890
  *
  */
-function update890Row() {
+var update890Row = function update890Row() {
   var minuten890 = arbeitszeit - gearbeiteteMinuten;
 
   var row890 = document.getElementById('tr-890');
@@ -62,14 +62,14 @@ function update890Row() {
     minuten890 < 0 ? min890.classList.add('is-danger') : min890.classList.remove('is-danger');
     row890.style.opacity = 1;
   }
-}
+};
 
 /**
  *  Gibt den Wert des Elements zurück; 0 falls 0 | NaN
  *
  * @param {HTMLElement} el
  */
-function extractInputVal(el) {
+var extractInputVal = function extractInputVal(el) {
   var val = 0;
 
   val = parseInt(el.value);
@@ -78,13 +78,13 @@ function extractInputVal(el) {
     return val;
   }
   return 0;
-}
+};
 
 /**
  * Summiert Minuten
  *
  */
-function minutesCalculator() {
+var minutesCalculator = function minutesCalculator() {
   var resultTarget = document.getElementById('tagessumme');
   var result = 0;
 
@@ -98,26 +98,26 @@ function minutesCalculator() {
   updateTagessumme();
 
   resultTarget.value = result;
-}
+};
 
 /**
  *  Fügt den eigentlichen EventListener hinzu
  *
  * @param {object} el [zu verarbeitendes Element]
  */
-function minutesCalculatorEventListener(el) {
+var minutesCalculatorEventListener = function minutesCalculatorEventListener(el) {
   el.addEventListener('input', function () {
     minutesCalculator();
     toggleContentRemoveButton();
   });
-}
+};
 
 /**
  *  Sucht Zeilen ohne EventListener raus und übergibt das jeweilige Element
  *
  * @param {number} nextRowId [falls gesetzt, fügt nur der hinzugefügten Zeile einen neuen EventListener hinzu]
  */
-function minutesCalculatorEventListenerHelper(nextRowId) {
+var minutesCalculatorEventListenerHelper = function minutesCalculatorEventListenerHelper(nextRowId) {
   if (nextRowId) {
     minutesCalculatorEventListener(document.getElementById('minuten-' + nextRowId));
   } else {
@@ -125,13 +125,13 @@ function minutesCalculatorEventListenerHelper(nextRowId) {
       if (el.id !== 'minuten-890') minutesCalculatorEventListener(el);
     });
   }
-}
+};
 
 /**
  * Aktiviert oder deaktiviert Buttons abhängig von Werten der ersten #creation-tbody-Zeile
  *
  */
-function toggleSaveButtons() {
+var toggleSaveButtons = function toggleSaveButtons() {
   var buttons = [document.getElementById('later'), document.getElementById('now')];
   var inputs = [document.getElementById('von'), document.getElementById('bis')];
 
@@ -144,13 +144,13 @@ function toggleSaveButtons() {
   buttons.forEach(function (button) {
     return button.disabled = !hasRequiredValues;
   });
-}
+};
 /**
  * Fügt der neu hinzugefügten Reihe die üblichen EventListener hinzu
  *
  * @param {number} nextRowId
  */
-function addTREventListeners(nextRowId) {
+var addTREventListeners = function addTREventListeners(nextRowId) {
   var elements = Array.from(document.querySelectorAll('[id*="-' + nextRowId + '"]'));
 
   elements.forEach(function (el) {
@@ -163,23 +163,23 @@ function addTREventListeners(nextRowId) {
   });
 
   minutesCalculatorEventListenerHelper(nextRowId);
-}
+};
 
 /**
  * Aktualisiert Anzeige der derzeitigen Arbeitszeit
  *
  */
-function updateArbeitszeitValues() {
+var updateArbeitszeitValues = function updateArbeitszeitValues() {
   document.getElementById('arbeitszeit').value = 'von ' + arbeitszeit;
   document.getElementById('tagessumme').placeholder = arbeitszeit;
-}
+};
 
 /**
  * Prüft, ob Frühstückspause angeklickt ist und gibt Wert in Minuten zurück
  *
  * @returns {number} Wert in Minuten
  */
-function returnFrühstückspauseValue() {
+var returnFrühstückspauseValue = function returnFrühstückspauseValue() {
   var checkbox = document.getElementById('frühstückspause');
 
   if (checkbox.checked) {
@@ -187,14 +187,14 @@ function returnFrühstückspauseValue() {
   }
 
   return 0;
-}
+};
 
 /**
  * Prüft, ob Mittagspause angeklickt ist und gibt Wert in Minuten zurück
  *
  * @returns {number} Wert in Minuten
  */
-function returnMittagspauseValue() {
+var returnMittagspauseValue = function returnMittagspauseValue() {
   var checkbox = document.getElementById('mittagspause');
 
   if (checkbox.checked) {
@@ -202,13 +202,13 @@ function returnMittagspauseValue() {
   }
 
   return 0;
-}
+};
 
 /**
  * Berechnet Arbeitszeit neu
  *
  */
-function arbeitszeitCalculator() {
+var arbeitszeitCalculator = function arbeitszeitCalculator() {
   var vonValue = document.getElementById('von').value.split(':');
   var bisValue = document.getElementById('bis').value.split(':');
 
@@ -218,9 +218,9 @@ function arbeitszeitCalculator() {
   var newArbeitszeit = stundenToMinutes + minutenToMinutes - returnFrühstückspauseValue() - returnMittagspauseValue();
 
   if (!isNaN(newArbeitszeit)) arbeitszeit = newArbeitszeit;
-}
+};
 
-function addAußerHausEventListener() {
+var addAußerHausEventListener = function addAußerHausEventListener() {
   var außerHausEl = document.getElementById('außer-haus');
 
   außerHausEl.addEventListener('input', function () {
@@ -232,7 +232,7 @@ function addAußerHausEventListener() {
       updateArbeitszeitValues();
     }
   });
-}
+};
 
 /**
 
@@ -240,7 +240,7 @@ function addAußerHausEventListener() {
  *  Fügt eine neue Zeile hinzu
  *
  */
-function addTR() {
+var addTR = function addTR() {
   var tbody = document.querySelector('#creation-tbody');
 
   var currentTRCount = Array.from(document.querySelectorAll('#creation-tbody tr')).length;
@@ -256,14 +256,14 @@ function addTR() {
 
   // add new event listeners
   addTREventListeners(nextRowId);
-}
+};
 
 /**
  * Pflegt Daten des jeweiligen Zettels in Felder ein
   *
  * @param { object } response
   */
-function insertEditData(response) {
+var insertEditData = function insertEditData(response) {
   document.getElementById('nav-new').click();
   document.getElementById('datepicker').value = response.day;
   document.getElementById('von').value = response.startTimestamp;
@@ -294,31 +294,31 @@ function insertEditData(response) {
   updateArbeitszeitValues();
   minutesCalculator();
   toggleSaveButtons();
-}
+};
 
 /**
  * Verändert aktuell angewähltes Navigationselement
  *
  * @param {string} selectedNav
  */
-function switchActiveNavigationLink(selectedNav) {
+var switchActiveNavigationLink = function switchActiveNavigationLink(selectedNav) {
   Array.from(document.querySelectorAll('.navbar-item[data-target]')).forEach(function (navLink) {
     var target = document.getElementById(navLink.dataset.target).classList;
 
     selectedNav === navLink.id ? target.add('is-active') : target.contains('is-active') ? target.remove('is-active') : void 0;
   });
-}
+};
 
 /**
  * Verändert Sichtbarkeit der Hauptmodule
  *
  * @param {string} targetId
  */
-function switchActiveModule(targetId) {
+var switchActiveModule = function switchActiveModule(targetId) {
   Array.from(document.querySelectorAll('main > div')).forEach(function (moduleEl) {
     return moduleEl.style.display = targetId === moduleEl.id ? 'block' : 'none';
   });
-}
+};
 
 /**
  * Löst Stateänderungen in der Navigation und bei den Hauptmodulen aus
@@ -326,16 +326,16 @@ function switchActiveModule(targetId) {
  * @param {string} selectedNav [id des geklickten Navigationselements]
  * @param {string} targetId [data-target-Attribut des geklickten Navigationselements]
  */
-function toggleTab(selectedNav, targetId) {
+var toggleTab = function toggleTab(selectedNav, targetId) {
   switchActiveNavigationLink(selectedNav);
   switchActiveModule(targetId);
-}
+};
 
 /**
  * Fügt den Checkboxen den EventListener hinzu
  *
  */
-function addPausenListener() {
+var addPausenListener = function addPausenListener() {
   var checkboxes = [document.getElementById('frühstückspause'), document.getElementById('mittagspause')];
   var pausenzeiten = [15, 30];
 
@@ -350,13 +350,13 @@ function addPausenListener() {
       updateArbeitszeitValues();
     });
   });
-}
+};
 
 /**
  * Setzt Tabelle zurück
  *
  */
-function removeContent() {
+var removeContent = function removeContent() {
   var elArray = [document.getElementById('von'), document.getElementById('bis'), document.getElementById('minuten-890'), document.getElementById('außer-haus')];
 
   Array.from(document.querySelectorAll('#creation-tbody input')).forEach(function (el) {
@@ -369,13 +369,13 @@ function removeContent() {
 
   toggleContentRemoveButton();
   toggleSaveButtons();
-}
+};
 
 /**
  * Initiiert Date & Timepicker
  *
  */
-function initDateAndTimePicker() {
+var initDateAndTimePicker = function initDateAndTimePicker() {
   var von = document.getElementById('von');
   var bis = document.getElementById('bis');
 
@@ -388,17 +388,17 @@ function initDateAndTimePicker() {
       toggleSaveButtons();
     });
   });
-}
+};
 
-function unhidePermSaveTRs() {
+var unhidePermSaveTRs = function unhidePermSaveTRs() {
   Array.from(document.querySelectorAll('#perm-save tr')).forEach(function (tr) {
     if (tr.classList.contains('hidden-tr')) tr.classList.remove('hidden-tr');
   });
 
   document.getElementById('perm-save-tr').remove();
-}
+};
 
-function addDeletionEventListener(el, mode) {
+var addDeletionEventListener = function addDeletionEventListener(el, mode) {
   el.addEventListener('click', function () {
     var tr = el.closest('tr');
     var pdfId = el.value;
@@ -423,7 +423,7 @@ function addDeletionEventListener(el, mode) {
       }
     });
   });
-}
+};
 
 /**
  * Holt alte Daten ab
@@ -431,7 +431,7 @@ function addDeletionEventListener(el, mode) {
  * @param {HTMLElement} el
  * @param {string} mode
  */
-function addEditEventListener(el, mode) {
+var addEditEventListener = function addEditEventListener(el, mode) {
   el.addEventListener('click', function () {
     fetch('api/editPDF.php?pdfId=' + el.value + '&mode=' + mode, { credentials: 'same-origin' }).then(function (response) {
       return response.json();
@@ -439,21 +439,30 @@ function addEditEventListener(el, mode) {
       return insertEditData(response);
     });
   });
-}
+};
 
 /**
  * Setzt Datepicker.value auf leer damit alle Datalist-Einträge auswählbar werden
  *
  */
-function silenceDatepicker() {
+var silenceDatepicker = function silenceDatepicker() {
   this.value = '';
-}
+};
+
+/**
+ * Zeigt Dateinamen nach erfolgreichem Upload an
+ */
+var showUploadedFileName = function showUploadedFileName() {
+  if (this.files.length > 0) {
+    document.getElementsByClassName('file-name')[0].innerText = this.files[0].name;
+  }
+};
 
 /**
  * Fügt alle relevanten EventListener hinzu
  *
  */
-function addEventListeners() {
+var addEventListeners = function addEventListeners() {
   // Get all "navbar-burger" elements
   var navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
 
@@ -475,6 +484,7 @@ function addEventListeners() {
     });
   });
 
+  document.querySelector('input[type="file"]').addEventListener('change', showUploadedFileName);
   document.getElementById('datepicker').addEventListener('click', silenceDatepicker);
   document.getElementById('add-tr').addEventListener('click', addTR);
   document.getElementById('remove-contents').addEventListener('click', removeContent);
@@ -500,7 +510,7 @@ function addEventListeners() {
   Array.from(document.querySelectorAll('.temp-edit-btn')).forEach(function (el) {
     return addEditEventListener(el, 'temporary');
   });
-}
+};
 
 document.addEventListener('DOMContentLoaded', function () {
   addEventListeners();

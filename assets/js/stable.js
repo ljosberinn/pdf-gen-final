@@ -6,7 +6,7 @@ let arbeitszeit = 0;
  *
  * @returns {boolean}
  */
-function scanInputs() {
+const scanInputs = () => {
   let hasValue = false;
 
   const els = [document.getElementById('von'), document.getElementById('bis'), document.getElementById('außer-haus')];
@@ -20,31 +20,31 @@ function scanInputs() {
   });
 
   return hasValue;
-}
+};
 
 /**
  * Aktiviert oder deaktiviert den "Zeilen leeren"-Button sobald etwas zum leeren vorhanden ist
  *
  */
-function toggleContentRemoveButton() {
+const toggleContentRemoveButton = () => {
   document.getElementById('remove-contents').disabled = !scanInputs();
-}
+};
 
 /**
  * Färbt Tagessumme abhängig von gearbeiteteMinuten und Arbeitszeit ein
  *
  */
-function updateTagessumme() {
+const updateTagessumme = () => {
   const tagessumme = document.getElementById('tagessumme').classList;
 
   gearbeiteteMinuten > arbeitszeit ? tagessumme.add('is-danger') : tagessumme.remove('is-danger');
-}
+};
 
 /**
  * Aktualisiert den Posten 890
  *
  */
-function update890Row() {
+const update890Row = () => {
   const minuten890 = arbeitszeit - gearbeiteteMinuten;
 
   const row890 = document.getElementById('tr-890');
@@ -58,14 +58,14 @@ function update890Row() {
     minuten890 < 0 ? min890.classList.add('is-danger') : min890.classList.remove('is-danger');
     row890.style.opacity = 1;
   }
-}
+};
 
 /**
  *  Gibt den Wert des Elements zurück; 0 falls 0 | NaN
  *
  * @param {HTMLElement} el
  */
-function extractInputVal(el) {
+const extractInputVal = el => {
   let val = 0;
 
   val = parseInt(el.value);
@@ -74,13 +74,13 @@ function extractInputVal(el) {
     return val;
   }
   return 0;
-}
+};
 
 /**
  * Summiert Minuten
  *
  */
-function minutesCalculator() {
+const minutesCalculator = () => {
   const resultTarget = document.getElementById('tagessumme');
   let result = 0;
 
@@ -94,26 +94,26 @@ function minutesCalculator() {
   updateTagessumme();
 
   resultTarget.value = result;
-}
+};
 
 /**
  *  Fügt den eigentlichen EventListener hinzu
  *
  * @param {object} el [zu verarbeitendes Element]
  */
-function minutesCalculatorEventListener(el) {
+const minutesCalculatorEventListener = el => {
   el.addEventListener('input', () => {
     minutesCalculator();
     toggleContentRemoveButton();
   });
-}
+};
 
 /**
  *  Sucht Zeilen ohne EventListener raus und übergibt das jeweilige Element
  *
  * @param {number} nextRowId [falls gesetzt, fügt nur der hinzugefügten Zeile einen neuen EventListener hinzu]
  */
-function minutesCalculatorEventListenerHelper(nextRowId) {
+const minutesCalculatorEventListenerHelper = nextRowId => {
   if (nextRowId) {
     minutesCalculatorEventListener(document.getElementById(`minuten-${nextRowId}`));
   } else {
@@ -121,13 +121,13 @@ function minutesCalculatorEventListenerHelper(nextRowId) {
       if (el.id !== 'minuten-890') minutesCalculatorEventListener(el);
     });
   }
-}
+};
 
 /**
  * Aktiviert oder deaktiviert Buttons abhängig von Werten der ersten #creation-tbody-Zeile
  *
  */
-function toggleSaveButtons() {
+const toggleSaveButtons = () => {
   const buttons = [document.getElementById('later'), document.getElementById('now')];
   const inputs = [document.getElementById('von'), document.getElementById('bis')];
 
@@ -136,13 +136,13 @@ function toggleSaveButtons() {
   inputs.forEach(el => (hasRequiredValues = el.value.indexOf(':') !== -1));
 
   buttons.forEach(button => (button.disabled = !hasRequiredValues));
-}
+};
 /**
  * Fügt der neu hinzugefügten Reihe die üblichen EventListener hinzu
  *
  * @param {number} nextRowId
  */
-function addTREventListeners(nextRowId) {
+const addTREventListeners = nextRowId => {
   const elements = Array.from(document.querySelectorAll(`[id*="-${nextRowId}"]`));
 
   elements.forEach(el => {
@@ -155,23 +155,23 @@ function addTREventListeners(nextRowId) {
   });
 
   minutesCalculatorEventListenerHelper(nextRowId);
-}
+};
 
 /**
  * Aktualisiert Anzeige der derzeitigen Arbeitszeit
  *
  */
-function updateArbeitszeitValues() {
+const updateArbeitszeitValues = () => {
   document.getElementById('arbeitszeit').value = `von ${arbeitszeit}`;
   document.getElementById('tagessumme').placeholder = arbeitszeit;
-}
+};
 
 /**
  * Prüft, ob Frühstückspause angeklickt ist und gibt Wert in Minuten zurück
  *
  * @returns {number} Wert in Minuten
  */
-function returnFrühstückspauseValue() {
+const returnFrühstückspauseValue = () => {
   const checkbox = document.getElementById('frühstückspause');
 
   if (checkbox.checked) {
@@ -179,14 +179,14 @@ function returnFrühstückspauseValue() {
   }
 
   return 0;
-}
+};
 
 /**
  * Prüft, ob Mittagspause angeklickt ist und gibt Wert in Minuten zurück
  *
  * @returns {number} Wert in Minuten
  */
-function returnMittagspauseValue() {
+const returnMittagspauseValue = () => {
   const checkbox = document.getElementById('mittagspause');
 
   if (checkbox.checked) {
@@ -194,13 +194,13 @@ function returnMittagspauseValue() {
   }
 
   return 0;
-}
+};
 
 /**
  * Berechnet Arbeitszeit neu
  *
  */
-function arbeitszeitCalculator() {
+const arbeitszeitCalculator = () => {
   const vonValue = document.getElementById('von').value.split(':');
   const bisValue = document.getElementById('bis').value.split(':');
 
@@ -210,9 +210,9 @@ function arbeitszeitCalculator() {
   const newArbeitszeit = stundenToMinutes + minutenToMinutes - returnFrühstückspauseValue() - returnMittagspauseValue();
 
   if (!isNaN(newArbeitszeit)) arbeitszeit = newArbeitszeit;
-}
+};
 
-function addAußerHausEventListener() {
+const addAußerHausEventListener = () => {
   const außerHausEl = document.getElementById('außer-haus');
 
   außerHausEl.addEventListener('input', () => {
@@ -224,7 +224,7 @@ function addAußerHausEventListener() {
       updateArbeitszeitValues();
     }
   });
-}
+};
 
 /**
 
@@ -232,7 +232,7 @@ function addAußerHausEventListener() {
  *  Fügt eine neue Zeile hinzu
  *
  */
-function addTR() {
+const addTR = () => {
   const tbody = document.querySelector('#creation-tbody');
 
   const currentTRCount = Array.from(document.querySelectorAll('#creation-tbody tr')).length;
@@ -299,14 +299,14 @@ function addTR() {
 
   // add new event listeners
   addTREventListeners(nextRowId);
-}
+};
 
 /**
  * Pflegt Daten des jeweiligen Zettels in Felder ein
   *
  * @param { object } response
   */
-function insertEditData(response) {
+const insertEditData = response => {
   document.getElementById('nav-new').click();
   document.getElementById('datepicker').value = response.day;
   document.getElementById('von').value = response.startTimestamp;
@@ -333,29 +333,29 @@ function insertEditData(response) {
   updateArbeitszeitValues();
   minutesCalculator();
   toggleSaveButtons();
-}
+};
 
 /**
  * Verändert aktuell angewähltes Navigationselement
  *
  * @param {string} selectedNav
  */
-function switchActiveNavigationLink(selectedNav) {
+const switchActiveNavigationLink = selectedNav => {
   Array.from(document.querySelectorAll('.navbar-item[data-target]')).forEach(navLink => {
     const target = document.getElementById(navLink.dataset.target).classList;
 
     selectedNav === navLink.id ? target.add('is-active') : target.contains('is-active') ? target.remove('is-active') : void 0;
   });
-}
+};
 
 /**
  * Verändert Sichtbarkeit der Hauptmodule
  *
  * @param {string} targetId
  */
-function switchActiveModule(targetId) {
+const switchActiveModule = targetId => {
   Array.from(document.querySelectorAll('main > div')).forEach(moduleEl => (moduleEl.style.display = targetId === moduleEl.id ? 'block' : 'none'));
-}
+};
 
 /**
  * Löst Stateänderungen in der Navigation und bei den Hauptmodulen aus
@@ -363,16 +363,16 @@ function switchActiveModule(targetId) {
  * @param {string} selectedNav [id des geklickten Navigationselements]
  * @param {string} targetId [data-target-Attribut des geklickten Navigationselements]
  */
-function toggleTab(selectedNav, targetId) {
+const toggleTab = (selectedNav, targetId) => {
   switchActiveNavigationLink(selectedNav);
   switchActiveModule(targetId);
-}
+};
 
 /**
  * Fügt den Checkboxen den EventListener hinzu
  *
  */
-function addPausenListener() {
+const addPausenListener = () => {
   const checkboxes = [document.getElementById('frühstückspause'), document.getElementById('mittagspause')];
   const pausenzeiten = [15, 30];
 
@@ -387,13 +387,13 @@ function addPausenListener() {
       updateArbeitszeitValues();
     });
   });
-}
+};
 
 /**
  * Setzt Tabelle zurück
  *
  */
-function removeContent() {
+const removeContent = () => {
   const elArray = [document.getElementById('von'), document.getElementById('bis'), document.getElementById('minuten-890'), document.getElementById('außer-haus')];
 
   Array.from(document.querySelectorAll('#creation-tbody input')).forEach(el => elArray.push(el));
@@ -402,13 +402,13 @@ function removeContent() {
 
   toggleContentRemoveButton();
   toggleSaveButtons();
-}
+};
 
 /**
  * Initiiert Date & Timepicker
  *
  */
-function initDateAndTimePicker() {
+const initDateAndTimePicker = () => {
   const von = document.getElementById('von');
   const bis = document.getElementById('bis');
 
@@ -421,17 +421,17 @@ function initDateAndTimePicker() {
       toggleSaveButtons();
     });
   });
-}
+};
 
-function unhidePermSaveTRs() {
+const unhidePermSaveTRs = () => {
   Array.from(document.querySelectorAll('#perm-save tr')).forEach(tr => {
     if (tr.classList.contains('hidden-tr')) tr.classList.remove('hidden-tr');
   });
 
   document.getElementById('perm-save-tr').remove();
-}
+};
 
-function addDeletionEventListener(el, mode) {
+const addDeletionEventListener = (el, mode) => {
   el.addEventListener('click', () => {
     const tr = el.closest('tr');
     const pdfId = el.value;
@@ -450,13 +450,13 @@ function addDeletionEventListener(el, mode) {
         fetch('api/deletePDF.php', {
           method: 'POST',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: `pdfId=${pdfId}&mode=${mode}`
+          body: `pdfId=${pdfId}&mode=${mode}`,
         });
         tr.style.opacity = 0;
       }
     });
   });
-}
+};
 
 /**
  * Holt alte Daten ab
@@ -464,27 +464,36 @@ function addDeletionEventListener(el, mode) {
  * @param {HTMLElement} el
  * @param {string} mode
  */
-function addEditEventListener(el, mode) {
+const addEditEventListener = (el, mode) => {
   el.addEventListener('click', () => {
     fetch(`api/editPDF.php?pdfId=${el.value}&mode=${mode}`, { credentials: 'same-origin' })
       .then(response => response.json())
       .then(response => insertEditData(response));
   });
-}
+};
 
 /**
  * Setzt Datepicker.value auf leer damit alle Datalist-Einträge auswählbar werden
  *
  */
-function silenceDatepicker() {
+const silenceDatepicker = function () {
   this.value = '';
-}
+};
+
+/**
+ * Zeigt Dateinamen nach erfolgreichem Upload an
+ */
+const showUploadedFileName = function () {
+  if (this.files.length > 0) {
+    document.getElementsByClassName('file-name')[0].innerText = this.files[0].name;
+  }
+};
 
 /**
  * Fügt alle relevanten EventListener hinzu
  *
  */
-function addEventListeners() {
+const addEventListeners = () => {
   // Get all "navbar-burger" elements
   const navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
 
@@ -506,6 +515,7 @@ function addEventListeners() {
     });
   });
 
+  document.querySelector('input[type="file"]').addEventListener('change', showUploadedFileName);
   document.getElementById('datepicker').addEventListener('click', silenceDatepicker);
   document.getElementById('add-tr').addEventListener('click', addTR);
   document.getElementById('remove-contents').addEventListener('click', removeContent);
@@ -523,7 +533,7 @@ function addEventListeners() {
 
   Array.from(document.querySelectorAll('.perm-edit-btn')).forEach(el => addEditEventListener(el, 'permanent'));
   Array.from(document.querySelectorAll('.temp-edit-btn')).forEach(el => addEditEventListener(el, 'temporary'));
-}
+};
 
 document.addEventListener('DOMContentLoaded', () => {
   addEventListeners();

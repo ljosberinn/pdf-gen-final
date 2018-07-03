@@ -19,6 +19,18 @@ module.exports = {
     'valid-typeof': 'warn',
     'arrow-parens': [2, 'as-needed'],
     'max-len': ['warn', 250],
+    'no-return-assign': 'off',
+    'radix': 'off',
+    'no-useless-escape': 'off',
+    'no-mixed-operators': 'off',
+    'func-names': 'off',
+    'no-alert': 'off',
+    'no-void': 'off',
+    'no-restricted-globals': 'off',
+    'no-nested-ternary': 'off',
+    'no-unused-expressions': 'off',
+    'no-param-reassign': 'off',
+    'prefer-destructuring': 'off'
   },
   globals: {
     swal: true

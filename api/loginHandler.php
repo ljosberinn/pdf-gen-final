@@ -25,7 +25,10 @@ if (isset($_POST['personalnummer'])) {
                 $_SESSION['name'] = $data['name'];
                 $_SESSION['arbeitszeit'] = $data['arbeitszeit'];
                 $_SESSION['startAvg'] = roundMinutes(returnAverageStartTime($conn, $personalnummer));
+                $_SESSION['überminuten'] = $data['überminuten'];
+
                 $_SESSION['urlaubstage'] = $data['urlaubstage'];
+                $_SESSION['remaining_urlaubstage'] = 0;
 
                 $startData = explode(':', $_SESSION['startAvg']);
                 $workEndSeconds = (validateInt($startData[0]) * 60 + validateInt($startData[1]) + $_SESSION['arbeitszeit'] + 45) * 60;
