@@ -1,5 +1,7 @@
 <?php
 
+ob_start();
+
 if (isset($_POST['personalnummer'])) {
 
     include 'functions.php';
@@ -14,7 +16,7 @@ if (isset($_POST['personalnummer'])) {
         $searchForUserQuery = "SELECT * FROM `personal` WHERE `personalnummer` = " .$personalnummer;
         $searchForUser = $conn->query($searchForUserQuery);
 
-        if ($searchForUser->num_rows == 1) {
+        if ($searchForUser->num_rows === 1) {
 
             while ($data = $searchForUser->fetch_assoc()) {
 
@@ -34,4 +36,5 @@ if (isset($_POST['personalnummer'])) {
     }
 }
 
+ob_end_flush();
 ?>
