@@ -2,131 +2,109 @@
 
 if (isset($_POST)) {
 
-  session_start();
+    session_start();
+    ob_start();
 
-  include 'functions.php';
-  include 'db.php';
+    include 'functions.php';
+    include 'db.php';
 
-  if (isset($_POST['now'])) {
-    $type = 'archiv';
-  } else if (isset($_POST['later'])) {
-    $type = 'zwischenspeicher';
-  }
-
-  if ($_POST['minuten-890'] != 0) {
-    $has890 = $_POST['minuten-890'];
-  } else {
-    $has890 = 0;
-  }
-
-  $getCreationStatement = getCreationStatement($type, $_SESSION['personalnummer']);
-
-  $created = time('now');
-  $day = returnUnixTSFromDate($_POST['datum']);
-  $startTimestamp = returnUnixTSFromDate($_POST['datum']. ' ' .$_POST['von']);
-  $endTimestamp = returnUnixTSFromDate($_POST['datum']. ' ' .$_POST['bis']);
-  $minutesWorked = ($endTimestamp-$startTimestamp) / 60;
-
-  if ($_POST['frühstückspause'] == 'on') {
-    $minutesWorked -= 15;
-    $frühstückspause = 1;
-  } else {
-    $frühstückspause = 0;
-  }
-
-  if ($_POST['mittagspause'] == 'on') {
-    $minutesWorked -= 30;
-    $mittagspause = 1;
-  } else {
-    $mittagspause = 0;
-  }
-
-  $außerHaus = $_POST['außer-haus'];
-
-  if ($außerHaus == "") {
-    $außerHaus = 0;
-  }
-
-  $resultingData = [];
-
-  $posten = [
-    'kostenstelle',
-    'auftragsnummer',
-    'kunde',
-    'leistungsart',
-    'minuten',
-    'anzahl',
-    'materialnummer',
-  ];
-
-  foreach ($posten as $name) {
-    ${$name} = [];
-  }
-
-  for ($i = 1; $i <= 22; $i += 1) {
-
-    if (!empty($_POST["minuten-" .$i])) {
-      foreach ($posten as $var) {
-        array_push(${$var}, $_POST[$var. '-' .$i]);
-      }
+    if (isset($_POST['now'])) {
+        $type = 'archiv';
+    } else if (isset($_POST['later'])) {
+        $type = 'zwischenspeicher';
     }
-  }
 
-  $secondaryInformation = [
-    'day',
-    'created',
-    'startTimestamp',
-    'endTimestamp',
-    'minutesWorked',
-    'frühstückspause',
-    'mittagspause',
-    'außerHaus',
-  ];
+    $has890 = $_POST['minuten-890'] != 0 ? $_POST['minuten-890'] : 0;
 
-  foreach ($secondaryInformation as $var) {
-    array_push($posten, $var);
-  }
+    $getCreationStatement = getCreationStatement($type, $_SESSION['personalnummer']);
 
-  foreach ($posten as $var) {
-    $resultingData[$var] = ${$var};
-  }
+    $created = time('now');
+    $day = returnUnixTSFromDate($_POST['datum']);
+    $startTimestamp = returnUnixTSFromDate($_POST['datum']. ' ' .$_POST['von']);
+    $endTimestamp = returnUnixTSFromDate($_POST['datum']. ' ' .$_POST['bis']);
+    $minutesWorked = ($endTimestamp-$startTimestamp) / 60;
 
-  $conn = new mysqli($host, $user, $password, $database);
-  $conn->set_charset('utf8');
+    $_POST['frühstückspause'] == 'on' ? ($minutesWorked -= 15 xor $frühstückspause = 1) : $frühstückspause = 0;
+    $_POST['mittagspause'] == 'on' ? ($minutesWorked -= 30 xor $mittagspause = 1) : $mittagspause = 0;
 
-  // create new table if not existing
-  $createTable = $conn->query($getCreationStatement);
+    $außerHaus = $_POST['außer-haus'];
+    if ($außerHaus == "") $außerHaus = 0;
 
-  // build data
+    $resultingData = [];
 
-  $length = count($resultingData['minuten']);
+    $posten = [
+      'kostenstelle',
+      'auftragsnummer',
+      'kunde',
+      'leistungsart',
+      'minuten',
+      'anzahl',
+      'materialnummer',
+    ];
 
-  $insertionStatement = buildInsertionStatement($_SESSION['personalnummer'], $type, $length, $has890);
+    foreach ($posten as $name) {
+        ${$name} = [];
+    }
 
-  $insertionStatement = substr($insertionStatement, 0, -2). ') VALUES(' .$day. ', ' .$created. ', ' .$startTimestamp. ', ' .$endTimestamp. ', ' .$minutesWorked. ', ' .$frühstückspause. ', ' .$mittagspause. ', ' .$außerHaus. ', ';
+    for ($i = 1; $i <= 22; $i += 1) {
+        if (!empty($_POST["minuten-" .$i])) {
+            foreach ($posten as $var) {
+                array_push(${$var}, $_POST[$var. '-' .$i]);
+            }
+        }
+    }
 
-  $insertionStatement = appendDataToInsertionStatement($insertionStatement, $resultingData, $length, $has890);
+    $secondaryInformation = [
+      'day',
+      'created',
+      'startTimestamp',
+      'endTimestamp',
+      'minutesWorked',
+      'frühstückspause',
+      'mittagspause',
+      'außerHaus',
+    ];
 
-  // kill previous data if existing
+    foreach ($secondaryInformation as $var) {
+        array_push($posten, $var);
+    }
 
-  $tables = ['archiv', 'zwischenspeicher'];
+    foreach ($posten as $var) {
+        $resultingData[$var] = ${$var};
+    }
 
-  foreach($tables as $table) {
-    $deletionStatement =  "DELETE FROM `" .$_SESSION['personalnummer']. "_" .$table. "`  WHERE `day` = " .$day. "";
-    $deletion = $conn->query($deletionStatement);
-  }
+    $conn = new mysqli($host, $user, $password, $database);
+    $conn->set_charset('utf8');
 
+    // create new table if not existing
+    $createTable = $conn->query($getCreationStatement);
 
-  // insert data
+    // build data
 
-  $insert = $conn->query($insertionStatement);
+    $length = count($resultingData['minuten']);
 
-  if ($insert && $type == 'zwischenspeicher') {
-    header("Location: ../?saved");
-  } else {
-    include 'createPDF.php';
-  }
+    $insertionStatement = buildInsertionStatement($_SESSION['personalnummer'], $type, $length, $has890);
 
+    $insertionStatement = substr($insertionStatement, 0, -2). ') VALUES(' .$day. ', ' .$created. ', ' .$startTimestamp. ', ' .$endTimestamp. ', ' .$minutesWorked. ', ' .$frühstückspause. ', ' .$mittagspause. ', ' .$außerHaus. ', ';
+
+    $insertionStatement = appendDataToInsertionStatement($insertionStatement, $resultingData, $length, $has890);
+
+    // kill previous data if existing
+
+    $tables = ['archiv', 'zwischenspeicher'];
+
+    foreach ($tables as $table) {
+        $deletionStatement =  "DELETE FROM `" .$_SESSION['personalnummer']. "_" .$table. "`  WHERE `day` = " .$day. "";
+        $deletion = $conn->query($deletionStatement);
+    }
+
+    // insert data
+
+    $insert = $conn->query($insertionStatement);
+
+    $insert && $type == 'zwischenspeicher' ? header("Location: ../?saved") : include 'createPDF.php';
+
+    ob_end_flush();
 }
 
 ?>

@@ -12,6 +12,10 @@
   border: none;
 }
 
+#tr-890 {
+  transition: 500ms ease-in-out;
+}
+
 /* https://codepen.io/AllThingsSmitty/pen/MyqmdM */
 
 @media screen and (max-width: 1088px) {

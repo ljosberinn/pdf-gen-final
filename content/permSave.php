@@ -22,14 +22,8 @@ $tableColumnKeys = array_keys($tableColumns);
 <?php
 
 foreach ($tableColumns as $rowDescription => $class) {
-  if ($class != "") {
-    $class = 'class="' .$class. '"';
-  } else {
-    $class = '';
-  }
-
-  echo '
-  <td ' .$class. '>' .$rowDescription. '</td>';
+    $class = $class !== "" ? 'class="' . $class . '"' : '';
+    echo '<td ' . $class . '>' . $rowDescription . '</td>';
 }
 
 ?>
@@ -44,9 +38,9 @@ foreach ($tableColumns as $rowDescription => $class) {
 
 require 'api/db.php';
 
-if(!$conn) {
-  $conn = new mysqli($host, $user, $password, $database);
-  $conn->set_charset('utf8');
+if (!$conn) {
+    $conn = new mysqli($host, $user, $password, $database);
+    $conn->set_charset('utf8');
 }
 
 $getAllData = 'SELECT `day`, `startTimestamp`, `endTimestamp`, `frühstückspause`, `mittagspause`, `außer-haus`, `minutesWorked` FROM `' .$_SESSION['personalnummer']. '_archiv` ORDER BY `day` DESC';
@@ -55,9 +49,7 @@ $data = [];
 
 if ($allData->num_rows > 0) {
     while ($dataset = $allData->fetch_assoc()) {
-
         array_push($data, $dataset);
-
     }
 }
 

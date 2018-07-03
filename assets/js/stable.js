@@ -1,22 +1,6 @@
 let gearbeiteteMinuten = 0;
 let arbeitszeit = 0;
 
-function postData(url, data) {
-  return fetch(url, {
-    body: JSON.stringify(data), // must match 'Content-Type' header
-    cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-    credentials: 'same-origin', // include, same-origin, *omit
-    headers: {
-      'user-agent': 'Mozilla/4.0 MDN Example',
-      'content-type': 'application/json',
-    },
-    method: 'POST', // *GET, POST, PUT, DELETE, etc.
-    mode: 'cors', // no-cors, cors, *same-origin
-    redirect: 'follow', // manual, *follow, error
-    referrer: 'no-referrer', // *client, no-referrer
-  }).then(response => response.json()); // parses response to JSON
-}
-
 /**
  * Scannt alle #creation-tbody-Felder nach Inhalten und gibt "true" zurück falls etwas eingegeben wurde
  *
@@ -66,14 +50,14 @@ function update890Row() {
   const row890 = document.getElementById('tr-890');
   const min890 = document.getElementById('minuten-890');
 
-  if (minuten890 === 0) {
-    row890.fadeOut();
-  } else {
-    row890.fadeIn();
-    minuten890 < 0 ? min890.classList.add('is-danger') : min890.classList.remove('is-danger');
-  }
-
   min890.value = minuten890;
+
+  if (minuten890 === 0) {
+    row890.style.opacity = 0;
+  } else {
+    minuten890 < 0 ? min890.classList.add('is-danger') : min890.classList.remove('is-danger');
+    row890.style.opacity = 1;
+  }
 }
 
 /**
@@ -131,13 +115,14 @@ function minutesCalculatorEventListener(el) {
  */
 function minutesCalculatorEventListenerHelper(nextRowId) {
   if (nextRowId) {
-    minutesCalculatorEventListener(document.getElementById(`#minuten-${nextRowId}`));
+    minutesCalculatorEventListener(document.getElementById(`minuten-${nextRowId}`));
   } else {
     Array.from(document.querySelectorAll('[id^="minuten-"]')).forEach(el => {
       if (el.id !== 'minuten-890') minutesCalculatorEventListener(el);
     });
   }
 }
+
 /**
  * Aktiviert oder deaktiviert Buttons abhängig von Werten der ersten #creation-tbody-Zeile
  *
@@ -224,9 +209,7 @@ function arbeitszeitCalculator() {
 
   const newArbeitszeit = stundenToMinutes + minutenToMinutes - returnFrühstückspauseValue() - returnMittagspauseValue();
 
-  if (!isNaN(newArbeitszeit)) {
-    arbeitszeit = newArbeitszeit;
-  }
+  if (!isNaN(newArbeitszeit)) arbeitszeit = newArbeitszeit;
 }
 
 function addAußerHausEventListener() {
@@ -309,7 +292,7 @@ function addTR() {
   </tr>`;
 
   if (nextRowId <= 22) {
-    tbody.append(template);
+    tbody.insertAdjacentHTML('beforeend', template);
   } else {
     alert('Mehr als 22 Zeilen passen nicht auf einen Zettel.');
   }
@@ -341,7 +324,7 @@ function insertEditData(response) {
 
       fieldNames.forEach(fieldName => {
         const target = `${fieldName}-${i}`;
-        document.getElementById(target).value = response[target];
+        if (response[target] !== 0) document.getElementById(target).value = response[target];
       });
     }
   }
@@ -422,20 +405,6 @@ function removeContent() {
 }
 
 /**
- * Berechnet den Feierabend basierend auf erwarteter Arbeitszeit
- *
- * @returns {string} feierabendString
- */
-function returnFeierabend() {
-  const startzeit = 480;
-  const endzeit = startzeit + arbeitszeit + 30 + 15;
-  const endStunde = Math.floor(endzeit / 60);
-  const endMinuten = (endzeit / 60 - endStunde) * 60;
-
-  return `${endStunde}:${endMinuten}`;
-}
-
-/**
  * Initiiert Date & Timepicker
  *
  */
@@ -444,7 +413,7 @@ function initDateAndTimePicker() {
   const bis = document.getElementById('bis');
 
   [von, bis].forEach(el => {
-    el.addEventListener('focus', () => {
+    el.addEventListener('input', () => {
       arbeitszeitCalculator();
       minutesCalculator();
       updateArbeitszeitValues();
@@ -464,7 +433,7 @@ function unhidePermSaveTRs() {
 
 function addDeletionEventListener(el, mode) {
   el.addEventListener('click', () => {
-    const tr = $(el).closest('tr');
+    const tr = el.closest('tr');
     const pdfId = el.value;
 
     swal({
@@ -478,14 +447,12 @@ function addDeletionEventListener(el, mode) {
       confirmButtonText: 'löschen',
     }).then(result => {
       if (result.value) {
-        postData('api/deletePDF.php', { pdfId, mode });
-        $(tr).fadeOut('fast');
-        /*
-        $.post({
-          url: 'api/deletePDF.php',
-          data: { pdfId, mode },
+        fetch('api/deletePDF.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: `pdfId=${pdfId}&mode=${mode}`
         });
-        */
+        tr.style.opacity = 0;
       }
     });
   });

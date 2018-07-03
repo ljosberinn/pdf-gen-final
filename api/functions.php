@@ -81,23 +81,11 @@ function appendNavItems($elementArray)
             continue;
         }
 
-        /*
         foreach (['class', 'href', 'data-target', 'id'] as $attribute) {
             ${str_replace('-', '', $attribute)} = !empty($specifications[$attribute]) ? '' .$attribute. '="' .$specifications[$attribute]. '"': '';
         }
-        */
 
-
-        $class = !empty($specifications['class']) ? 'class="' .$specifications['class']. '"' : '';
-        $href = !empty($specifications['href']) ? 'href="' .$specifications['href']. '"' : '';
-        $target = !empty($specifications['data-target']) ? 'data-target="' .$specifications['data-target'] : '';
-        $id = !empty($specifications['id']) ? 'id="' .$specifications['id']. '"' : '';
-
-
-        echo '
-        <a ' .$href. ' ' .$datatarget. ' ' .$id. ' ' .$class. '>
-            ' .$navText. '
-        </a>';
+        echo '<a ' .$href. ' ' .$datatarget. ' ' .$id. ' ' .$class. '>' .$navText. '</a>';
     }
 }
 

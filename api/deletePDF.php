@@ -8,14 +8,11 @@ if (isset($_POST['pdfId'])
     || $_POST['mode'] == 'temporary')
     ) {
 
-    if ($_POST['mode'] == 'permanent') {
-        $targetTable = 'archiv';
-    } else {
-        $targetTable = 'zwischenspeicher';
-    }
+    $targetTable = $_POST['mode'] == 'permanent' ? 'archiv' : 'zwischenspeicher';
 
     session_start();
     include 'db.php';
+
     $conn = new mysqli($host, $user, $password, $database);
     $conn->set_charset('utf8');
 

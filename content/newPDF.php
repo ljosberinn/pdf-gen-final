@@ -110,14 +110,9 @@ $now = new DateTimeImmutable();
             <?php
 
             foreach ($tableColumns as $th => $classes) {
-              if (!empty($classes)) {
-                $class = 'class="' .$classes. '"';
-              } else {
-                $class = "";
-              }
+                $class = !empty($classes) ? 'class="' .$classes. '"' : "";
 
-              echo '
-              <th ' .$class. '>' .$th. '</th>';
+                echo '<th ' .$class. '>' .$th. '</th>';
             }
 
             ?>
