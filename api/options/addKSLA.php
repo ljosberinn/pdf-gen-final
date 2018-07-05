@@ -25,7 +25,6 @@ if (isset($_POST['target']) && isset($_POST['id']) && isset($_POST['desc'])) {
 
         $response = [
             'completed_in' => microtime_float() - $start,
-            'query' => $insertionQuery,
         ];
 
         $execution ? ($response['success'] = true) : ($response['error'] = $conn->error);

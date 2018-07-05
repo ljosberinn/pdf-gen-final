@@ -24,7 +24,6 @@ if (isset($_POST['target']) && isset($_POST['id'])) {
 
         $response = [
             'completed_in' => microtime_float() - $start,
-            'query' => $removalQuery,
         ];
 
         $execution ? ($response['success'] = true) : ($response['error'] = $conn->error);
