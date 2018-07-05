@@ -478,22 +478,99 @@ var adminToggleAdd = function adminToggleAdd(target) {
   }
 };
 
+var adminChangeFields = function adminChangeFields(target, types, values) {
+  var numberTarget = document.getElementById(target + '-edit-0');
+  var descTarget = document.getElementById(target + '-edit-1');
+
+  for (var i = 0; i < types.length; i += 1) {
+    var targetEl = document.getElementById(target + '-edit-' + i);
+    targetEl.type = types[i];
+
+    if (values) {
+      targetEl.value = values[i];
+    }
+  }
+};
+
 var adminToggleEdit = function adminToggleEdit(target) {
   var select = document.getElementById(target + '-edit');
 
   if (select) {
     select.addEventListener('change', function () {
       var numberDescPair = document.querySelector('#' + target + '-edit option[value="' + this.value + '"]').innerText.split(' – ');
-      var numberTarget = document.getElementById(target + '-edit-0');
-      var descTarget = document.getElementById(target + '-edit-1');
-
-      numberTarget.value = numberDescPair[0];
+      /* const numberTarget = document.getElementById(`${target}-edit-0`);
+      const descTarget = document.getElementById(`${target}-edit-1`);
+       numberTarget.value = numberDescPair[0];
       numberTarget.type = 'number';
+       descTarget.value = numberDescPair[1];
+      descTarget.type = 'text'; */
 
-      descTarget.value = numberDescPair[1];
-      descTarget.type = 'text';
+      adminChangeFields(target, ['number', 'text'], numberDescPair);
 
       document.getElementById(target + '-btn-edit').disabled = false;
+      document.getElementById(target + '-btn-delete').disabled = false;
+    });
+  }
+};
+
+var capitalize = function capitalize(word) {
+  return word.charAt(0).toUpperCase() + word.slice(1);
+};
+
+var adminDeleteListener = function adminDeleteListener(target) {
+  var deleteBtn = document.getElementById(target + '-btn-delete');
+  var btnCL = deleteBtn.classList;
+
+  if (deleteBtn) {
+    deleteBtn.addEventListener('click', function (e) {
+      e.preventDefault();
+      var value = document.getElementById(target + '-edit-0').value;
+
+      swal({
+        title: 'Sicher?',
+        type: 'warning',
+        showCancelButton: true,
+        cancelButtonText: 'Abbrechen',
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'löschen'
+      }).then(function (result) {
+        if (result.value) {
+          deleteBtn.disabled = true;
+          btnCL.remove('is-danger');
+          ['is-loading', 'is-warning'].forEach(function (className) {
+            return btnCL.add(className);
+          });
+
+          fetch('api/options/deleteKSLA.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'target=' + target + '&id=' + value
+          }).then(function (response) {
+            return response.json();
+          }).then(function (json) {
+            ['is-loading', 'is-warning'].forEach(function (className) {
+              return btnCL.remove(className);
+            });
+
+            if (json.success) {
+              var select = document.querySelector('#' + target + '-edit');
+              Array.from(select.selectedOptions)[0].remove();
+              select.selectedIndex = 0;
+              adminChangeFields(target, ['hidden', 'hidden']);
+            }
+
+            btnCL.add(json.success ? 'is-success' : 'is-danger');
+            deleteBtn.innerText = json.success ? 'Erfolg' : 'Fehler! Info: ' + json.error;
+            deleteBtn.disabled = false;
+
+            setTimeout(function () {
+              if (btnCL.contains('is-success')) btnCL.replace('is-success', 'is-danger');
+              deleteBtn.innerText = capitalize(target) + ' l\xF6schen';
+            }, 5000);
+          });
+        }
+      });
     });
   }
 };
@@ -504,6 +581,7 @@ var adminEventListener = function adminEventListener() {
   targets.forEach(function (target) {
     adminToggleAdd(target);
     adminToggleEdit(target);
+    adminDeleteListener(target);
   });
 };
 

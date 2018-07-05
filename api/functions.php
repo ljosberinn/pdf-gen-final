@@ -397,6 +397,13 @@ function secondsToTime($minutes)
     return $result->h . ':' . $result->i;
 }
 
+function microtime_float()
+{
+    list($usec, $sec) = explode(" ", microtime());
+    return ((float) $usec + (float) $sec);
+}
+
+
 
 ?>
 

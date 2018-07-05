@@ -509,22 +509,87 @@ const adminToggleAdd = target => {
   }
 };
 
+const adminChangeFields = (target, types, values) => {
+  const numberTarget = document.getElementById(`${target}-edit-0`);
+  const descTarget = document.getElementById(`${target}-edit-1`);
+
+  for (let i = 0; i < types.length; i += 1) {
+    const targetEl = document.getElementById(`${target}-edit-${i}`);
+    targetEl.type = types[i];
+
+    if (values) {
+      targetEl.value = values[i];
+    }
+  }
+};
+
 const adminToggleEdit = target => {
   const select = document.getElementById(`${target}-edit`);
 
   if (select) {
     select.addEventListener('change', function () {
       const numberDescPair = document.querySelector(`#${target}-edit option[value="${this.value}"]`).innerText.split(' – ');
-      const numberTarget = document.getElementById(`${target}-edit-0`);
-      const descTarget = document.getElementById(`${target}-edit-1`);
-
-      numberTarget.value = numberDescPair[0];
-      numberTarget.type = 'number';
-
-      descTarget.value = numberDescPair[1];
-      descTarget.type = 'text';
+     
+      adminChangeFields(target, ['number', 'text'], numberDescPair);
 
       document.getElementById(`${target}-btn-edit`).disabled = false;
+      document.getElementById(`${target}-btn-delete`).disabled = false;
+    });
+  }
+};
+
+const capitalize = word => word.charAt(0).toUpperCase() + word.slice(1);
+
+const adminDeleteListener = target => {
+  const deleteBtn = document.getElementById(`${target}-btn-delete`);
+  const btnCL = deleteBtn.classList;
+
+  if (deleteBtn) {
+    deleteBtn.addEventListener('click', e => {
+      e.preventDefault();
+      const value = document.getElementById(`${target}-edit-0`).value;
+
+      swal({
+        title: 'Sicher?',
+        type: 'warning',
+        showCancelButton: true,
+        cancelButtonText: 'Abbrechen',
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'löschen',
+      }).then(result => {
+        if (result.value) {
+          deleteBtn.disabled = true;
+          btnCL.remove('is-danger');
+          ['is-loading', 'is-warning'].forEach(className => btnCL.add(className));
+
+          fetch('api/options/deleteKSLA.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `target=${target}&id=${value}`,
+          })
+            .then(response => response.json())
+            .then(json => {
+              ['is-loading', 'is-warning'].forEach(className => btnCL.remove(className));
+
+              if (json.success) {
+                const select = document.querySelector(`#${target}-edit`);
+                Array.from(select.selectedOptions)[0].remove();
+                select.selectedIndex = 0;
+                adminChangeFields(target, ['hidden', 'hidden']);
+              }
+
+              btnCL.add(json.success ? 'is-success' : 'is-danger');
+              deleteBtn.innerText = json.success ? 'Erfolg' : `Fehler! Info: ${json.error}`;
+              deleteBtn.disabled = false;
+
+              setTimeout(() => {
+                if (btnCL.contains('is-success')) btnCL.replace('is-success', 'is-danger');
+                deleteBtn.innerText = `${capitalize(target)} löschen`;
+              }, 5000);
+            });
+        }
+      });
     });
   }
 };
@@ -535,6 +600,7 @@ const adminEventListener = () => {
   targets.forEach(target => {
     adminToggleAdd(target);
     adminToggleEdit(target);
+    adminDeleteListener(target);
   });
 };
 

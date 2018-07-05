@@ -16,6 +16,11 @@
   transition: 500ms ease-in-out;
 }
 
+[id*="-btn-delete"]:disabled,
+[id*="-btn-delete"].is-success {
+  pointer-events: none;
+}
+
 /* https://codepen.io/AllThingsSmitty/pen/MyqmdM */
 
 @media screen and (max-width: 1088px) {
