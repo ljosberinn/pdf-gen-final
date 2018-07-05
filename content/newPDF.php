@@ -45,7 +45,7 @@ for ($i = 0; $i < 14; $i += 1) {
             <?php
 
             foreach ($dateOptions as $option) {
-              echo $option;
+                echo $option;
             }
 
             ?>

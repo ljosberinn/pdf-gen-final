@@ -1,0 +1,102 @@
+<h2 class="column has-text-centered is-12">
+  <strong>Neuen Angestellten hinzufügen</strong>
+</h2>
+
+<form method="POST" action="api/options/createNewUser.php">
+  <div class="field is-horizontal">
+    <div class="field-label is-normal">
+      <label class="label">Name & Personalnummer</label>
+    </div>
+    <div class="field-body">
+      <div class="field">
+        <p class="control is-expanded">
+          <input class="input" type="text" placeholder="Vorname" name="vorname-neu" required>
+        </p>
+      </div>
+      <div class="field">
+        <p class="control is-expanded">
+          <input class="input" type="text" placeholder="Nachname" name="nachname-neu" required>
+        </p>
+      </div>
+      <div class="field">
+        <p class="control is-expanded">
+          <input class="input" type="number" placeholder="Personalnummer" name="personalnummer-neu" required>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="field is-horizontal">
+    <div class="field-label is-normal">
+      <label class="label">Tägliche Arbeitszeit</label>
+    </div>
+    <div class="field-body">
+      <div class="field">
+        <p class="control is-expanded">
+          <input class="input" type="number" placeholder="465" value="465" name="arbeitszeit-neu" required>
+        </p>
+        <p class="help">in Minuten</p>
+      </div>
+      <div class="field">
+        <p class="control is-expanded">
+          <input class="input" type="number" value="0" name="überstunden-neu">
+        </p>
+        <p class="help">Vorhandene Überstunden in
+          <strong>Minuten</strong>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="field is-horizontal">
+    <div class="field-label is-normal">
+      <label class="label">Urlaubstage/Jahr</label>
+    </div>
+    <div class="field-body">
+      <div class="field">
+        <p class="control is-expanded">
+          <input class="input" type="number" placeholder="465" value="28" name="urlaubstage-neu" required>
+        </p>
+      </div>
+      <div class="field">
+        <p class="control is-expanded">
+          <input class="input" type="number" value="0" name="used_urlaubstage-neu">
+        </p>
+        <p class="help">Anzahl bereits genutzter Urlaubstage</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="field is-horizontal">
+    <div class="field-label is-normal">
+      <label class="label">Adminrechte</label>
+    </div>
+    <div class="field-body">
+      <div class="field is-narrow">
+        <div class="control">
+          <div class="select is-fullwidth">
+            <select name="admin-neu">
+              <option selected value="0">nein</option>
+              <option value="1">ja</option>
+            </select>
+          </div>
+          <p class="help">bei "ja" darf der Angestellte diese Einstellungen einsehen</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="field is-horizontal">
+    <div class="field-label">
+    </div>
+    <div class="field-body">
+      <div class="field">
+        <div class="control">
+          <button disabled class="button is-primary">
+            Neuen Angestellten hinzufügen
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
