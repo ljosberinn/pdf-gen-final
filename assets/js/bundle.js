@@ -465,7 +465,7 @@ var toggleButtonDisabledOnInput = function toggleButtonDisabledOnInput() {
   document.getElementById(this.id + '-btn').disabled = this.value.length === 0;
 };
 
-var adminToggleAdd = function adminToggleAdd(target) {
+var adminToggleKSLAAdd = function adminToggleKSLAAdd(target) {
   var number = document.getElementById(target + '-number-add');
   var desc = document.getElementById(target + '-desc-add');
 
@@ -479,31 +479,19 @@ var adminToggleAdd = function adminToggleAdd(target) {
 };
 
 var adminChangeFields = function adminChangeFields(target, types, values) {
-  var numberTarget = document.getElementById(target + '-edit-0');
-  var descTarget = document.getElementById(target + '-edit-1');
-
   for (var i = 0; i < types.length; i += 1) {
     var targetEl = document.getElementById(target + '-edit-' + i);
     targetEl.type = types[i];
-
-    if (values) {
-      targetEl.value = values[i];
-    }
+    if (values) targetEl.value = values[i];
   }
 };
 
-var adminToggleEdit = function adminToggleEdit(target) {
+var adminToggleKSLAEdit = function adminToggleKSLAEdit(target) {
   var select = document.getElementById(target + '-edit');
 
   if (select) {
     select.addEventListener('change', function () {
       var numberDescPair = document.querySelector('#' + target + '-edit option[value="' + this.value + '"]').innerText.split(' – ');
-      /* const numberTarget = document.getElementById(`${target}-edit-0`);
-      const descTarget = document.getElementById(`${target}-edit-1`);
-       numberTarget.value = numberDescPair[0];
-      numberTarget.type = 'number';
-       descTarget.value = numberDescPair[1];
-      descTarget.type = 'text'; */
 
       adminChangeFields(target, ['number', 'text'], numberDescPair);
 
@@ -517,7 +505,7 @@ var capitalize = function capitalize(word) {
   return word.charAt(0).toUpperCase() + word.slice(1);
 };
 
-var adminDeleteListener = function adminDeleteListener(target) {
+var adminDeleteKSLAListener = function adminDeleteKSLAListener(target) {
   var deleteBtn = document.getElementById(target + '-btn-delete');
   var btnCL = deleteBtn.classList;
 
@@ -575,13 +563,53 @@ var adminDeleteListener = function adminDeleteListener(target) {
   }
 };
 
+var adminAddKSLAListener = function adminAddKSLAListener(target) {
+  var btn = document.getElementById(target + '-btn-add');
+  var btnCL = btn.classList;
+
+  btn.addEventListener('click', function (e) {
+    e.preventDefault();
+
+    btn.disabled = true;
+    btnCL.remove('is-success');
+    ['is-loading', 'is-warning'].forEach(function (className) {
+      return btnCL.add(className);
+    });
+
+    var value = document.getElementById(target + '-number-add').value;
+    var desc = document.getElementById(target + '-desc-add').value;
+
+    fetch('api/options/addKSLA.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: 'target=' + target + '&id=' + value + '&desc=' + desc
+    }).then(function (response) {
+      return response.json();
+    }).then(function (json) {
+      ['is-loading', 'is-warning'].forEach(function (className) {
+        return btnCL.remove(className);
+      });
+
+      btnCL.add(json.success ? 'is-success' : 'is-danger');
+      btn.innerText = json.success ? 'Erfolg' : 'Fehler! Info: ' + json.error;
+      btn.disabled = false;
+
+      setTimeout(function () {
+        if (btnCL.contains('is-danger')) btnCL.replace('is-danger', 'is-success');
+        btn.innerText = capitalize(target) + ' hinzuf\xFCgen';
+      }, 5000);
+    });
+  });
+};
+
 var adminEventListener = function adminEventListener() {
   var targets = ['kostenstelle', 'leistungsart'];
 
   targets.forEach(function (target) {
-    adminToggleAdd(target);
-    adminToggleEdit(target);
-    adminDeleteListener(target);
+    adminToggleKSLAAdd(target);
+    adminToggleKSLAEdit(target);
+    adminDeleteKSLAListener(target);
+    adminAddKSLAListener(target);
   });
 };
 

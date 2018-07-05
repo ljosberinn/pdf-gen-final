@@ -17,7 +17,9 @@
 }
 
 [id*="-btn-delete"]:disabled,
-[id*="-btn-delete"].is-success {
+[id*="-btn-delete"].is-success,
+[id*="-btn-add"]:disabled,
+[id*="-btn-add"].is-danger {
   pointer-events: none;
 }
 

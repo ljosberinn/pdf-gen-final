@@ -1,16 +1,17 @@
 <?php
 
-if (isset($_POST['target']) && isset($_POST['id'])) {
+if (isset($_POST['target']) && isset($_POST['id']) && isset($_POST['desc'])) {
 
     include '../functions.php';
 
     $start = microtime_float();
 
     $id = validateInt($_POST['id']);
+    $desc = filter_input(INPUT_POST, 'desc', FILTER_SANITIZE_STRING);
 
     $validTableTargets = ['leistungsart', 'kostenstelle'];
 
-    if (in_array($_POST['target'], $validTableTargets) && $id) {
+    if (in_array($_POST['target'], $validTableTargets) && $id && $desc) {
         include '../db.php';
 
         $conn = new mysqli($host, $user, $password, $database);
@@ -18,13 +19,13 @@ if (isset($_POST['target']) && isset($_POST['id'])) {
 
         $targetTable = $_POST['target'] === 'leistungsart' ? 'leistungsarten' : 'kostenstellen';
 
-        $removalQuery = "DELETE FROM `" .$targetTable. "` WHERE `" .$_POST['target']. "` = " .$id;
+        $insertionQuery = "INSERT INTO `" . $targetTable . "` (`" .$_POST['target']. "`, `beschreibung`) VALUES(" .$id. ", '" .$desc. "')";
 
-        $execution = $conn->query($removalQuery);
+        $execution = $conn->query($insertionQuery);
 
         $response = [
             'completed_in' => microtime_float() - $start,
-            'query' => $removalQuery,
+            'query' => $insertionQuery,
         ];
 
         $execution ? ($response['success'] = true) : ($response['error'] = $conn->error);

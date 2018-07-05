@@ -496,7 +496,7 @@ const toggleButtonDisabledOnInput = function () {
   document.getElementById(`${this.id}-btn`).disabled = this.value.length === 0;
 };
 
-const adminToggleAdd = target => {
+const adminToggleKSLAAdd = target => {
   const number = document.getElementById(`${target}-number-add`);
   const desc = document.getElementById(`${target}-desc-add`);
 
@@ -510,26 +510,20 @@ const adminToggleAdd = target => {
 };
 
 const adminChangeFields = (target, types, values) => {
-  const numberTarget = document.getElementById(`${target}-edit-0`);
-  const descTarget = document.getElementById(`${target}-edit-1`);
-
   for (let i = 0; i < types.length; i += 1) {
     const targetEl = document.getElementById(`${target}-edit-${i}`);
     targetEl.type = types[i];
-
-    if (values) {
-      targetEl.value = values[i];
-    }
+    if (values) targetEl.value = values[i];
   }
 };
 
-const adminToggleEdit = target => {
+const adminToggleKSLAEdit = target => {
   const select = document.getElementById(`${target}-edit`);
 
   if (select) {
     select.addEventListener('change', function () {
       const numberDescPair = document.querySelector(`#${target}-edit option[value="${this.value}"]`).innerText.split(' – ');
-     
+
       adminChangeFields(target, ['number', 'text'], numberDescPair);
 
       document.getElementById(`${target}-btn-edit`).disabled = false;
@@ -540,7 +534,7 @@ const adminToggleEdit = target => {
 
 const capitalize = word => word.charAt(0).toUpperCase() + word.slice(1);
 
-const adminDeleteListener = target => {
+const adminDeleteKSLAListener = target => {
   const deleteBtn = document.getElementById(`${target}-btn-delete`);
   const btnCL = deleteBtn.classList;
 
@@ -594,13 +588,49 @@ const adminDeleteListener = target => {
   }
 };
 
+const adminAddKSLAListener = target => {
+  const btn = document.getElementById(`${target}-btn-add`);
+  const btnCL = btn.classList;
+
+  btn.addEventListener('click', e => {
+    e.preventDefault();
+
+    btn.disabled = true;
+    btnCL.remove('is-success');
+    ['is-loading', 'is-warning'].forEach(className => btnCL.add(className));
+
+    const value = document.getElementById(`${target}-number-add`).value;
+    const desc = document.getElementById(`${target}-desc-add`).value;
+
+    fetch('api/options/addKSLA.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: `target=${target}&id=${value}&desc=${desc}`,
+    })
+      .then(response => response.json())
+      .then(json => {
+        ['is-loading', 'is-warning'].forEach(className => btnCL.remove(className));
+
+        btnCL.add(json.success ? 'is-success' : 'is-danger');
+        btn.innerText = json.success ? 'Erfolg' : `Fehler! Info: ${json.error}`;
+        btn.disabled = false;
+
+        setTimeout(() => {
+          if (btnCL.contains('is-danger')) btnCL.replace('is-danger', 'is-success');
+          btn.innerText = `${capitalize(target)} hinzufügen`;
+        }, 5000);
+      });
+  });
+};
+
 const adminEventListener = () => {
   const targets = ['kostenstelle', 'leistungsart'];
 
   targets.forEach(target => {
-    adminToggleAdd(target);
-    adminToggleEdit(target);
-    adminDeleteListener(target);
+    adminToggleKSLAAdd(target);
+    adminToggleKSLAEdit(target);
+    adminDeleteKSLAListener(target);
+    adminAddKSLAListener(target);
   });
 };
 
