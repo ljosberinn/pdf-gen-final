@@ -14,5 +14,5 @@
         <p class="help">Nur PNG oder JPG/JPEG werden akzeptiert!</p>
     </div>
   </div>
-  <button disabled class="button is-primary">Signatur hochladen</button>
+  <button disabled class="button is-primary" id="signatur-btn">Signatur hochladen</button>
 </form>

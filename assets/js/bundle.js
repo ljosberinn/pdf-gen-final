@@ -455,7 +455,12 @@ var silenceDatepicker = function silenceDatepicker() {
 var showUploadedFileName = function showUploadedFileName() {
   if (this.files.length > 0) {
     document.getElementsByClassName('file-name')[0].innerText = this.files[0].name;
+    document.getElementById(this.id + '-btn').disabled = this.files.length === 0;
   }
+};
+
+var toggleButtonDisabledOnInput = function toggleButtonDisabledOnInput() {
+  document.getElementById(this.id + '-btn').disabled = this.value.length === 0;
 };
 
 /**
@@ -488,6 +493,9 @@ var addEventListeners = function addEventListeners() {
   document.getElementById('datepicker').addEventListener('click', silenceDatepicker);
   document.getElementById('add-tr').addEventListener('click', addTR);
   document.getElementById('remove-contents').addEventListener('click', removeContent);
+
+  // options Listeners
+  document.getElementById('überminuten').addEventListener('input', toggleButtonDisabledOnInput);
 
   arbeitszeit = parseInt(document.getElementById('arbeitszeit').value.replace(/von /, ''));
 

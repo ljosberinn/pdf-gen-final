@@ -1,10 +1,11 @@
 <form method="POST" action="api/saveOptions.php">
   <div class="control">
     <div class="columns">
-      <label class="column"> Überstunden bitte in Minuten angeben!
-        <input class="input" type="number" name="überstunden" value="<?php echo $_SESSION['überminuten']; ?>" />
-      </label>
+      <div class="column">
+        <input class="input" type="number" name="überstunden" id="überminuten" value="<?php echo $_SESSION['überminuten']; ?>" />
+        <p class="help">Überstunden bitte in Minuten angeben!</p>
+      </div>
     </div>
-    <button disabled class="button is-primary">Überstunden festlegen</button>
+    <button disabled class="button is-primary" id="überminuten-btn" >Überstunden festlegen</button>
   </div>
 </form>
