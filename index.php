@@ -1,5 +1,7 @@
 <?php
 
+ob_start();
+
  /**
   * Core file
   *
@@ -29,6 +31,8 @@ if (isset($_GET['logout']) && !empty($_SESSION['personalnummer'])) {
     session_destroy();
     header('Location: index.php');
 }
+
+ob_end_flush();
 
 ?>
 

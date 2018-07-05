@@ -13,10 +13,9 @@
   <!-- Signatur -->
   <?php require 'options/signatur.php';
 
-
-  if ($_SESSION['personalnummer'] == 1090) {
-      echo '<hr>';
-      include_once 'options/adminOptions.php';
+  if ($_SESSION['admin']) {
+    echo '<hr>';
+    include_once 'options/adminOptions.php';
   }
 
   ?>

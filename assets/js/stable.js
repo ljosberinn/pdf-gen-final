@@ -474,7 +474,6 @@ const addEditEventListener = (el, mode) => {
 
 /**
  * Setzt Datepicker.value auf leer damit alle Datalist-Einträge auswählbar werden
- *
  */
 const silenceDatepicker = function () {
   this.value = '';
@@ -490,43 +489,100 @@ const showUploadedFileName = function () {
   }
 };
 
+/**
+ * Aktiviert zugehörigen Button des Inputfeldes sobald Inhalt verfügbar ist
+ */
 const toggleButtonDisabledOnInput = function () {
   document.getElementById(`${this.id}-btn`).disabled = this.value.length === 0;
 };
 
-/**
- * Fügt alle relevanten EventListener hinzu
- *
- */
-const addEventListeners = () => {
-  // Get all "navbar-burger" elements
-  const navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
+const adminToggleAdd = target => {
+  const number = document.getElementById(`${target}-number-add`);
+  const desc = document.getElementById(`${target}-desc-add`);
 
-  // Check if there are any navbar burgers
-  if (navbarBurgers.length > 0) {
-    // Add a click event on each of them
-    navbarBurgers.forEach(el => {
-      el.addEventListener('click', () => {
-        const target = el.dataset.target;
-        target.classList.toggle('is-active');
-        document.getElementById(target).classList.toggle('is-active');
+  if (number && desc) {
+    [number, desc].forEach(el => {
+      el.addEventListener('input', () => {
+        document.getElementById(`${target}-btn-add`).disabled = !(number.value.length > 0 && desc.value.length > 0);
       });
     });
   }
+};
 
+const adminToggleEdit = target => {
+  const select = document.getElementById(`${target}-edit`);
+
+  if (select) {
+    select.addEventListener('change', function () {
+      const numberDescPair = document.querySelector(`#${target}-edit option[value="${this.value}"]`).innerText.split(' – ');
+      const numberTarget = document.getElementById(`${target}-edit-0`);
+      const descTarget = document.getElementById(`${target}-edit-1`);
+
+      numberTarget.value = numberDescPair[0];
+      numberTarget.type = 'number';
+
+      descTarget.value = numberDescPair[1];
+      descTarget.type = 'text';
+
+      document.getElementById(`${target}-btn-edit`).disabled = false;
+    });
+  }
+};
+
+const adminEventListener = () => {
+  const targets = ['kostenstelle', 'leistungsart'];
+
+  targets.forEach(target => {
+    adminToggleAdd(target);
+    adminToggleEdit(target);
+  });
+};
+
+/**
+ * Mobile Nav Hamburger
+ */
+const initHamburger = () => {
+  const navbarBurgers = Array.from(document.querySelectorAll('.navbar-burger'));
+
+  if (navbarBurgers.length > 0) {
+    navbarBurgers.forEach(el => {
+      el.addEventListener('click', () => {
+        [el, document.getElementById(el.dataset.target)].forEach(element => element.classList.toggle('is-active'));
+      });
+    });
+  }
+};
+
+/**
+ * Initiiert TabSwitcher...
+ */
+const initTabswitcher = () => {
   Array.from(document.querySelectorAll('.navbar-item[data-target')).forEach(el => {
     el.addEventListener('click', () => {
       toggleTab(el.id, el.dataset.target);
     });
   });
+};
 
-  document.querySelector('input[type="file"]').addEventListener('change', showUploadedFileName);
+/**
+ * Fügt alle relevanten EventListener hinzu
+ */
+const addEventListeners = () => {
+  initHamburger();
+  initTabswitcher();
+
+  const fileInput = document.querySelector('input[type="file"]');
+  if (fileInput) fileInput.addEventListener('change', showUploadedFileName);
+
   document.getElementById('datepicker').addEventListener('click', silenceDatepicker);
   document.getElementById('add-tr').addEventListener('click', addTR);
   document.getElementById('remove-contents').addEventListener('click', removeContent);
 
   // options Listeners
   document.getElementById('überminuten').addEventListener('input', toggleButtonDisabledOnInput);
+
+  // admin
+  adminEventListener();
 
   arbeitszeit = parseInt(document.getElementById('arbeitszeit').value.replace(/von /, ''));
 

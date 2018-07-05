@@ -27,6 +27,8 @@ if (isset($_POST['personalnummer'])) {
                 $_SESSION['startAvg'] = roundMinutes(returnAverageStartTime($conn, $personalnummer));
                 $_SESSION['überminuten'] = $data['überminuten'];
 
+                $_SESSION['admin'] = $data['rolle'] == 1;
+
                 $_SESSION['urlaubstage'] = $data['urlaubstage'];
                 $_SESSION['remaining_urlaubstage'] = 0;
 

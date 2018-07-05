@@ -443,7 +443,6 @@ var addEditEventListener = function addEditEventListener(el, mode) {
 
 /**
  * Setzt Datepicker.value auf leer damit alle Datalist-Einträge auswählbar werden
- *
  */
 var silenceDatepicker = function silenceDatepicker() {
   this.value = '';
@@ -459,43 +458,102 @@ var showUploadedFileName = function showUploadedFileName() {
   }
 };
 
+/**
+ * Aktiviert zugehörigen Button des Inputfeldes sobald Inhalt verfügbar ist
+ */
 var toggleButtonDisabledOnInput = function toggleButtonDisabledOnInput() {
   document.getElementById(this.id + '-btn').disabled = this.value.length === 0;
 };
 
-/**
- * Fügt alle relevanten EventListener hinzu
- *
- */
-var addEventListeners = function addEventListeners() {
-  // Get all "navbar-burger" elements
-  var navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
+var adminToggleAdd = function adminToggleAdd(target) {
+  var number = document.getElementById(target + '-number-add');
+  var desc = document.getElementById(target + '-desc-add');
 
-  // Check if there are any navbar burgers
-  if (navbarBurgers.length > 0) {
-    // Add a click event on each of them
-    navbarBurgers.forEach(function (el) {
-      el.addEventListener('click', function () {
-        var target = el.dataset.target;
-        target.classList.toggle('is-active');
-        document.getElementById(target).classList.toggle('is-active');
+  if (number && desc) {
+    [number, desc].forEach(function (el) {
+      el.addEventListener('input', function () {
+        document.getElementById(target + '-btn-add').disabled = !(number.value.length > 0 && desc.value.length > 0);
       });
     });
   }
+};
 
+var adminToggleEdit = function adminToggleEdit(target) {
+  var select = document.getElementById(target + '-edit');
+
+  if (select) {
+    select.addEventListener('change', function () {
+      var numberDescPair = document.querySelector('#' + target + '-edit option[value="' + this.value + '"]').innerText.split(' – ');
+      var numberTarget = document.getElementById(target + '-edit-0');
+      var descTarget = document.getElementById(target + '-edit-1');
+
+      numberTarget.value = numberDescPair[0];
+      numberTarget.type = 'number';
+
+      descTarget.value = numberDescPair[1];
+      descTarget.type = 'text';
+
+      document.getElementById(target + '-btn-edit').disabled = false;
+    });
+  }
+};
+
+var adminEventListener = function adminEventListener() {
+  var targets = ['kostenstelle', 'leistungsart'];
+
+  targets.forEach(function (target) {
+    adminToggleAdd(target);
+    adminToggleEdit(target);
+  });
+};
+
+/**
+ * Mobile Nav Hamburger
+ */
+var initHamburger = function initHamburger() {
+  var navbarBurgers = Array.from(document.querySelectorAll('.navbar-burger'));
+
+  if (navbarBurgers.length > 0) {
+    navbarBurgers.forEach(function (el) {
+      el.addEventListener('click', function () {
+        [el, document.getElementById(el.dataset.target)].forEach(function (element) {
+          return element.classList.toggle('is-active');
+        });
+      });
+    });
+  }
+};
+
+/**
+ * Initiiert TabSwitcher...
+ */
+var initTabswitcher = function initTabswitcher() {
   Array.from(document.querySelectorAll('.navbar-item[data-target')).forEach(function (el) {
     el.addEventListener('click', function () {
       toggleTab(el.id, el.dataset.target);
     });
   });
+};
 
-  document.querySelector('input[type="file"]').addEventListener('change', showUploadedFileName);
+/**
+ * Fügt alle relevanten EventListener hinzu
+ */
+var addEventListeners = function addEventListeners() {
+  initHamburger();
+  initTabswitcher();
+
+  var fileInput = document.querySelector('input[type="file"]');
+  if (fileInput) fileInput.addEventListener('change', showUploadedFileName);
+
   document.getElementById('datepicker').addEventListener('click', silenceDatepicker);
   document.getElementById('add-tr').addEventListener('click', addTR);
   document.getElementById('remove-contents').addEventListener('click', removeContent);
 
   // options Listeners
   document.getElementById('überminuten').addEventListener('input', toggleButtonDisabledOnInput);
+
+  // admin
+  adminEventListener();
 
   arbeitszeit = parseInt(document.getElementById('arbeitszeit').value.replace(/von /, ''));
 
