@@ -122,7 +122,6 @@ const minutesCalculatorEventListenerHelper = nextRowId => {
     });
   }
 };
-
 /**
  * Aktiviert oder deaktiviert Buttons abhängig von Werten der ersten #creation-tbody-Zeile
  *
@@ -760,4 +759,5 @@ const addEventListeners = () => {
 document.addEventListener('DOMContentLoaded', () => {
   addEventListeners();
   initDateAndTimePicker();
+  update890Row();
 });

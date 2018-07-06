@@ -232,13 +232,13 @@ for ($i = 0; $i < 14; $i += 1) {
               </span>
               <span>Zeilen leeren</span>
             </button>
-            <button name="later" class="button is-info" id="later" disabled>
+            <button name="later" class="button is-info" id="later">
               <span class="icon is-small">
                 <i class="far fa-clock"></i>
               </span>
               <span>Für später speichern</span>
             </button>
-            <button name="now" class="button is-success" id="now" disabled>
+            <button name="now" class="button is-success" id="now">
               <span class="icon is-small">
                 <i class="fas fa-check"></i>
               </span>
