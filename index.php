@@ -20,10 +20,16 @@ ob_start();
   * @link      https://gerritalex.de/tzfinal
   */
 
-
+require 'api/db.php';
 require 'api/functions.php';
 
 setHeaders();
+
+$conn = new mysqli($host, $user, $password, $database);
+$conn->set_charset('utf8');
+
+$kostenstellen = returnConstants($conn, 'kostenstelle');
+$leistungsarten = returnConstants($conn, 'leistungsart');
 
 session_start();
 
@@ -78,13 +84,11 @@ ob_end_flush();
             $class = '';
         }
 
-        echo '
-        <' .$tag. ' ' .$class. '>';
+        echo "<$tag $class>";
 
         include 'content/' .$tag. '.php';
 
-        echo '
-        </' .$tag. '>';
+        echo "</$tag>";
     }
 
     $lateScripts = [

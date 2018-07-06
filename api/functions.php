@@ -102,49 +102,29 @@ function validateInt($supposedNumber)
 }
 
 /**
- * Fetches Kostenstellen from DB and outputs them as option-elements
+ * Fetches
  *
- * @return void
+ * @param object $conn [mysqli object]
+ * @param string $type ['kostenstelle' or 'leistungsart']
+ *
+ * @return array $arr
  */
-function returnKostenstellen()
+function returnConstants($conn, $type)
 {
-    include 'db.php';
+    $arr = [];
 
-    $conn = new mysqli($host, $user, $password, $database);
-    $conn->set_charset('utf-8');
+    $plural = $type === 'kostenstelle' ? 'kostenstellen' : 'leistungsarten';
 
-    $getAllKostenstellenQuery = "SELECT * FROM `kostenstellen` ORDER BY `kostenstelle` ASC";
-    $getAllKostenstellen = $conn->query($getAllKostenstellenQuery);
+    $query = "SELECT * FROM `" .$plural. "` ORDER BY `" .$type. "` ASC";
+    $execution = $conn->query($query);
 
-    if ($getAllKostenstellen->num_rows > 0) {
-        while ($data = $getAllKostenstellen->fetch_assoc()) {
-            echo '
-            <option value="' .$data['kostenstelle']. '">' .$data['kostenstelle']. ' – ' .$data['beschreibung']. '</option>';
+    if ($execution->num_rows > 0) {
+        while ($data = $execution->fetch_assoc()) {
+            array_push($arr, '<option value="' .$data[$type]. '">' .$data[$type]. ' – ' .$data['beschreibung']. '</option>');
         }
     }
-}
 
-/**
- * Fetches Leistungsarten from DB and outputs them as option-elements
- *
- * @return void
- */
-function returnLeistungsarten()
-{
-    include 'db.php';
-
-    $conn = new mysqli($host, $user, $password, $database);
-    $conn->set_charset('utf8');
-
-    $getAllKostenstellenQuery = "SELECT * FROM `leistungsarten` ORDER BY `leistungsart` ASC";
-    $getAllKostenstellen = $conn->query($getAllKostenstellenQuery);
-
-    if ($getAllKostenstellen->num_rows > 0) {
-        while ($data = $getAllKostenstellen->fetch_assoc()) {
-            echo '
-            <option value="' .$data['leistungsart']. '">' .$data['leistungsart']. ' – ' .$data['beschreibung']. '</option>';
-        }
-    }
+    return $arr;
 }
 
 /**
@@ -211,8 +191,11 @@ function getCreationStatement($type, $personalnummer)
  */
 function sanitizeInput($type, $input)
 {
-    if ($input == '') return $type !== 'kunde' ? 0 : $input;
-    else return $input;
+    if ($input == '') {
+        return $type !== 'kunde' ? 0 : $input;
+    } else {
+        return $input;
+    }
 }
 
 /**
@@ -255,13 +238,13 @@ function appendDataToInsertionStatement($insertionStatement, $data, $length, $ha
 {
 
     $posten = [
-      'kostenstelle',
-      'auftragsnummer',
-      'kunde',
-      'leistungsart',
-      'minuten',
-      'anzahl',
-      'materialnummer',
+        'kostenstelle',
+        'auftragsnummer',
+        'kunde',
+        'leistungsart',
+        'minuten',
+        'anzahl',
+        'materialnummer',
     ];
 
     for ($i = 0; $i <= ($length - 1); $i += 1) {
@@ -283,7 +266,9 @@ function appendDataToInsertionStatement($insertionStatement, $data, $length, $ha
         }
     }
 
-    if ($has890 > 0) $insertionStatement .= $has890. ',';
+    if ($has890 > 0) {
+        $insertionStatement .= $has890. ',';
+    }
 
     return substr($insertionStatement, 0, -1). ');';
 }
@@ -327,8 +312,8 @@ function returnAverageStartTime($conn, $personalnummer)
             $minutes = round(($hourNonFloored - $hour) * 60);
 
             $checkStrlen = [
-              'hour',
-              'minutes',
+                'hour',
+                'minutes',
             ];
 
             foreach ($checkStrlen as $varName) {
@@ -349,8 +334,6 @@ function returnAverageStartTime($conn, $personalnummer)
 
 /**
  *  Localizes new DateTimeImmutable object
-
- * @method public manualDateLocalization
  *
  * @param object $ts [new DateTimeImmutable() object]
  *
@@ -375,6 +358,13 @@ function manualDateLocalization($ts)
     return $ts;
 }
 
+/**
+ * Rounds minutes to either 0 or 5 depending on its value
+ *
+ * @param string $commaSeparatedHourMinuteStamp [e.g. 05:13]
+ *
+ * @return string [e.g. 05:15]
+ */
 function roundMinutes($commaSeparatedHourMinuteStamp)
 {
     $arr = explode(':', $commaSeparatedHourMinuteStamp);
@@ -389,6 +379,13 @@ function roundMinutes($commaSeparatedHourMinuteStamp)
     }
 }
 
+/**
+ * Calculates seconds of day passed to hours and minutes of that day
+ *
+ * @param int $minutes [e.g. 120]
+ *
+ * @return string [e.g. 00:02]
+ */
 function secondsToTime($minutes)
 {
     $dtF = new \DateTime('@0');
@@ -397,6 +394,11 @@ function secondsToTime($minutes)
     return $result->h . ':' . $result->i;
 }
 
+/**
+ * Helper function to allow <1s microtimes
+ *
+ * @return float
+ */
 function microtime_float()
 {
     list($usec, $sec) = explode(" ", microtime());

@@ -5,8 +5,10 @@
 $arr = ['kostenstelle', 'leistungsart'];
 $plural = ['Kostenstellen', 'Leistungsarten'];
 
+
 foreach ($arr as $option) {
     $i = array_search($option, $arr);
+    $data = $option === 'kostenstelle' ? $kostenstellen : $leistungsarten;
 
     echo '
     <!-- ' .$plural[$i]. ' -->
@@ -31,9 +33,9 @@ foreach ($arr as $option) {
         <div class="column">
           <select class="select" id="' .$option. '-select">
             <option selected disabled>auswählen</option>';
-
-    $option === 'kostenstelle' ? returnKostenstellen() : returnLeistungsarten();
-
+            foreach ($data as $dataset) {
+              echo $dataset;
+            }
     echo '</select>
         </div>
         <div class="column">

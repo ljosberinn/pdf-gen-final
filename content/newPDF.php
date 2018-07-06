@@ -252,14 +252,18 @@ for ($i = 0; $i < 14; $i += 1) {
     <datalist id="kostenstelle">
         <?php
 
-        returnKostenstellen();
+        foreach ($kostenstellen as $kostenstelle) {
+            echo $kostenstelle;
+        }
 
         ?>
     </datalist>
     <datalist id="leistungsart">
         <?php
 
-        returnLeistungsarten();
+        foreach ($leistungsarten as $leistungsart) {
+            echo $leistungsart;
+        }
 
         ?>
     </datalist>
