@@ -3,15 +3,7 @@
     <strong class="has-text-white">ADMINBEREICH</strong>
   </h1>
 </div>
-<div class="columns">
 
-  <!-- Kostenstellen -->
-<?php require 'editKostenstellen.php'; ?>
-  <!-- Leistungsarten -->
-<?php require 'editLeistungsarten.php'; ?>
+<?php require 'createKSLA.php'; ?>
 
-</div>
-
-<hr>
-  <!-- neuer Angestellter -->
 <?php require 'createNewUser.html'; ?>

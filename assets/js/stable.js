@@ -450,6 +450,7 @@ const addDeletionEventListener = (el, mode) => {
         fetch('api/deletePDF.php', {
           method: 'POST',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          credentials: 'same-origin',
           body: `pdfId=${pdfId}&mode=${mode}`,
         });
         tr.style.opacity = 0;
@@ -509,24 +510,11 @@ const adminToggleKSLAAdd = target => {
   }
 };
 
-const adminChangeFields = (target, types, values) => {
-  for (let i = 0; i < types.length; i += 1) {
-    const targetEl = document.getElementById(`${target}-edit-${i}`);
-    targetEl.type = types[i];
-    if (values) targetEl.value = values[i];
-  }
-};
-
-const adminToggleKSLAEdit = target => {
-  const select = document.getElementById(`${target}-edit`);
+const adminToggleKSLATarget = target => {
+  const select = document.getElementById(`${target}-select`);
 
   if (select) {
-    select.addEventListener('change', function () {
-      const numberDescPair = document.querySelector(`#${target}-edit option[value="${this.value}"]`).innerText.split(' – ');
-
-      adminChangeFields(target, ['number', 'text'], numberDescPair);
-
-      document.getElementById(`${target}-btn-edit`).disabled = false;
+    select.addEventListener('change', () => {
       document.getElementById(`${target}-btn-delete`).disabled = false;
     });
   }
@@ -541,7 +529,8 @@ const adminDeleteKSLAListener = target => {
   if (deleteBtn) {
     deleteBtn.addEventListener('click', e => {
       e.preventDefault();
-      const value = document.getElementById(`${target}-edit-0`).value;
+
+      const value = Array.from(document.querySelector(`#${target}-select`).selectedOptions)[0].innerText.split(' – ')[0];
 
       swal({
         title: 'Sicher?',
@@ -560,6 +549,7 @@ const adminDeleteKSLAListener = target => {
           fetch('api/options/deleteKSLA.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            credentials: 'same-origin',
             body: `target=${target}&id=${value}`,
           })
             .then(response => response.json())
@@ -567,10 +557,9 @@ const adminDeleteKSLAListener = target => {
               ['is-loading', 'is-warning'].forEach(className => btnCL.remove(className));
 
               if (json.success) {
-                const select = document.querySelector(`#${target}-edit`);
+                const select = document.querySelector(`#${target}-select`);
                 Array.from(select.selectedOptions)[0].remove();
                 select.selectedIndex = 0;
-                adminChangeFields(target, ['hidden', 'hidden']);
               }
 
               btnCL.add(json.success ? 'is-success' : 'is-danger');
@@ -605,6 +594,7 @@ const adminAddKSLAListener = target => {
     fetch('api/options/addKSLA.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      credentials: 'same-origin',
       body: `target=${target}&id=${value}&desc=${desc}`,
     })
       .then(response => response.json())
@@ -628,7 +618,7 @@ const adminEventListener = () => {
 
   targets.forEach(target => {
     adminToggleKSLAAdd(target);
-    adminToggleKSLAEdit(target);
+    adminToggleKSLATarget(target);
     adminDeleteKSLAListener(target);
     adminAddKSLAListener(target);
   });

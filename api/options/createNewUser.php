@@ -1,5 +1,7 @@
 <?php
 
+session_start();
+
 if (isset($_POST['vorname-neu'])
   && isset($_POST['nachname-neu'])
   && isset($_POST['personalnummer-neu'])
@@ -7,7 +9,8 @@ if (isset($_POST['vorname-neu'])
   && isset($_POST['überstunden-neu'])
   && isset($_POST['urlaubstage-neu'])
   && isset($_POST['used_urlaubstage-neu'])
-  && isset($_POST['admin-neu'])) {
+  && isset($_POST['admin-neu'])
+  && $_SESSION['admin'] == 1) {
 
     $vorname = filter_input(INPUT_POST, 'vorname-neu', FILTER_SANITIZE_STRING);
     $nachname = filter_input(INPUT_POST, 'nachname-neu', FILTER_SANITIZE_STRING);

@@ -1,6 +1,8 @@
 <?php
 
-if (isset($_POST['target']) && isset($_POST['id'])) {
+session_start();
+
+if (isset($_POST['target']) && isset($_POST['id']) && $_SESSION['admin'] == 1) {
 
     include '../functions.php';
 
