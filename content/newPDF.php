@@ -17,16 +17,6 @@ foreach ($tableColumnKeys as $tableColumnKey) {
     array_push($tableColumnKeys_lowerCase, strtolower($tableColumnKey));
 }
 
-$now = new DateTimeImmutable();
-
-$oneWeekBack = $now->modify('-1 week');
-$dateOptions = [];
-
-for ($i = 0; $i < 14; $i += 1) {
-    $plusOneDay = $oneWeekBack->modify('+' .$i. ' day')->format('D, d.m.Y');
-    array_push($dateOptions, '<option value="'.manualDateLocalization($plusOneDay).'" />');
-}
-
 ?>
 
 
@@ -40,16 +30,7 @@ for ($i = 0; $i < 14; $i += 1) {
         <div class="field">
           <div class="control">
             <label for="datepicker" class="label heading">Datum </label>
-            <input id="datepicker" name="datum" class="input" required list="datelist" value="<?php echo manualDateLocalization($now->format('D, d.m.Y')); ?>"/>
-            <datalist id="datelist">
-            <?php
-
-            foreach ($dateOptions as $option) {
-                echo $option;
-            }
-
-            ?>
-            </datalist>
+            <input name="datum" type="date" class="input" required />
           </div>
         </div>
       </div>

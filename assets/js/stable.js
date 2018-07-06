@@ -50,13 +50,15 @@ const update890Row = () => {
   const row890 = document.getElementById('tr-890');
   const min890 = document.getElementById('minuten-890');
 
-  min890.value = minuten890;
+  if (row890 && min890) {
+    min890.value = minuten890;
 
-  if (minuten890 === 0) {
-    row890.style.opacity = 0;
-  } else {
-    minuten890 < 0 ? min890.classList.add('is-danger') : min890.classList.remove('is-danger');
-    row890.style.opacity = 1;
+    if (minuten890 === 0) {
+      row890.style.opacity = 0;
+    } else {
+      minuten890 < 0 ? min890.classList.add('is-danger') : min890.classList.remove('is-danger');
+      row890.style.opacity = 1;
+    }
   }
 };
 
@@ -408,10 +410,10 @@ const removeContent = () => {
 };
 
 /**
- * Initiiert Date & Timepicker
+ * Initiiert Von-Bis-EventListener
  *
  */
-const initDateAndTimePicker = () => {
+const workEventListeners = () => {
   const von = document.getElementById('von');
   const bis = document.getElementById('bis');
 
@@ -729,6 +731,7 @@ const addEventListenerIfExists = (id, type, eventListener) => {
 const addEventListeners = () => {
   initHamburger();
   initTabswitcher();
+  workEventListeners();
 
   const fileInput = document.querySelector('input[type="file"]');
   if (fileInput) fileInput.addEventListener('change', showUploadedFileName);
@@ -756,8 +759,28 @@ const addEventListeners = () => {
   [...document.querySelectorAll('.temp-edit-btn')].forEach(el => addEditEventListener(el, 'temporary'));
 };
 
+const returnDateWithLeadingZero = timestamp => `${`0${timestamp.getDate()}`.slice(-2)}.${`0${timestamp.getMonth() + 1}`.slice(-2)}.${timestamp.getFullYear()}`;
+
+const datePicker = () => {
+  const datePickertarget = document.querySelector('[name="datum"]');
+
+  if (datePickertarget) {
+    const datepickerOptions = {
+      dateFormat: 'dd.mm.yyyy',
+      lang: 'de',
+    };
+
+    bulmaCalendar.attach('[name="datum"]', datepickerOptions);
+
+    setTimeout(() => {
+      document.querySelector('[name="datum"]').click();
+      document.querySelector('button.date-item.is-today.is-active').click();
+    }, 1000);
+  }
+};
+
 document.addEventListener('DOMContentLoaded', () => {
   addEventListeners();
-  initDateAndTimePicker();
+  datePicker();
   update890Row();
 });

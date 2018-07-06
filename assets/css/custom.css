@@ -22,6 +22,14 @@ button.is-loading {
   pointer-events: none;
 }
 
+.calendar-container {
+  border-left: 0.5px solid #00d1b2;
+  border-bottom: 0.5px solid #00d1b2;
+  border-right: 0.5px solid #00d1b2;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+
 /* https://codepen.io/AllThingsSmitty/pen/MyqmdM */
 
 @media screen and (max-width: 1088px) {

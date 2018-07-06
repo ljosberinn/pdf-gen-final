@@ -56,6 +56,7 @@ ob_end_flush();
 
       $localFiles = [
         'bulma.helper' => 'css',
+        'bulma-calendar.min' => 'css',
         'custom' => 'css',
       ];
 
