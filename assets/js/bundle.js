@@ -225,15 +225,17 @@ var arbeitszeitCalculator = function arbeitszeitCalculator() {
 var addAußerHausEventListener = function addAußerHausEventListener() {
   var außerHausEl = document.getElementById('außer-haus');
 
-  außerHausEl.addEventListener('input', function () {
-    var außerHausVal = extractInputVal(außerHausEl);
-    if (außerHausVal > 0) {
-      arbeitszeitCalculator();
-      arbeitszeit -= außerHausVal;
-      update890Row();
-      updateArbeitszeitValues();
-    }
-  });
+  if (außerHausEl) {
+    außerHausEl.addEventListener('input', function () {
+      var außerHausVal = extractInputVal(außerHausEl);
+      if (außerHausVal > 0) {
+        arbeitszeitCalculator();
+        arbeitszeit -= außerHausVal;
+        update890Row();
+        updateArbeitszeitValues();
+      }
+    });
+  }
 };
 
 /**
@@ -342,15 +344,17 @@ var addPausenListener = function addPausenListener() {
   var pausenzeiten = [15, 30];
 
   checkboxes.forEach(function (el) {
-    el.addEventListener('change', function () {
-      var i = checkboxes.indexOf(el);
+    if (el) {
+      el.addEventListener('change', function () {
+        var i = checkboxes.indexOf(el);
 
-      !this.checked ? arbeitszeit += pausenzeiten[i] : arbeitszeit -= pausenzeiten[i];
+        !this.checked ? arbeitszeit += pausenzeiten[i] : arbeitszeit -= pausenzeiten[i];
 
-      minutesCalculator();
-      arbeitszeitCalculator();
-      updateArbeitszeitValues();
-    });
+        minutesCalculator();
+        arbeitszeitCalculator();
+        updateArbeitszeitValues();
+      });
+    }
   });
 };
 
@@ -382,13 +386,15 @@ var initDateAndTimePicker = function initDateAndTimePicker() {
   var bis = document.getElementById('bis');
 
   [von, bis].forEach(function (el) {
-    el.addEventListener('input', function () {
-      arbeitszeitCalculator();
-      minutesCalculator();
-      updateArbeitszeitValues();
-      toggleContentRemoveButton();
-      toggleSaveButtons();
-    });
+    if (el) {
+      el.addEventListener('input', function () {
+        arbeitszeitCalculator();
+        minutesCalculator();
+        updateArbeitszeitValues();
+        toggleContentRemoveButton();
+        toggleSaveButtons();
+      });
+    }
   });
 };
 
@@ -497,9 +503,9 @@ var capitalize = function capitalize(word) {
 
 var adminDeleteKSLAListener = function adminDeleteKSLAListener(target) {
   var deleteBtn = document.getElementById(target + '-btn-delete');
-  var btnCL = deleteBtn.classList;
 
   if (deleteBtn) {
+    var btnCL = deleteBtn.classList;
     deleteBtn.addEventListener('click', function (e) {
       e.preventDefault();
 
@@ -515,7 +521,6 @@ var adminDeleteKSLAListener = function adminDeleteKSLAListener(target) {
         confirmButtonText: 'löschen'
       }).then(function (result) {
         if (result.value) {
-          deleteBtn.disabled = true;
           btnCL.remove('is-danger');
           ['is-loading', 'is-warning'].forEach(function (className) {
             return btnCL.add(className);
@@ -541,7 +546,6 @@ var adminDeleteKSLAListener = function adminDeleteKSLAListener(target) {
 
             btnCL.add(json.success ? 'is-success' : 'is-danger');
             deleteBtn.innerText = json.success ? 'Erfolg' : 'Fehler! Info: ' + json.error;
-            deleteBtn.disabled = false;
 
             setTimeout(function () {
               if (btnCL.contains('is-success')) btnCL.replace('is-success', 'is-danger');
@@ -556,42 +560,43 @@ var adminDeleteKSLAListener = function adminDeleteKSLAListener(target) {
 
 var adminAddKSLAListener = function adminAddKSLAListener(target) {
   var btn = document.getElementById(target + '-btn-add');
-  var btnCL = btn.classList;
 
-  btn.addEventListener('click', function (e) {
-    e.preventDefault();
+  if (btn) {
+    var btnCL = btn.classList;
 
-    btn.disabled = true;
-    btnCL.remove('is-success');
-    ['is-loading', 'is-warning'].forEach(function (className) {
-      return btnCL.add(className);
-    });
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
 
-    var value = document.getElementById(target + '-number-add').value;
-    var desc = document.getElementById(target + '-desc-add').value;
-
-    fetch('api/options/addKSLA.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      credentials: 'same-origin',
-      body: 'target=' + target + '&id=' + value + '&desc=' + desc
-    }).then(function (response) {
-      return response.json();
-    }).then(function (json) {
+      btnCL.remove('is-success');
       ['is-loading', 'is-warning'].forEach(function (className) {
-        return btnCL.remove(className);
+        return btnCL.add(className);
       });
 
-      btnCL.add(json.success ? 'is-success' : 'is-danger');
-      btn.innerText = json.success ? 'Erfolg' : 'Fehler! Info: ' + json.error;
-      btn.disabled = false;
+      var value = document.getElementById(target + '-number-add').value;
+      var desc = document.getElementById(target + '-desc-add').value;
 
-      setTimeout(function () {
-        if (btnCL.contains('is-danger')) btnCL.replace('is-danger', 'is-success');
-        btn.innerText = capitalize(target) + ' hinzuf\xFCgen';
-      }, 5000);
+      fetch('api/options/addKSLA.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        credentials: 'same-origin',
+        body: 'target=' + target + '&id=' + value + '&desc=' + desc
+      }).then(function (response) {
+        return response.json();
+      }).then(function (json) {
+        ['is-loading', 'is-warning'].forEach(function (className) {
+          return btnCL.remove(className);
+        });
+
+        btnCL.add(json.success ? 'is-success' : 'is-danger');
+        btn.innerText = json.success ? 'Erfolg' : 'Fehler! Info: ' + json.error;
+
+        setTimeout(function () {
+          if (btnCL.contains('is-danger')) btnCL.replace('is-danger', 'is-success');
+          btn.innerText = capitalize(target) + ' hinzuf\xFCgen';
+        }, 5000);
+      });
     });
-  });
+  }
 };
 
 var faultyElementListener = function faultyElementListener() {
@@ -599,29 +604,71 @@ var faultyElementListener = function faultyElementListener() {
   this.removeEventListener('input', faultyElementListener);
 };
 
-var adminHighlightFaultyElements = function adminHighlightFaultyElements(elements) {
+var adminHighlightFaultyElements = function adminHighlightFaultyElements(elements, btn) {
   elements[0].focus();
   elements.forEach(function (el) {
     el.classList.add('is-danger');
     el.addEventListener('input', faultyElementListener);
   });
+  ['is-loading', 'is-warning'].forEach(function (className) {
+    return btn.classList.remove(className);
+  });
+  btn.classList.add('is-primary');
 };
 
-var adminCreateNewUser = function adminCreateNewUser(inputs) {};
+var adminCreateNewUser = function adminCreateNewUser(inputs, btn) {
+  var bodyString = '';
+
+  inputs.forEach(function (input) {
+    bodyString += input.name + '=' + input.value + '&';
+  });
+
+  bodyString = bodyString.slice(0, -1);
+
+  fetch('api/options/createNewUser.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    credentials: 'same-origin',
+    body: bodyString
+  }).then(function (response) {
+    return response.json();
+  }).then(function (json) {
+    ['is-loading', 'is-warning'].forEach(function (className) {
+      return btn.classList.remove(className);
+    });
+
+    btn.classList.add(json.success ? 'is-success' : 'is-danger');
+    btn.innerText = json.success ? 'Erfolg' : 'Fehler! Info: ' + json.error;
+
+    setTimeout(function () {
+      if (btn.classList.contains('is-success')) btn.classList.replace('is-success', 'is-primary');
+      btn.innerText = 'Neuen Angestellten hinzufügen';
+    }, 5000);
+  });
+};
 
 var adminCreateUserListener = function adminCreateUserListener() {
   var btn = document.getElementById('create-user-btn');
 
-  btn.addEventListener('click', function (e) {
-    e.preventDefault();
+  if (btn) {
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
 
-    var inputs = [].concat(_toConsumableArray(document.querySelectorAll('form[action="api/options/createNewUser.php"] input')));
-    var faultyEls = inputs.filter(function (el) {
-      return el.required && el.value.length === 0;
+      btn.classList.remove('is-primary');
+      ['is-loading', 'is-warning'].forEach(function (className) {
+        return btn.classList.add(className);
+      });
+
+      var formParent = 'form[action="api/options/createNewUser.php"]';
+
+      var inputs = [].concat(_toConsumableArray(document.querySelectorAll(formParent + ' input, ' + formParent + ' select')));
+      var faultyEls = inputs.filter(function (el) {
+        return el.required && el.value.length === 0;
+      });
+
+      faultyEls.length === 0 ? adminCreateNewUser(inputs, btn) : adminHighlightFaultyElements(faultyEls, btn);
     });
-
-    faultyEls.length === 0 ? adminCreateNewUser(inputs) : adminHighlightFaultyElements(faultyEls);
-  });
+  }
 };
 
 var adminEventListener = function adminEventListener() {
@@ -663,6 +710,11 @@ var initTabswitcher = function initTabswitcher() {
   });
 };
 
+var addEventListenerIfExists = function addEventListenerIfExists(id, type, eventListener) {
+  var element = document.getElementById(id);
+  if (element) element.addEventListener(type, eventListener);
+};
+
 /**
  * Fügt alle relevanten EventListener hinzu
  */
@@ -673,23 +725,21 @@ var addEventListeners = function addEventListeners() {
   var fileInput = document.querySelector('input[type="file"]');
   if (fileInput) fileInput.addEventListener('change', showUploadedFileName);
 
-  document.getElementById('datepicker').addEventListener('click', silenceDatepicker);
-  document.getElementById('add-tr').addEventListener('click', addTR);
-  document.getElementById('remove-contents').addEventListener('click', removeContent);
-
-  // options Listeners
-  document.getElementById('überminuten').addEventListener('input', toggleButtonDisabledOnInput);
+  addEventListenerIfExists('datepicker', 'click', silenceDatepicker);
+  addEventListenerIfExists('add-tr', 'click', addTR);
+  addEventListenerIfExists('remove-contents', 'click', removeContent);
+  addEventListenerIfExists('perm-save-toggler', 'click', unhidePermSaveTRs);
+  addEventListenerIfExists('überminuten', 'input', toggleButtonDisabledOnInput);
 
   // admin
   adminEventListener();
 
-  arbeitszeit = parseInt(document.getElementById('arbeitszeit').value.replace(/von /, ''));
+  var arbeitszeitEl = document.getElementById('arbeitszeit');
+  if (arbeitszeitEl) arbeitszeit = parseInt(arbeitszeitEl.value.replace(/von /, ''));
 
   addPausenListener();
   addAußerHausEventListener();
   minutesCalculatorEventListenerHelper();
-
-  document.getElementById('perm-save-toggler').addEventListener('click', unhidePermSaveTRs);
 
   [].concat(_toConsumableArray(document.querySelectorAll('.perm-delete-btn'))).forEach(function (el) {
     return addDeletionEventListener(el, 'permanent');

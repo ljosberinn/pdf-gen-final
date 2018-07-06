@@ -215,15 +215,17 @@ const arbeitszeitCalculator = () => {
 const addAußerHausEventListener = () => {
   const außerHausEl = document.getElementById('außer-haus');
 
-  außerHausEl.addEventListener('input', () => {
-    const außerHausVal = extractInputVal(außerHausEl);
-    if (außerHausVal > 0) {
-      arbeitszeitCalculator();
-      arbeitszeit -= außerHausVal;
-      update890Row();
-      updateArbeitszeitValues();
-    }
-  });
+  if (außerHausEl) {
+    außerHausEl.addEventListener('input', () => {
+      const außerHausVal = extractInputVal(außerHausEl);
+      if (außerHausVal > 0) {
+        arbeitszeitCalculator();
+        arbeitszeit -= außerHausVal;
+        update890Row();
+        updateArbeitszeitValues();
+      }
+    });
+  }
 };
 
 /**
@@ -377,15 +379,17 @@ const addPausenListener = () => {
   const pausenzeiten = [15, 30];
 
   checkboxes.forEach(el => {
-    el.addEventListener('change', function () {
-      const i = checkboxes.indexOf(el);
+    if (el) {
+      el.addEventListener('change', function () {
+        const i = checkboxes.indexOf(el);
 
-      !this.checked ? (arbeitszeit += pausenzeiten[i]) : (arbeitszeit -= pausenzeiten[i]);
+        !this.checked ? (arbeitszeit += pausenzeiten[i]) : (arbeitszeit -= pausenzeiten[i]);
 
-      minutesCalculator();
-      arbeitszeitCalculator();
-      updateArbeitszeitValues();
-    });
+        minutesCalculator();
+        arbeitszeitCalculator();
+        updateArbeitszeitValues();
+      });
+    }
   });
 };
 
@@ -413,13 +417,15 @@ const initDateAndTimePicker = () => {
   const bis = document.getElementById('bis');
 
   [von, bis].forEach(el => {
-    el.addEventListener('input', () => {
-      arbeitszeitCalculator();
-      minutesCalculator();
-      updateArbeitszeitValues();
-      toggleContentRemoveButton();
-      toggleSaveButtons();
-    });
+    if (el) {
+      el.addEventListener('input', () => {
+        arbeitszeitCalculator();
+        minutesCalculator();
+        updateArbeitszeitValues();
+        toggleContentRemoveButton();
+        toggleSaveButtons();
+      });
+    }
   });
 };
 
@@ -524,9 +530,9 @@ const capitalize = word => word.charAt(0).toUpperCase() + word.slice(1);
 
 const adminDeleteKSLAListener = target => {
   const deleteBtn = document.getElementById(`${target}-btn-delete`);
-  const btnCL = deleteBtn.classList;
 
   if (deleteBtn) {
+    const btnCL = deleteBtn.classList;
     deleteBtn.addEventListener('click', e => {
       e.preventDefault();
 
@@ -542,7 +548,6 @@ const adminDeleteKSLAListener = target => {
         confirmButtonText: 'löschen',
       }).then(result => {
         if (result.value) {
-          deleteBtn.disabled = true;
           btnCL.remove('is-danger');
           ['is-loading', 'is-warning'].forEach(className => btnCL.add(className));
 
@@ -564,7 +569,6 @@ const adminDeleteKSLAListener = target => {
 
               btnCL.add(json.success ? 'is-success' : 'is-danger');
               deleteBtn.innerText = json.success ? 'Erfolg' : `Fehler! Info: ${json.error}`;
-              deleteBtn.disabled = false;
 
               setTimeout(() => {
                 if (btnCL.contains('is-success')) btnCL.replace('is-success', 'is-danger');
@@ -579,38 +583,39 @@ const adminDeleteKSLAListener = target => {
 
 const adminAddKSLAListener = target => {
   const btn = document.getElementById(`${target}-btn-add`);
-  const btnCL = btn.classList;
 
-  btn.addEventListener('click', e => {
-    e.preventDefault();
+  if (btn) {
+    const btnCL = btn.classList;
 
-    btn.disabled = true;
-    btnCL.remove('is-success');
-    ['is-loading', 'is-warning'].forEach(className => btnCL.add(className));
+    btn.addEventListener('click', e => {
+      e.preventDefault();
 
-    const value = document.getElementById(`${target}-number-add`).value;
-    const desc = document.getElementById(`${target}-desc-add`).value;
+      btnCL.remove('is-success');
+      ['is-loading', 'is-warning'].forEach(className => btnCL.add(className));
 
-    fetch('api/options/addKSLA.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      credentials: 'same-origin',
-      body: `target=${target}&id=${value}&desc=${desc}`,
-    })
-      .then(response => response.json())
-      .then(json => {
-        ['is-loading', 'is-warning'].forEach(className => btnCL.remove(className));
+      const value = document.getElementById(`${target}-number-add`).value;
+      const desc = document.getElementById(`${target}-desc-add`).value;
 
-        btnCL.add(json.success ? 'is-success' : 'is-danger');
-        btn.innerText = json.success ? 'Erfolg' : `Fehler! Info: ${json.error}`;
-        btn.disabled = false;
+      fetch('api/options/addKSLA.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        credentials: 'same-origin',
+        body: `target=${target}&id=${value}&desc=${desc}`,
+      })
+        .then(response => response.json())
+        .then(json => {
+          ['is-loading', 'is-warning'].forEach(className => btnCL.remove(className));
 
-        setTimeout(() => {
-          if (btnCL.contains('is-danger')) btnCL.replace('is-danger', 'is-success');
-          btn.innerText = `${capitalize(target)} hinzufügen`;
-        }, 5000);
-      });
-  });
+          btnCL.add(json.success ? 'is-success' : 'is-danger');
+          btn.innerText = json.success ? 'Erfolg' : `Fehler! Info: ${json.error}`;
+
+          setTimeout(() => {
+            if (btnCL.contains('is-danger')) btnCL.replace('is-danger', 'is-success');
+            btn.innerText = `${capitalize(target)} hinzufügen`;
+          }, 5000);
+        });
+    });
+  }
 };
 
 const faultyElementListener = function () {
@@ -618,29 +623,63 @@ const faultyElementListener = function () {
   this.removeEventListener('input', faultyElementListener);
 };
 
-const adminHighlightFaultyElements = elements => {
+const adminHighlightFaultyElements = (elements, btn) => {
   elements[0].focus();
   elements.forEach(el => {
     el.classList.add('is-danger');
     el.addEventListener('input', faultyElementListener);
   });
+  ['is-loading', 'is-warning'].forEach(className => btn.classList.remove(className));
+  btn.classList.add('is-primary');
 };
 
-const adminCreateNewUser = inputs => {
+const adminCreateNewUser = (inputs, btn) => {
+  let bodyString = '';
 
+  inputs.forEach(input => {
+    bodyString += `${input.name}=${input.value}&`;
+  });
+
+  bodyString = bodyString.slice(0, -1);
+
+  fetch('api/options/createNewUser.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    credentials: 'same-origin',
+    body: bodyString,
+  })
+    .then(response => response.json())
+    .then(json => {
+      ['is-loading', 'is-warning'].forEach(className => btn.classList.remove(className));
+
+      btn.classList.add(json.success ? 'is-success' : 'is-danger');
+      btn.innerText = json.success ? 'Erfolg' : `Fehler! Info: ${json.error}`;
+
+      setTimeout(() => {
+        if (btn.classList.contains('is-success')) btn.classList.replace('is-success', 'is-primary');
+        btn.innerText = 'Neuen Angestellten hinzufügen';
+      }, 5000);
+    });
 };
 
 const adminCreateUserListener = () => {
   const btn = document.getElementById('create-user-btn');
 
-  btn.addEventListener('click', e => {
-    e.preventDefault();
+  if (btn) {
+    btn.addEventListener('click', e => {
+      e.preventDefault();
 
-    const inputs = [...document.querySelectorAll('form[action="api/options/createNewUser.php"] input')];
-    const faultyEls = inputs.filter(el => el.required && el.value.length === 0);
+      btn.classList.remove('is-primary');
+      ['is-loading', 'is-warning'].forEach(className => btn.classList.add(className));
 
-    faultyEls.length === 0 ? adminCreateNewUser(inputs) : adminHighlightFaultyElements(faultyEls);
-  });
+      const formParent = 'form[action="api/options/createNewUser.php"]';
+
+      const inputs = [...document.querySelectorAll(`${formParent} input, ${formParent} select`)];
+      const faultyEls = inputs.filter(el => el.required && el.value.length === 0);
+
+      faultyEls.length === 0 ? adminCreateNewUser(inputs, btn) : adminHighlightFaultyElements(faultyEls, btn);
+    });
+  }
 };
 
 const adminEventListener = () => {
@@ -680,6 +719,11 @@ const initTabswitcher = () => {
   });
 };
 
+const addEventListenerIfExists = (id, type, eventListener) => {
+  const element = document.getElementById(id);
+  if (element) element.addEventListener(type, eventListener);
+};
+
 /**
  * Fügt alle relevanten EventListener hinzu
  */
@@ -690,23 +734,21 @@ const addEventListeners = () => {
   const fileInput = document.querySelector('input[type="file"]');
   if (fileInput) fileInput.addEventListener('change', showUploadedFileName);
 
-  document.getElementById('datepicker').addEventListener('click', silenceDatepicker);
-  document.getElementById('add-tr').addEventListener('click', addTR);
-  document.getElementById('remove-contents').addEventListener('click', removeContent);
-
-  // options Listeners
-  document.getElementById('überminuten').addEventListener('input', toggleButtonDisabledOnInput);
+  addEventListenerIfExists('datepicker', 'click', silenceDatepicker);
+  addEventListenerIfExists('add-tr', 'click', addTR);
+  addEventListenerIfExists('remove-contents', 'click', removeContent);
+  addEventListenerIfExists('perm-save-toggler', 'click', unhidePermSaveTRs);
+  addEventListenerIfExists('überminuten', 'input', toggleButtonDisabledOnInput);
 
   // admin
   adminEventListener();
 
-  arbeitszeit = parseInt(document.getElementById('arbeitszeit').value.replace(/von /, ''));
+  const arbeitszeitEl = document.getElementById('arbeitszeit');
+  if (arbeitszeitEl) arbeitszeit = parseInt(arbeitszeitEl.value.replace(/von /, ''));
 
   addPausenListener();
   addAußerHausEventListener();
   minutesCalculatorEventListenerHelper();
-
-  document.getElementById('perm-save-toggler').addEventListener('click', unhidePermSaveTRs);
 
   [...document.querySelectorAll('.perm-delete-btn')].forEach(el => addDeletionEventListener(el, 'permanent'));
   [...document.querySelectorAll('.temp-delete-btn')].forEach(el => addDeletionEventListener(el, 'temporary'));

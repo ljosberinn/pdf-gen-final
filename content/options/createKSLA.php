@@ -27,8 +27,6 @@ foreach ($arr as $option) {
 
       <hr>
 
-      <h2><strong>' .$plural[$i]. ' bearbeiten</strong></h2>
-
       <div class="columns">
         <div class="column">
           <select class="select" id="' .$option. '-select">

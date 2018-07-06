@@ -16,10 +16,9 @@
   transition: 500ms ease-in-out;
 }
 
-[id*="-btn-delete"]:disabled,
 [id*="-btn-delete"].is-success,
-[id*="-btn-add"]:disabled,
-[id*="-btn-add"].is-danger {
+[id*="-btn-add"].is-danger,
+button.is-loading {
   pointer-events: none;
 }
 
