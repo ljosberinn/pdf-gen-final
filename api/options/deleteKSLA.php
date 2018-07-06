@@ -3,10 +3,10 @@
 session_start();
 
 if (isset($_POST['target']) && isset($_POST['id']) && $_SESSION['admin'] == 1) {
-
     include '../functions.php';
-
     $start = microtime_float();
+
+    header("Content-type: application/json; charset=utf-8");
 
     $id = validateInt($_POST['id']);
 

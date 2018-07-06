@@ -15,7 +15,9 @@
   "main": "index.php",
   "dependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "./node_modules/.bin/babel assets/js --out-file assets/js/bundle.js --ignore bundle.js -w",
+    "run": "./node_modules/.bin/babel assets/js --out-file assets/js/bundle.js --ignore bundle.js"
   },
   "repository": {
     "type": "git",

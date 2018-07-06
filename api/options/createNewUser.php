@@ -1,16 +1,22 @@
 <?php
 
+ob_start();
+
 session_start();
 
 if (isset($_POST['vorname-neu'])
-  && isset($_POST['nachname-neu'])
-  && isset($_POST['personalnummer-neu'])
-  && isset($_POST['arbeitszeit-neu'])
-  && isset($_POST['überstunden-neu'])
-  && isset($_POST['urlaubstage-neu'])
-  && isset($_POST['used_urlaubstage-neu'])
-  && isset($_POST['admin-neu'])
-  && $_SESSION['admin'] == 1) {
+    && isset($_POST['nachname-neu'])
+    && isset($_POST['personalnummer-neu'])
+    && isset($_POST['arbeitszeit-neu'])
+    && isset($_POST['überstunden-neu'])
+    && isset($_POST['urlaubstage-neu'])
+    && isset($_POST['used_urlaubstage-neu'])
+    && isset($_POST['admin-neu'])
+    && $_SESSION['admin'] == 1
+  ) {
+    include '../functions.php';
+    $start = microtime_float();
+    header("Content-type: application/json; charset=utf-8");
 
     $vorname = filter_input(INPUT_POST, 'vorname-neu', FILTER_SANITIZE_STRING);
     $nachname = filter_input(INPUT_POST, 'nachname-neu', FILTER_SANITIZE_STRING);
@@ -27,8 +33,20 @@ if (isset($_POST['vorname-neu'])
 
     $insertQuery = "INSERT INTO `personal` (`personalnummer`, `name`, `arbeitszeit`, `urlaubstage`, `überminuten`) VALUES(" .$personalnummer. ", '" .$vorname. " " . $nachname. "', " .$arbeitszeit. ", " .$urlaubstage. ", " .$überminuten. ")";
 
-    array_push($data, $insertQuery);
+    include '../db.php';
 
-    print_r($data);
+    $conn = new mysqli($host, $user, $password, $database);
+    $conn->set_charset('utf8');
 
+    $response = [
+        'completed_in' => microtime_float() - $start,
+        'data' => $data,
+        'query' => $insertQuery,
+    ];
+
+    echo json_encode($response);
+} else {
+    header('Location: ../../index.php');
 }
+
+ob_end_flush();
