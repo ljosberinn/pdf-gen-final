@@ -57,6 +57,13 @@
         <?php
 
         $navBarEndItems = [
+          '<span class="icon is-small"><i class="fas fa-search"></i></span> <span>Suche</span>' => [
+            'id'          => '',
+            'class'       => 'navbar-item',
+            'data-target' => 'search',
+            'href'        => '',
+            'login'       => 'required',
+          ],
           'Optionen' => [
             'id'          => '',
             'class'       => 'navbar-item',

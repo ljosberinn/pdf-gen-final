@@ -13,6 +13,7 @@ if (empty($_SESSION['personalnummer'])) {
       'permSave',
       'calendar',
       'options',
+      'search',
     ];
 }
 

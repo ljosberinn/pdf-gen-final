@@ -3,7 +3,6 @@ api/db.php
 node_modules
 api/convertOldToNew.php
 assets/css/*.min.css
-assets/js/*.min.js
 vendor
 package-lock.json
 assets/js/bundle.js
