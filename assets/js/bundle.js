@@ -3698,6 +3698,43 @@ var addEventListenerIfExists = function addEventListenerIfExists(id, type, event
   if (element) element.addEventListener(type, eventListener);
 };
 
+var calendarListeners = function calendarListeners() {
+  var buttons = [document.querySelector('.calendar-nav-previous-month button'), document.querySelector('.calendar-nav-next-month button')];
+  var selects = [document.getElementById('calendar-month'), document.getElementById('calendar-year')];
+
+  var currentMonth = parseInt(document.getElementById('calendar-month').value);
+  var currentYear = parseInt(document.getElementById('calendar-year').value);
+
+  buttons.forEach(function (button) {
+    button.addEventListener('click', function (e) {
+      e.preventDefault();
+      this.disabled = true;
+      getCalendarData(currentYear, currentMonth + parseInt(this.dataset.action));
+    });
+  });
+
+  selects.forEach(function (select) {
+    select.addEventListener('change', function () {
+      this.disabled = true;
+      getCalendarData(selects[1].value, selects[0].value);
+    });
+  });
+};
+
+var getCalendarData = function getCalendarData(year, month) {
+  fetch('api/calendar.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    credentials: 'same-origin',
+    body: 'year=' + year + '&month=' + month
+  }).then(function (response) {
+    return response.text();
+  }).then(function (response) {
+    document.getElementById('vacation').innerHTML = response;
+    calendarListeners();
+  });
+};
+
 /**
  * Fügt alle relevanten EventListener hinzu
  */
@@ -3725,6 +3762,8 @@ var addEventListeners = function addEventListeners() {
   addAußerHausEventListener();
   minutesCalculatorEventListenerHelper();
 
+  calendarListeners();
+
   [].concat(_toConsumableArray(document.querySelectorAll('.perm-delete-btn'))).forEach(function (el) {
     return addDeletionEventListener(el, 'permanent');
   });
@@ -3740,9 +3779,7 @@ var addEventListeners = function addEventListeners() {
   });
 };
 
-var returnDateWithLeadingZero = function returnDateWithLeadingZero(timestamp) {
-  return ('0' + timestamp.getDate()).slice(-2) + '.' + ('0' + (timestamp.getMonth() + 1)).slice(-2) + '.' + timestamp.getFullYear();
-};
+// const returnDateWithLeadingZero = timestamp => `${`0${timestamp.getDate()}`.slice(-2)}.${`0${timestamp.getMonth() + 1}`.slice(-2)}.${timestamp.getFullYear()}`;
 
 var datePicker = function datePicker() {
   var datePickertarget = document.querySelector('[name="datum"]');
