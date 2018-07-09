@@ -30,6 +30,10 @@ button.is-loading {
   border-bottom-right-radius: 5px;
 }
 
+.navbar-item .button {
+    border: none;
+}
+
 /* https://codepen.io/AllThingsSmitty/pen/MyqmdM */
 
 @media screen and (max-width: 1088px) {

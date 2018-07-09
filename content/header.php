@@ -17,28 +17,28 @@
         <?php
 
         $navBarStartItems = [
-          'Neuen Tageszettel erstellen' => [
+          '<button type="button" class="button"><span class="icon is-small"><i class="far fa-file-pdf"></i></span> <span>Neuen Tageszettel erstellen</span></button>' => [
             'id'          => 'nav-new',
             'class'       => 'navbar-item',
             'data-target' => 'new-pdf',
             'href'        => '',
             'login'       => 'required',
           ],
-          'Zwischenspeicher' => [
+          '<button type="button" class="button"><span class="icon is-small"><i class="fas fa-step-forward"></i></span> <span>Zwischenspeicher</span></button>' => [
             'id'          => 'nav-temp',
             'class'       => 'navbar-item',
             'data-target' => 'temp-save',
             'href'        => '',
             'login'       => 'required',
           ],
-          'Archiv' => [
+          '<button type="button" class="button"><span class="icon is-small"><i class="fas fa-archive"></i></span> <span>Archiv</span></button>' => [
             'id'          => 'nav-perm',
             'class'       => 'navbar-item',
             'data-target' => 'perm-save',
             'href'        => '',
             'login'       => 'required',
           ],
-          'Kalender' => [
+          '<button type="button" class="button"><span class="icon is-small"><i class="far fa-calendar-alt"></i></span> <span>Kalender</span></button>' => [
             'id'          => 'nav-calendar',
             'class'       => 'navbar-item',
             'data-target' => 'calendar',
@@ -57,28 +57,28 @@
         <?php
 
         $navBarEndItems = [
-          '<span class="icon is-small"><i class="fas fa-search"></i></span> <span>Suche</span>' => [
+          '<button type="button" class="button"><span class="icon is-small"><i class="fas fa-search"></i></span> <span>Suche</span></button>' => [
             'id'          => '',
             'class'       => 'navbar-item',
             'data-target' => 'search',
             'href'        => '',
             'login'       => 'required',
           ],
-          'Optionen' => [
+          '<button type="button" class="button"><span class="icon is-small"><i class="fas fa-sliders-h"></i></span> <span>Optionen</span></button>' => [
             'id'          => '',
             'class'       => 'navbar-item',
             'data-target' => 'options',
             'href'        => '',
             'login'       => 'required',
           ],
-          'Login' => [
+          '<button type="button" class="button"><span class="icon is-small"><i class="fas fa-sign-in-alt"></i></span> <span>Login</span></button>' => [
             'id'          => '',
             'class'       => 'navbar-item',
             'data-target' => '',
             'href'        => '',
             'login'       => '',
           ],
-          'Logout' => [
+          '<button type="button" class="button"><span class="icon is-small"><i class="fas fa-sign-out-alt"></i></span> <span>Logout</span></button>' => [
             'id'          => '',
             'class'       => 'navbar-item',
             'data-target' => '',
