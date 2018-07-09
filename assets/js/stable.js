@@ -757,7 +757,7 @@ const getCalendarData = (year, month) => {
   })
     .then(response => response.text())
     .then(response => {
-      document.getElementById('vacation').innerHTML = response;
+      document.getElementById('calendar').innerHTML = response;
       calendarListeners();
     });
 };

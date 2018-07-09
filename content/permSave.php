@@ -38,6 +38,10 @@ foreach ($tableColumns as $rowDescription => $class) {
 
 require 'api/db.php';
 
+$wochentage = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
+$weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+
 if (!$conn) {
     $conn = new mysqli($host, $user, $password, $database);
     $conn->set_charset('utf8');
@@ -95,9 +99,18 @@ foreach ($data as $dataset) {
 
     $arbeitszeit = '<span class="' .$arbeitszeitClass. '">' .$dataset['minutesWorked']. ' ' .$addendum. '</span>';
 
+    $dayString = strftime('%a, %d.%m.%Y', $dataset['day']);
+
+    foreach ($weekdays as $weekday) {
+        $index = array_search($weekday, $weekdays);
+        if (strpos($dayString, $weekday) !== false) {
+            $dayString = str_replace($weekday, $wochentage[$index], $dayString);
+        }
+    }
+
     echo '
     <tr ' .$trClass. '>
-      <td class="has-text-right">' .strftime('%a, %d.%m.%Y', $dataset['day']). '</td>
+      <td class="has-text-right">' .$dayString. '</td>
       <td class="has-text-centered">' .date('H:i', $dataset['startTimestamp']). ' - ' .date('H:i', $dataset['endTimestamp']). '</td>
       <td>' .$pausenAußerHaus. '</td>
       <td class="has-text-right">' .$arbeitszeit. '</td>

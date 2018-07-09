@@ -3730,7 +3730,7 @@ var getCalendarData = function getCalendarData(year, month) {
   }).then(function (response) {
     return response.text();
   }).then(function (response) {
-    document.getElementById('vacation').innerHTML = response;
+    document.getElementById('calendar').innerHTML = response;
     calendarListeners();
   });
 };

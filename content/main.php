@@ -11,8 +11,7 @@ if (empty($_SESSION['personalnummer'])) {
       'newPDF',
       'tempSave',
       'permSave',
-      'statistics',
-      'vacation',
+      'calendar',
       'options',
     ];
 }

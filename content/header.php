@@ -38,17 +38,10 @@
             'href'        => '',
             'login'       => 'required',
           ],
-          'Urlaub' => [
-            'id'          => 'nav-vacation',
+          'Kalender' => [
+            'id'          => 'nav-calendar',
             'class'       => 'navbar-item',
-            'data-target' => 'vacation',
-            'href'        => '',
-            'login'       => 'required',
-          ],
-          'Statistiken' => [
-            'id'          => 'nav-stats',
-            'class'       => 'navbar-item',
-            'data-target' => 'statistics',
+            'data-target' => 'calendar',
             'href'        => '',
             'login'       => 'required',
           ],
