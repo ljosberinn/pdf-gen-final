@@ -31,7 +31,39 @@ button.is-loading {
 }
 
 .navbar-item .button {
-    border: none;
+  border: none;
+}
+
+.calendar.is-large [class*="calendar-range-"]::before {
+  top: 1.9rem;
+}
+
+.calendar.is-large [class*="calendar-range-"][class*="calendar-range-start-"]::before {
+  left: auto;
+  width: 1.9rem;
+}
+
+.calendar [class*="calendar-range-"] {
+  position: relative;
+}
+
+.calendar [class*="calendar-range-"]::before {
+  content: "";
+  height: 2.2rem;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+  transform: translateY(-50%);
+}
+
+.calendar [class*="calendar-range-"][class*="calendar-range-start-"]::before {
+  left: 50%;
+}
+
+.calendar.is-large [class*="calendar-range-"][class*="calendar-range-end-"]::before {
+  right: 1.9rem;
 }
 
 /* https://codepen.io/AllThingsSmitty/pen/MyqmdM */

@@ -729,23 +729,28 @@ const calendarListeners = () => {
   const buttons = [document.querySelector('.calendar-nav-previous-month button'), document.querySelector('.calendar-nav-next-month button')];
   const selects = [document.getElementById('calendar-month'), document.getElementById('calendar-year')];
 
-  const currentMonth = parseInt(document.getElementById('calendar-month').value);
-  const currentYear = parseInt(document.getElementById('calendar-year').value);
+  const monthEl = document.getElementById('calendar-month');
+  const yearEl = document.getElementById('calendar-year');
 
-  buttons.forEach(button => {
-    button.addEventListener('click', function (e) {
-      e.preventDefault();
-      this.disabled = true;
-      getCalendarData(currentYear, currentMonth + parseInt(this.dataset.action));
-    });
-  });
+  if (monthEl && yearEl) {
+    const currentMonth = parseInt(monthEl.value);
+    const currentYear = parseInt(yearEl.value);
 
-  selects.forEach(select => {
-    select.addEventListener('change', function () {
-      this.disabled = true;
-      getCalendarData(selects[1].value, selects[0].value);
+    buttons.forEach(button => {
+      button.addEventListener('click', function (e) {
+        e.preventDefault();
+        this.disabled = true;
+        getCalendarData(currentYear, currentMonth + parseInt(this.dataset.action));
+      });
     });
-  });
+
+    selects.forEach(select => {
+      select.addEventListener('change', function () {
+        this.disabled = true;
+        getCalendarData(selects[1].value, selects[0].value);
+      });
+    });
+  }
 };
 
 const getCalendarData = (year, month) => {
@@ -816,43 +821,41 @@ const vacationDiffParser = () => {
         }, 150);
       });
     });
+
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      this.disabled = true;
+      ['is-loading', 'is-warning'].forEach(className => this.classList.add(className));
+      this.classList.remove('is-success');
+
+      const span = document.querySelector('#vacation-btn span:nth-of-type(2)');
+
+      fetch('api/vacation.php', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `start=${startEl.value}&end=${endEl.value}&days=${daysTarget.value}`,
+      })
+        .then(response => response.json())
+        .then(response => {
+          ['is-loading', 'is-warning'].forEach(className => this.classList.remove(className));
+          if (response.success) {
+            this.classList.add('is-success');
+            span.innerText = 'Erfolgreich eingetragen.';
+          } else {
+            this.classList.add('is-warning');
+            span.innerText = response.error;
+          }
+
+          setTimeout(() => {
+            this.classList.remove(this.classList.contains('is-success') ? 'is-success' : 'is-warning');
+            this.classList.add('is-success');
+            span.innerText = 'Urlaub eintragen';
+            this.disabled = false;
+          }, 3000);
+        });
+    });
   }
-
-  btn.addEventListener('click', function (e) {
-    e.preventDefault();
-    this.disabled = true;
-    ['is-loading', 'is-warning'].forEach(className => this.classList.add(className));
-    this.classList.remove('is-success');
-
-    const span = document.querySelector('#vacation-btn span:nth-of-type(2)');
-
-    fetch('api/vacation.php', {
-      method: 'POST',
-      credentials: 'same-origin',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: `start=${startEl.value}&end=${endEl.value}&days=${daysTarget.value}`,
-    })
-      .then(response => response.json())
-      .then(response => {
-        console.log(response);
-        
-        ['is-loading', 'is-warning'].forEach(className => this.classList.remove(className));
-        if (response.success) {
-          this.classList.add('is-success');
-          span.innerText = 'Erfolgreich eingetragen.';
-        } else {
-          this.classList.add('is-warning');
-          span.innerText = response.error;
-        }
-
-        setTimeout(() => {
-          this.classList.remove(this.classList.contains('is-success') ? 'is-success' : 'is-warning');
-          this.classList.add('is-success');
-          span.innerText = 'Urlaub eintragen';
-          this.disabled = false;
-        }, 3000);
-      });
-  });
 };
 
 /**

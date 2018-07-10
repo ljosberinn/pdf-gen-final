@@ -13,6 +13,38 @@ class Calendar
 
     private $_conn;
 
+    private $_days_in_month = 0;
+    private $_blank = 0;
+    private $_month = 0;
+    private $_year = 0;
+    private $_i = 0;
+
+    private $_existingTageszettel = [];
+    private $_vacation = [];
+    private $_currentlyActiveVacation = [];
+    private $_styles = [];
+
+    private $_bgColors = [
+        '#d1fff8',
+        '#363636',
+        '#209cee',
+        '#3273dc',
+        '#23d160',
+        '#ffdd57',
+        '#ff3860',
+    ];
+
+    private $_fontColors = [
+        '#00d1b2',
+        '#e0e0e0',
+        '#ddf0fc',
+        '#e0eaf9',
+        '#dcf9e6',
+        '#fff9e5',
+        '#ffe1e7',
+    ];
+
+
     /**
      * @method private _returnOption
      *
@@ -128,12 +160,11 @@ class Calendar
     /**
      * @method private _lookForTageszettel
      *
-     * @param array $existingTageszettel [array via _getCreatedTageszettel]
-     * @param int   $currentDay          [unixTimestamp of current iterated day]
+     * @param int $currentDay [unixTimestamp of current iterated day]
      *
      * @return array $response [HTML a element plus minutesWorked value]
      */
-    private function _lookForTageszettel($existingTageszettel, $currentDay)
+    private function _lookForTageszettel($currentDay)
     {
 
         $response = [
@@ -141,8 +172,8 @@ class Calendar
             'value' => 0,
         ];
 
-        if ($existingTageszettel[$currentDay]) {
-            $value = $existingTageszettel[$currentDay];
+        if ($this->_existingTageszettel[$currentDay]) {
+            $value = $this->_existingTageszettel[$currentDay];
 
             $class = '';
 
@@ -167,7 +198,8 @@ class Calendar
      *
      * @return string [html P element]
      */
-    private function _appendFooter($workDaysInMonth = 0, $workTimeOfMonth = 0) {
+    private function _appendFooter($workDaysInMonth = 0, $workTimeOfMonth = 0)
+    {
         $maximumPossibleWorkTime = $_SESSION['arbeitszeit'] * $workDaysInMonth;
 
         $workTimeQuota = round($workTimeOfMonth / $maximumPossibleWorkTime, 3) * 100;
@@ -177,26 +209,111 @@ class Calendar
     }
 
     /**
-     * @method private _appendBody
+     * @method private _getVacation
      *
-     * @param int   $blank               [required blanks at start of month]
-     * @param int   $days_in_month       [days within month]
-     * @param int   $month               [selected month]
-     * @param int   $year                [selected year]
-     * @param array $existingTageszettel [array via _getCreatedTageszettel]
+     * @param int $first_day [timestamp: start of month]
+     * @param int $last_day  [timestamp: end of month]
+     *
+     * @return array $response []
+     */
+    private function _getVacation($first_day, $last_day)
+    {
+        $getVacationStmt = "SELECT * FROM `vacation` WHERE `start` >= " .$first_day. " AND `end` <= " .$last_day;
+        $getVacation = $this->_conn->query($getVacationStmt);
+
+        $response = [];
+
+        if ($getVacation->num_rows > 0) {
+
+            while ($data = $getVacation->fetch_assoc()) {
+
+                $length = sizeof($response[$data['person']]);
+                $response[$data['person']][$length] = ['start' => $data['start'], 'end' => $data['end']];
+
+            }
+        }
+
+        return $response;
+    }
+
+    /**
+     * @method private _getVacationClasses
+     *
+     * @param int $currentDay [unixtimestamp of currently iterated day]
+     *
+     * @return array $vacation_info [resulting classes indicating active/starting/ending vacation]
+     */
+    private function _getVacationClasses($currentDay)
+    {
+        foreach ($this->_vacation as $personalnummer => $vacation) {
+
+            foreach ($vacation as $vacation_info) {
+
+                if ($vacation_info['start'] == $currentDay) {
+                    $active = 'is-active';
+
+                    // if the currently iterated day is a vacation start for someone, add range-start class
+                    $vacationClasses .= ' calendar-range-start-' . $personalnummer;
+                    // activate ongoing vacation
+                    array_push($this->_currentlyActiveVacation, $personalnummer);
+                }
+
+                // show range for currently ongoing vacations
+                foreach ($this->_currentlyActiveVacation as $id) {
+                    if (strpos($vacationClasses, 'calendar-range-' .$id) === false) {
+                        $vacationClasses .= ' calendar-range-' . $id;
+                    }
+
+                    $styles = [
+                        '.calendar .calendar-range-' .$id. '::before { background: ',
+                        '.calendar .calendar-range-' .$id. ' .date-item { color: ',
+                    ];
+
+                    if (array_search($styles[0]. '' .$this->_bgColors[($this->_i - 1)]. '; }', $this->_styles) === false) {
+
+                        $styles[0] .= $this->_bgColors[$this->_i]. '; }';
+                        $styles[1] .= $this->_fontColors[$this->_i] . '; }';
+
+                        foreach ($styles as $style) {
+                            array_push($this->_styles, $style);
+                        }
+
+                        $this->_i += 1;
+                    }
+                }
+
+                if ($vacation_info['end'] == $currentDay) {
+                    $active = 'is-active';
+
+                    // if the currently iterated day is a vacation end for someone, add range-end class
+                    $vacationClasses .= ' calendar-range-end-' . $personalnummer;
+                    //  remove ongoing vacation
+                    $index = array_search($personalnummer, $this->_currentlyActiveVacation);
+                    unset($this->_currentlyActiveVacation[$index]);
+                    $this->_currentlyActiveVacation = array_values($this->_currentlyActiveVacation);
+                }
+            }
+        }
+
+        return [$vacationClasses, $active, $styles];
+    }
+
+
+    /**
+     * @method private _appendBody
      *
      * @return string [some HTML]
      */
-    private function _appendBody($blank = 7, $days_in_month = 0, $month = 1, $year = 2000, $existingTageszettel = [])
+    private function _appendBody()
     {
         echo '<div class="calendar-body">';
 
         $day_count = 1;
 
-        while ($blank > 0) {
+        while ($this->_blank > 0) {
             echo self::DISABLED;
 
-            $blank -= 1;
+            $this->_blank -= 1;
             $day_count++;
         }
 
@@ -205,19 +322,24 @@ class Calendar
         $workTimeOfMonth = 0;
         $workDaysInMonth = 0;
 
-        while ($day_num <= $days_in_month) {
+        $currentlyActiveVacation = [];
 
-            $currentDay = mktime(0, 0, 0, $month, $day_num, $year);
+        while ($day_num <= $this->_days_in_month) {
+
+            $currentDay = mktime(0, 0, 0, $this->_month, $day_num, $this->_year);
 
             $weekday = date('w', $currentDay);
             if ($weekday != 0 && $weekday != 6) {
                 $workDaysInMonth += 1;
             }
 
-            $pdfData = $this->_lookForTageszettel($existingTageszettel, $currentDay);
+            $pdfData = $this->_lookForTageszettel($currentDay);
             $workTimeOfMonth += $pdfData['value'];
 
-            echo '<div class="calendar-date"><button class="date-item">' . $day_num . '</button>' . $pdfData['button'] . '</div>';
+            $vacationClasses = '';
+            $vacationClasses = $this->_getVacationClasses($currentDay);
+
+            echo '<div class="calendar-date ' .$vacationClasses[0]. '"><button class="date-item' .($currentDay == $today ? ' is-active' : ''). ' ' .$vacationClasses[1]. '">' . $day_num . '</button>' . $pdfData['button'] . '</div>';
 
             $day_num++;
             $day_count++;
@@ -226,6 +348,15 @@ class Calendar
                 $day_count = 1;
             }
         }
+
+        if (!empty($this->_styles)) {
+            echo '<style>';
+            foreach ($this->_styles as $style) {
+                echo $style;
+            }
+            echo '</style>';
+        }
+
 
         while ($day_count > 1 && $day_count <= 7) {
             echo self::DISABLED;
@@ -248,11 +379,11 @@ class Calendar
 
         $this->_conn = $this->_db();
 
-        $date = time();
+        $today = strtotime("midnight", time());
 
         if (empty($year) or (empty($month) && $month != 0)) {
-            $year = date('Y', $date);
-            $month = date('m', $date);
+            $year = date('Y', $today);
+            $month = date('m', $today);
         }
 
         if ($month == 13) {
@@ -263,9 +394,16 @@ class Calendar
             $month = 12;
         }
 
-        $first_day = mktime(0, 0, 0, $month, 1, $year);
+        $this->_month = $month;
+        $this->_year = $year;
+
+        $first_day = mktime(0, 0, 0, $this->_month, 1, $this->_year);
+
         $title = date('F', $first_day);
         $day_of_week = date('D', $first_day);
+
+        $this->_blank = $this->_returnBlanks($day_of_week);
+        $this->_days_in_month = cal_days_in_month(0, $this->_month, $this->_year);
 
         foreach (self::MONTHS_EN as $month_EN) {
             $index = array_search($month_EN, self::MONTHS_EN);
@@ -274,19 +412,19 @@ class Calendar
 
         for ($yearOffset = -3; $yearOffset <= 3; $yearOffset += 1) {
             $otherYear = $year + $yearOffset;
-            $yearOptions .= $this->_returnOption($otherYear == $year ? 'selected disabled' : '', $otherYear, $otherYear);
+            $yearOptions .= $this->_returnOption($otherYear == $this->_year ? 'selected disabled' : '', $otherYear, $otherYear);
         }
-
-        $blank = $this->_returnBlanks($day_of_week);
-
-        $days_in_month = cal_days_in_month(0, $month, $year);
 
         echo $this->_returnCalendarNavigation($monthOptions, $yearOptions);
 
         echo $this->_appendHeader();
 
-        $existingTageszettel = $this->_getCreatedTageszettel($first_day, mktime(0, 0, 0, $month, $days_in_month, $year));
-        echo $this->_appendBody($blank, $days_in_month, $month, $year, $existingTageszettel);
+        $last_day = mktime(0, 0, 0, $this->_month, $this->_days_in_month, $this->_year) + 86399;
+
+        $this->_existingTageszettel = $this->_getCreatedTageszettel($first_day, $last_day);
+        $this->_vacation = $this->_getVacation($first_day, $last_day);
+
+        echo $this->_appendBody();
 
         echo '
         </div>

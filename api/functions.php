@@ -405,7 +405,7 @@ function microtime_float()
     return ((float) $usec + (float) $sec);
 }
 /**
- *  @method returnUsedVacationDays
+ * @method returnUsedVacationDays
  *
  * @param object $conn  [mysqli object]
  * @param int    $start [unix timestamp]
