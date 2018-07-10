@@ -18,6 +18,8 @@ class Calendar
     private $_month = 0;
     private $_year = 0;
     private $_i = 0;
+    private $_first_day = 0;
+    private $_last_day = 0;
 
     private $_existingTageszettel = [];
     private $_vacation = [];
@@ -134,16 +136,13 @@ class Calendar
 
     /**
      * @method private _getCreatedTageszettel
-     *
-     * @param int $start [unixTimestamp of first day in month]
-     * @param int $end   [unixTimestamp of last day in month]
-     *
+     *     *
      * @return array $response [empty if no PDFs within range; else filled with unixTS + minutesWorked values]
      */
-    private function _getCreatedTageszettel($start = 0, $end = 0)
+    private function _getCreatedTageszettel()
     {
 
-        $getCreatedStmt = "SELECT `day`, `minutesWorked` FROM `" . $_SESSION['personalnummer'] . "_archiv` WHERE `day` BETWEEN " . $start . " AND " . $end;
+        $getCreatedStmt = "SELECT `day`, `minutesWorked` FROM `" . $_SESSION['personalnummer'] . "_archiv` WHERE `day` BETWEEN " . $this->_first_day . " AND " . $this->_last_day;
         $getCreated = $this->_conn->query($getCreatedStmt);
 
         $response = [];
@@ -191,6 +190,26 @@ class Calendar
     }
 
     /**
+     * @method private _scanForVacationThisMonth
+     *
+     * @return int $days [amount of free days]
+     */
+    private function _scanForVacationThisMonth()
+    {
+        $scanForVacationThisMonthStmt = "SELECT SUM(`days`) AS `days` FROM `vacation` WHERE `person` = " . $_SESSION['personalnummer'] . " AND `start` >= " . $this->_first_day . " AND `end` <= " . $this->_last_day;
+        $scanForVacationThisMonth = $this->_conn->query($scanForVacationThisMonthStmt);
+
+        $days = 0;
+        if ($scanForVacationThisMonth->num_rows > 0) {
+            while ($data = $scanForVacationThisMonth->fetch_assoc()) {
+                $days = $data['days'];
+            }
+        }
+
+        return $days;
+    }
+
+    /**
      * @method private _appendFooter
      *
      * @param int $workDaysInMonth [workdays of this month]
@@ -200,7 +219,8 @@ class Calendar
      */
     private function _appendFooter($workDaysInMonth = 0, $workTimeOfMonth = 0)
     {
-        $maximumPossibleWorkTime = $_SESSION['arbeitszeit'] * $workDaysInMonth;
+
+        $maximumPossibleWorkTime = ($_SESSION['arbeitszeit'] * $workDaysInMonth) - ($_SESSION['arbeitszeit'] * $this->_scanForVacationThisMonth());
 
         $workTimeQuota = round($workTimeOfMonth / $maximumPossibleWorkTime, 3) * 100;
         $missingMinutes = round((($maximumPossibleWorkTime - $workTimeOfMonth) * -1) / 60, 2);
@@ -211,14 +231,11 @@ class Calendar
     /**
      * @method private _getVacation
      *
-     * @param int $first_day [timestamp: start of month]
-     * @param int $last_day  [timestamp: end of month]
-     *
      * @return array $response []
      */
-    private function _getVacation($first_day, $last_day)
+    private function _getVacation()
     {
-        $getVacationStmt = "SELECT * FROM `vacation` WHERE `start` >= " .$first_day. " AND `end` <= " .$last_day;
+        $getVacationStmt = "SELECT * FROM `vacation` WHERE `start` >= " .$this->_first_day. " AND `end` <= " .$this->_last_day;
         $getVacation = $this->_conn->query($getVacationStmt);
 
         $response = [];
@@ -397,13 +414,15 @@ class Calendar
         $this->_month = $month;
         $this->_year = $year;
 
-        $first_day = mktime(0, 0, 0, $this->_month, 1, $this->_year);
+        $this->_first_day = mktime(0, 0, 0, $this->_month, 1, $this->_year);
 
-        $title = date('F', $first_day);
-        $day_of_week = date('D', $first_day);
+        $title = date('F', $this->_first_day);
+        $day_of_week = date('D', $this->_first_day);
 
         $this->_blank = $this->_returnBlanks($day_of_week);
         $this->_days_in_month = cal_days_in_month(0, $this->_month, $this->_year);
+        $this->_last_day = mktime(0, 0, 0, $this->_month, $this->_days_in_month, $this->_year) + 86399;
+
 
         foreach (self::MONTHS_EN as $month_EN) {
             $index = array_search($month_EN, self::MONTHS_EN);
@@ -419,9 +438,7 @@ class Calendar
 
         echo $this->_appendHeader();
 
-        $last_day = mktime(0, 0, 0, $this->_month, $this->_days_in_month, $this->_year) + 86399;
-
-        $this->_existingTageszettel = $this->_getCreatedTageszettel($first_day, $last_day);
+        $this->_existingTageszettel = $this->_getCreatedTageszettel();
         $this->_vacation = $this->_getVacation($first_day, $last_day);
 
         echo $this->_appendBody();
