@@ -404,6 +404,30 @@ function microtime_float()
     list($usec, $sec) = explode(" ", microtime());
     return ((float) $usec + (float) $sec);
 }
+/**
+ *  @method returnUsedVacationDays
+ *
+ * @param object $conn  [mysqli object]
+ * @param int    $start [unix timestamp]
+ * @param int    $end   [unix timestamp]
+ *
+ * @return int $usedVacationDays
+ */
+function returnUsedVacationDays($conn, $start, $end)
+{
+    $usedVacationStmt = "SELECT SUM(`days`) AS `used_vacation` FROM `vacations` WHERE `person` = " . $personalnummer . " AND `start` >= " . $start . " AND `end` <= " . $end;
+    $usedVacation = $conn->query($usedVacationStmt);
+
+    $usedVacationDays = 0;
+
+    if ($usedVacation->num_rows === 1) {
+        while ($data = $usedVacation->fetch_assoc()) {
+            $usedVacationDays = $data['used_vacation'];
+        }
+    }
+
+    return $usedVacationDays;
+}
 
 
 

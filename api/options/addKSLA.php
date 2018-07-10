@@ -7,7 +7,6 @@ if (isset($_POST['target']) && isset($_POST['id']) && isset($_POST['desc']) && $
     $start = microtime_float();
     header("Content-type: application/json; charset=utf-8");
 
-
     $id = validateInt($_POST['id']);
     $desc = filter_input(INPUT_POST, 'desc', FILTER_SANITIZE_STRING);
 

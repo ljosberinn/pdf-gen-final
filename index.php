@@ -7,10 +7,10 @@ ob_start();
   *
   * Whole page follows:
   * PHP: PEAR coding standards (line length exempted)
-  * JS: ES6
+  * JS: ES6+
   * Indentation: 2 spaces, single-quotes
   *
-  * PHP version 7.2
+  * PHP version 5.6
   *
   * @category  Index
   * @package   Index
@@ -48,9 +48,10 @@ ob_end_flush();
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Hello Bulma!</title>
+  <title>PDF-Generator & Urlaubsverwaltung</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.0/css/bulma.min.css"/>
   <script src="https://unpkg.com/sweetalert2@7.19.3/dist/sweetalert2.all.min.js"></script>
+  <script src="https://use.fontawesome.com/releases/v5.0.7/js/all.js"></script>
 
     <?php
 
@@ -64,7 +65,7 @@ ob_end_flush();
 
     ?>
 
-  <script defer src="https://use.fontawesome.com/releases/v5.0.7/js/all.js"></script>
+
 </head>
 
 <body>

@@ -762,6 +762,99 @@ const getCalendarData = (year, month) => {
     });
 };
 
+const datePicker = () => {
+  const datePickertarget = document.querySelector('[name="datum"]');
+
+  if (datePickertarget) {
+    const datepickerOptions = {
+      dateFormat: 'dd.mm.yyyy',
+      lang: 'de',
+    };
+
+    ['[name="vacation-start"]', '[name="vacation-end"]', '[name="datum"]'].forEach(selector => bulmaCalendar.attach(selector), datepickerOptions);
+
+    setTimeout(() => {
+      document.querySelector('[name="datum"]').click();
+      document.querySelector('button.date-item.is-today.is-active').click();
+    }, 1000);
+  }
+};
+
+const getBusinessDateCount = (startDate, endDate) => {
+  const ifThen = (a, b, c) => (a === b ? c : a);
+
+  let elapsed = (endDate - startDate) / 86400000;
+
+  const daysBeforeFirstSunday = (7 - startDate.getDay()) % 7;
+  const daysAfterLastSunday = endDate.getDay();
+
+  elapsed -= daysBeforeFirstSunday + daysAfterLastSunday;
+  elapsed = elapsed / 7 * 5;
+  elapsed += ifThen(daysBeforeFirstSunday - 1, -1, 0) + ifThen(daysAfterLastSunday, 6, 5);
+
+  return Math.ceil(elapsed);
+};
+
+const vacationDiffParser = () => {
+  const startEl = document.querySelector('[name="vacation-start"]');
+  const endEl = document.querySelector('[name="vacation-end"]');
+  const daysTarget = document.querySelector('[name="vacation-days"]');
+  const btn = document.getElementById('vacation-btn');
+
+  if (startEl && endEl) {
+    [startEl, endEl].forEach(el => {
+      el.addEventListener('blur', () => {
+        setTimeout(() => {
+          const diff = getBusinessDateCount(new Date(startEl.value), new Date(endEl.value));
+
+          if (!isNaN(diff) && diff > 0) {
+            daysTarget.value = diff;
+            btn.disabled = false;
+          } else {
+            btn.disabled = true;
+          }
+        }, 150);
+      });
+    });
+  }
+
+  btn.addEventListener('click', function (e) {
+    e.preventDefault();
+    this.disabled = true;
+    ['is-loading', 'is-warning'].forEach(className => this.classList.add(className));
+    this.classList.remove('is-success');
+
+    const span = document.querySelector('#vacation-btn span:nth-of-type(2)');
+
+    fetch('api/vacation.php', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: `start=${startEl.value}&end=${endEl.value}&days=${daysTarget.value}`,
+    })
+      .then(response => response.json())
+      .then(response => {
+        console.log(response);
+        
+        ['is-loading', 'is-warning'].forEach(className => this.classList.remove(className));
+        if (response.success) {
+          this.classList.add('is-success');
+          span.innerText = 'Erfolgreich eingetragen.';
+        } else {
+          this.classList.add('is-warning');
+          span.innerText = response.error;
+        }
+
+        setTimeout(() => {
+          this.classList.remove(this.classList.contains('is-success') ? 'is-success' : 'is-warning');
+          this.classList.add('is-success');
+          span.innerText = 'Urlaub eintragen';
+          this.disabled = false;
+        }, 3000);
+      });
+  });
+};
+
 /**
  * Fügt alle relevanten EventListener hinzu
  */
@@ -778,6 +871,8 @@ const addEventListeners = () => {
   addEventListenerIfExists('remove-contents', 'click', removeContent);
   addEventListenerIfExists('perm-save-toggler', 'click', unhidePermSaveTRs);
   addEventListenerIfExists('überminuten', 'input', toggleButtonDisabledOnInput);
+  datePicker();
+  vacationDiffParser();
 
   // admin
   adminEventListener();
@@ -798,28 +893,8 @@ const addEventListeners = () => {
   [...document.querySelectorAll('.temp-edit-btn')].forEach(el => addEditEventListener(el, 'temporary'));
 };
 
-// const returnDateWithLeadingZero = timestamp => `${`0${timestamp.getDate()}`.slice(-2)}.${`0${timestamp.getMonth() + 1}`.slice(-2)}.${timestamp.getFullYear()}`;
-
-const datePicker = () => {
-  const datePickertarget = document.querySelector('[name="datum"]');
-
-  if (datePickertarget) {
-    const datepickerOptions = {
-      dateFormat: 'dd.mm.yyyy',
-      lang: 'de',
-    };
-
-    bulmaCalendar.attach('[name="datum"]', datepickerOptions);
-
-    setTimeout(() => {
-      document.querySelector('[name="datum"]').click();
-      document.querySelector('button.date-item.is-today.is-active').click();
-    }, 1000);
-  }
-};
-
 document.addEventListener('DOMContentLoaded', () => {
   addEventListeners();
-  datePicker();
+
   update890Row();
 });

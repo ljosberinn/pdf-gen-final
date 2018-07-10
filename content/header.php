@@ -1,8 +1,8 @@
 <nav class="navbar" aria-label="main navigation">
   <div class="container">
     <div class="navbar-brand">
-      <a class="navbar-item" href="https://bulma.io">
-        PDFGenerator 3.0 - Final
+      <a class="navbar-item">
+        PDF-Generator & Urlaubsverwaltung
       </a>
       <a role="button" class="navbar-burger" data-target="navMenu" aria-label="menu" aria-expanded="false">
         <span aria-hidden="true"></span>
