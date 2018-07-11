@@ -80,6 +80,10 @@ button.is-loading {
   margin-left: 0;
 }
 
+.fas.fa-plane {
+  transform: rotate(-45deg);
+}
+
 /* https://codepen.io/AllThingsSmitty/pen/MyqmdM */
 
 @media screen and (max-width: 1088px) {

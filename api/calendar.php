@@ -10,6 +10,13 @@ class Calendar
     const DISABLED = '<div class="calendar-date is-disabled"><button class="date-item"></button></div>';
     const WOCHENTAGE = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
     const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const ICONS = [
+        'start' => 'plane-departure',
+        'ongoing' => 'plane',
+        'end' => 'plane-arrival',
+        'one-day' => 'umbrella-beach',
+    ];
+
 
     private $_conn;
     private $_title;
@@ -218,7 +225,7 @@ class Calendar
      */
     private function _getVacation()
     {
-        $getVacationStmt = "SELECT * FROM `vacation`";
+        $getVacationStmt = "SELECT * FROM `vacation` WHERE `start` >= " .($this->_first_day - $this->_seconds_in_last_month). " AND `end` <= " .($this->_last_day + $this->_seconds_in_last_month);
         $getVacation = $this->_conn->query($getVacationStmt);
 
         $response = [];
@@ -249,13 +256,16 @@ class Calendar
     /**
      * @method private _returnVacationButton
      *
-     * @param int $name [currently iterated name]
+     * @param int    $name [currently iterated name]
+     * @param string $icon [icon name]
      *
      * @return string [HTML button element]
      */
-    private function _returnVacationButton($name)
+    private function _returnVacationButton($name, $icon)
     {
-        return '<button class="button calendar-event is-small is-danger"><span class="icon is-small"><i class="fas fa-exclamation-triangle"></i></span> <span>' .$name. ' Urlaub</span></button>';
+
+
+        return '<button class="button calendar-event is-small is-danger"><span class="icon is-small"><i class="fas fa-' .self::ICONS[$icon]. '"></i></span> <span>' . $name . '</span></button>';
     }
 
     /**
@@ -267,36 +277,44 @@ class Calendar
      */
     private function _getEventButtons($currentDay)
     {
+
         foreach ($this->_vacation as $name => $vacation) {
             foreach ($vacation as $vacation_info) {
 
-                $btn = $this->_returnVacationButton($name);
-
                 if ($vacation_info['start'] == $currentDay && $vacation_info['end'] == $currentDay) {
-                    $eventButtons .= $btn;
+                    $eventButtons .= $this->_returnVacationButton($name, 'one-day');
                 } else {
                     if ($vacation_info['start'] == $currentDay) {
                         // if the currently iterated day is a vacation start for someone
-                        $eventButtons .= $btn;
+                        $eventButtons .= $this->_returnVacationButton($name, 'start');
                         // activate ongoing vacation
                         array_push($this->_currentlyActiveVacation, $name);
                     }
 
-                    // show warning for currently ongoing vacations
-                    foreach ($this->_currentlyActiveVacation as $activeName) {
-                        $indivBtn = $this->_returnVacationButton($activeName);
+                    /*
+                    if ($vacation_info['start'] < ($this->_first_day - $this->_seconds_in_last_month) && $vacation_info['end'] < $this->_last_day && $this->_first_day == $currentDay) {
+                        $eventButtons .= $this->_returnVacationButton($name, 'start');
+                        array_push($this->_currentlyActiveVacation, $name);
+                    }
+                    */
 
-                        $weekday = date('w', $currentDay);
+                    if ($vacation_info['start'] <= ($currentDay - 86399) && $vacation_info['end'] >= ($currentDay + 86399)) {
+                        // show warning for currently ongoing vacations
+                        foreach ($this->_currentlyActiveVacation as $activeName) {
+                            $indivBtn = $this->_returnVacationButton($activeName, 'ongoing');
 
-                        if ($weekday != 0 && $weekday != 6 && strpos($eventButtons, $indivBtn) === false && $vacation_info['end'] != $currentDay) {
-                            $eventButtons .= $indivBtn;
+                            $weekday = date('w', $currentDay);
+
+                            if ($weekday != 0 && $weekday != 6 && strpos($eventButtons, $indivBtn) === false) {
+                                $eventButtons .= $indivBtn;
+                            }
                         }
                     }
 
                     if ($vacation_info['end'] == $currentDay) {
                         // if the currently iterated day is a vacation end for someone
-                        if (strpos($eventButtons, $btn) === false) {
-                            $eventButtons .= $btn;
+                        if (strpos($eventButtons, $this->_returnVacationButton($name, 'ongoing')) === false) {
+                            $eventButtons .= $this->_returnVacationButton($name, 'end');
                         }
                         //  remove ongoing vacation
                         $index = array_search($name, $this->_currentlyActiveVacation);
@@ -410,6 +428,7 @@ class Calendar
         $this->_first_day = mktime(0, 0, 0, $this->_month, 1, $this->_year);
         $this->_days_in_month = cal_days_in_month(0, $this->_month, $this->_year);
         $this->_last_day = mktime(0, 0, 0, $this->_month, $this->_days_in_month, $this->_year) + 86399;
+        $this->_seconds_in_last_month = cal_days_in_month(0, ($this->_month == 0 ? 11 : $this->_month), ($this->_month == 0 ? $this->_year - 1 : $this->_year)) * 86400;
 
         $this->_title = date('F', $this->_first_day);
 
