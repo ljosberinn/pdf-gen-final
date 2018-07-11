@@ -413,9 +413,9 @@ function microtime_float()
  *
  * @return int $usedVacationDays
  */
-function returnUsedVacationDays($conn, $start, $end)
+function returnUsedVacationDays($conn, $start, $end, $personalnummer)
 {
-    $usedVacationStmt = "SELECT SUM(`days`) AS `used_vacation` FROM `vacations` WHERE `person` = " . $personalnummer . " AND `start` >= " . $start . " AND `end` <= " . $end;
+    $usedVacationStmt = "SELECT SUM(`days`) AS `used_vacation` FROM `vacation` WHERE `person` = " . $personalnummer . " AND `start` >= " . $start . " AND `end` <= " . $end;
     $usedVacation = $conn->query($usedVacationStmt);
 
     $usedVacationDays = 0;

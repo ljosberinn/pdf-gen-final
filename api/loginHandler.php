@@ -19,8 +19,8 @@ if (isset($_POST['personalnummer'])) {
 
         if ($searchForUser->num_rows === 1) {
 
-            $currentlyUsedVacation = returnUsedVacationDays($conn, strtotime(date('Y-01-01')), strtotime(date('Y-12-31')));
-            $usedVacationPreviousYear = returnUsedVacationDays($conn, strtotime(date('' .(date('Y') - 1). '-01-01')), strtotime(date('' .(date('Y') - 1). '-12-31')));
+            $currentlyUsedVacation = returnUsedVacationDays($conn, strtotime(date('Y-01-01')), strtotime(date('Y-12-31')), $personalnummer);
+            $usedVacationPreviousYear = returnUsedVacationDays($conn, strtotime(date('' .(date('Y') - 1). '-01-01')), strtotime(date('' .(date('Y') - 1). '-12-31')), $personalnummer);
 
             while ($data = $searchForUser->fetch_assoc()) {
 
