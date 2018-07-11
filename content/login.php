@@ -4,7 +4,7 @@
     <div class="field">
       <label class="label">Personalnummer</label>
       <div class="control has-icons-left">
-        <input class="input" type="number" placeholder="Personalnummer" name="personalnummer" value="" required>
+        <input class="input" type="number" placeholder="Personalnummer" name="personalnummer" required autofocus>
         <span class="icon is-small is-left">
           <i class="fas fa-user"></i>
         </span>

@@ -66,6 +66,20 @@ button.is-loading {
   right: 1.9rem;
 }
 
+.calendar-events button.button.calendar-event {
+  border-radius: 0;
+  width: 100%;
+  pointer-events: none;
+}
+
+.calendar.is-large .calendar-events {
+  padding: 0;
+}
+
+.calendar.is-large .button .icon:first-child:not(:last-child) {
+  margin-left: 0;
+}
+
 /* https://codepen.io/AllThingsSmitty/pen/MyqmdM */
 
 @media screen and (max-width: 1088px) {

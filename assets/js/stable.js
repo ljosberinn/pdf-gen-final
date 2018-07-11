@@ -818,7 +818,7 @@ const vacationDiffParser = () => {
           } else {
             btn.disabled = true;
           }
-        }, 150);
+        }, 500);
       });
     });
 

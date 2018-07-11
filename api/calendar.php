@@ -12,40 +12,18 @@ class Calendar
     const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
     private $_conn;
+    private $_title;
 
     private $_days_in_month = 0;
     private $_blank = 0;
     private $_month = 0;
     private $_year = 0;
-    private $_i = 0;
     private $_first_day = 0;
     private $_last_day = 0;
 
     private $_existingTageszettel = [];
     private $_vacation = [];
     private $_currentlyActiveVacation = [];
-    private $_styles = [];
-
-    private $_bgColors = [
-        '#d1fff8',
-        '#363636',
-        '#209cee',
-        '#3273dc',
-        '#23d160',
-        '#ffdd57',
-        '#ff3860',
-    ];
-
-    private $_fontColors = [
-        '#00d1b2',
-        '#e0e0e0',
-        '#ddf0fc',
-        '#e0eaf9',
-        '#dcf9e6',
-        '#fff9e5',
-        '#ffe1e7',
-    ];
-
 
     /**
      * @method private _returnOption
@@ -76,14 +54,21 @@ class Calendar
     /**
      * @method private _returnCalendarNavigation
      *
-     * @param string[] $monthOptions [possible months as option elements]
-     * @param string[] $yearOptions  [possible years as option elements]
-     *
      * @return string [some html]
      */
-    private function _returnCalendarNavigation($monthOptions = '<option selected disabled>error</option>', $yearOptions = '<option selected disabled>error</option>')
+    private function _returnCalendarNavigation()
     {
-        return '
+        foreach (self::MONTHS_EN as $month_EN) {
+            $index = array_search($month_EN, self::MONTHS_EN);
+            $monthOptions .= $this->_returnOption($this->_title === $month_EN ? 'selected disabled' : '', ($index + 1), self::MONTHS_DE[$index]);
+        }
+
+        for ($yearOffset = -3; $yearOffset <= 3; $yearOffset += 1) {
+            $otherYear = $this->_year + $yearOffset;
+            $yearOptions .= $this->_returnOption($otherYear == $this->_year ? 'selected disabled' : '', $otherYear, $otherYear);
+        }
+
+        echo '
         <div class="calendar is-large">
         <div class="calendar-nav">
             <div class="calendar-nav-previous-month">
@@ -97,9 +82,7 @@ class Calendar
                 <button data-action="1" class="button is-small is-text"><svg viewBox="0 0 50 80" xml:space="preserve"><polyline fill="none" stroke-width=".5em" stroke-linecap="round" stroke-linejoin="round" points="0.375,0.375 45.63,38.087 0.375,75.8 "></polyline></svg></button>
             </div>
         </div>
-
-        <div class="calendar-container">
-            ';
+        <div class="calendar-container">';
     }
 
     /**
@@ -182,7 +165,7 @@ class Calendar
                 $class = 'is-success';
             }
 
-            $response['button'] = '<div class="calendar-events"><a class="calendar-event ' . $class . '">' . $value . '</a></div>';
+            $response['button'] = '<button class="button is-small calendar-event ' . $class . '"><span class="icon is-small"><i class="far fa-file-pdf"></i></span> <span>' . $value . '</span></button>';
             $response['value'] = $value;
         }
 
@@ -225,7 +208,7 @@ class Calendar
         $workTimeQuota = round($workTimeOfMonth / $maximumPossibleWorkTime, 3) * 100;
         $missingMinutes = round((($maximumPossibleWorkTime - $workTimeOfMonth) * -1) / 60, 2);
 
-        return '<p>Über-/Unterstunden diesen Monat: <span class="' .($missingMinutes < 0 ? 'has-text-danger' : 'has-text-success'). '">' . number_format($missingMinutes) . '</span> (' . $workTimeQuota . '% des Solls erreicht)</p>';
+        return '<p>Über-/Unterstunden diesen Monat: <span class="' .($missingMinutes < 0 ? 'has-text-danger' : 'has-text-success'). '">' . number_format($missingMinutes) . '</span> (<strong>' . $workTimeQuota . '%</strong> des Solls erreicht)</p>';
     }
 
     /**
@@ -235,7 +218,7 @@ class Calendar
      */
     private function _getVacation()
     {
-        $getVacationStmt = "SELECT * FROM `vacation` WHERE `start` >= " .$this->_first_day. " AND `end` <= " .$this->_last_day;
+        $getVacationStmt = "SELECT * FROM `vacation`";
         $getVacation = $this->_conn->query($getVacationStmt);
 
         $response = [];
@@ -244,8 +227,18 @@ class Calendar
 
             while ($data = $getVacation->fetch_assoc()) {
 
-                $length = sizeof($response[$data['person']]);
-                $response[$data['person']][$length] = ['start' => $data['start'], 'end' => $data['end']];
+                $convertNummerToNameStmt = "SELECT `name` FROM `personal` WHERE `personalnummer` = " .$data['person'];
+                $convertNummerToName = $this->_conn->query($convertNummerToNameStmt);
+
+                if ($convertNummerToName->num_rows === 1) {
+                    while ($nameData = $convertNummerToName->fetch_assoc()) {
+                        $fullName = explode(' ', $nameData['name']);
+                        $name = substr($fullName[0], 0, 1). '. ' .$fullName[1];
+                    }
+                }
+
+                $length = sizeof($response[$name]);
+                $response[$name][$length] = ['start' => $data['start'], 'end' => $data['end']];
 
             }
         }
@@ -254,67 +247,68 @@ class Calendar
     }
 
     /**
-     * @method private _getVacationClasses
+     * @method private _returnVacationButton
+     *
+     * @param int $name [currently iterated name]
+     *
+     * @return string [HTML button element]
+     */
+    private function _returnVacationButton($name)
+    {
+        return '<button class="button calendar-event is-small is-danger"><span class="icon is-small"><i class="fas fa-exclamation-triangle"></i></span> <span>' .$name. ' Urlaub</span></button>';
+    }
+
+    /**
+     * @method private _getEventButtons
      *
      * @param int $currentDay [unixtimestamp of currently iterated day]
      *
      * @return array $vacation_info [resulting classes indicating active/starting/ending vacation]
      */
-    private function _getVacationClasses($currentDay)
+    private function _getEventButtons($currentDay)
     {
-        foreach ($this->_vacation as $personalnummer => $vacation) {
-
+        foreach ($this->_vacation as $name => $vacation) {
             foreach ($vacation as $vacation_info) {
 
-                if ($vacation_info['start'] == $currentDay) {
-                    $active = 'is-active';
+                $btn = $this->_returnVacationButton($name);
 
-                    // if the currently iterated day is a vacation start for someone, add range-start class
-                    $vacationClasses .= ' calendar-range-start-' . $personalnummer;
-                    // activate ongoing vacation
-                    array_push($this->_currentlyActiveVacation, $personalnummer);
-                }
-
-                // show range for currently ongoing vacations
-                foreach ($this->_currentlyActiveVacation as $id) {
-                    if (strpos($vacationClasses, 'calendar-range-' .$id) === false) {
-                        $vacationClasses .= ' calendar-range-' . $id;
+                if ($vacation_info['start'] == $currentDay && $vacation_info['end'] == $currentDay) {
+                    $eventButtons .= $btn;
+                } else {
+                    if ($vacation_info['start'] == $currentDay) {
+                        // if the currently iterated day is a vacation start for someone
+                        $eventButtons .= $btn;
+                        // activate ongoing vacation
+                        array_push($this->_currentlyActiveVacation, $name);
                     }
 
-                    $styles = [
-                        '.calendar .calendar-range-' .$id. '::before { background: ',
-                        '.calendar .calendar-range-' .$id. ' .date-item { color: ',
-                    ];
+                    // show warning for currently ongoing vacations
+                    foreach ($this->_currentlyActiveVacation as $activeName) {
+                        $indivBtn = $this->_returnVacationButton($activeName);
 
-                    if (array_search($styles[0]. '' .$this->_bgColors[($this->_i - 1)]. '; }', $this->_styles) === false) {
+                        $weekday = date('w', $currentDay);
 
-                        $styles[0] .= $this->_bgColors[$this->_i]. '; }';
-                        $styles[1] .= $this->_fontColors[$this->_i] . '; }';
-
-                        foreach ($styles as $style) {
-                            array_push($this->_styles, $style);
+                        if ($weekday != 0 && $weekday != 6 && strpos($eventButtons, $indivBtn) === false && $vacation_info['end'] != $currentDay) {
+                            $eventButtons .= $indivBtn;
                         }
-
-                        $this->_i += 1;
                     }
-                }
 
-                if ($vacation_info['end'] == $currentDay) {
-                    $active = 'is-active';
-
-                    // if the currently iterated day is a vacation end for someone, add range-end class
-                    $vacationClasses .= ' calendar-range-end-' . $personalnummer;
-                    //  remove ongoing vacation
-                    $index = array_search($personalnummer, $this->_currentlyActiveVacation);
-                    unset($this->_currentlyActiveVacation[$index]);
-                    $this->_currentlyActiveVacation = array_values($this->_currentlyActiveVacation);
+                    if ($vacation_info['end'] == $currentDay) {
+                        // if the currently iterated day is a vacation end for someone
+                        if (strpos($eventButtons, $btn) === false) {
+                            $eventButtons .= $btn;
+                        }
+                        //  remove ongoing vacation
+                        $index = array_search($name, $this->_currentlyActiveVacation);
+                        unset($this->_currentlyActiveVacation[$index]);
+                        $this->_currentlyActiveVacation = array_values($this->_currentlyActiveVacation);
+                    }
                 }
             }
         }
 
-        return [$vacationClasses, $active, $styles];
+        return $eventButtons;
     }
-
 
     /**
      * @method private _appendBody
@@ -353,10 +347,18 @@ class Calendar
             $pdfData = $this->_lookForTageszettel($currentDay);
             $workTimeOfMonth += $pdfData['value'];
 
-            $vacationClasses = '';
-            $vacationClasses = $this->_getVacationClasses($currentDay);
+            $eventButtons = '';
+            $eventButtons = $this->_getEventButtons($currentDay);
 
-            echo '<div class="calendar-date ' .$vacationClasses[0]. '"><button class="date-item' .($currentDay == $today ? ' is-active' : ''). ' ' .$vacationClasses[1]. '">' . $day_num . '</button>' . $pdfData['button'] . '</div>';
+            if ($pdfData['button'] != '') {
+                $eventButtons = $pdfData['button']. '' .$eventButtons;
+            }
+
+            if ($eventButtons != '') {
+                $eventButtons = '<div class="calendar-events">' .$eventButtons. '</div>';
+            }
+
+            echo '<div class="calendar-date"><button class="date-item' .($currentDay == $today ? ' is-active' : ''). '">' . $day_num . '</button>' . $eventButtons . '</div>';
 
             $day_num++;
             $day_count++;
@@ -365,15 +367,6 @@ class Calendar
                 $day_count = 1;
             }
         }
-
-        if (!empty($this->_styles)) {
-            echo '<style>';
-            foreach ($this->_styles as $style) {
-                echo $style;
-            }
-            echo '</style>';
-        }
-
 
         while ($day_count > 1 && $day_count <= 7) {
             echo self::DISABLED;
@@ -415,37 +408,19 @@ class Calendar
         $this->_year = $year;
 
         $this->_first_day = mktime(0, 0, 0, $this->_month, 1, $this->_year);
-
-        $title = date('F', $this->_first_day);
-        $day_of_week = date('D', $this->_first_day);
-
-        $this->_blank = $this->_returnBlanks($day_of_week);
         $this->_days_in_month = cal_days_in_month(0, $this->_month, $this->_year);
         $this->_last_day = mktime(0, 0, 0, $this->_month, $this->_days_in_month, $this->_year) + 86399;
 
+        $this->_title = date('F', $this->_first_day);
 
-        foreach (self::MONTHS_EN as $month_EN) {
-            $index = array_search($month_EN, self::MONTHS_EN);
-            $monthOptions .= $this->_returnOption($title === $month_EN ? 'selected disabled' : '', ($index + 1), self::MONTHS_DE[$index]);
-        }
+        $day_of_week = date('D', $this->_first_day);
+        $this->_blank = $this->_returnBlanks($day_of_week);
 
-        for ($yearOffset = -3; $yearOffset <= 3; $yearOffset += 1) {
-            $otherYear = $year + $yearOffset;
-            $yearOptions .= $this->_returnOption($otherYear == $this->_year ? 'selected disabled' : '', $otherYear, $otherYear);
-        }
 
-        echo $this->_returnCalendarNavigation($monthOptions, $yearOptions);
-
-        echo $this->_appendHeader();
-
+        $this->_vacation = $this->_getVacation();
         $this->_existingTageszettel = $this->_getCreatedTageszettel();
-        $this->_vacation = $this->_getVacation($first_day, $last_day);
 
-        echo $this->_appendBody();
-
-        echo '
-        </div>
-    </div>';
+        echo $this->_returnCalendarNavigation(). '' .$this->_appendHeader(). '' .$this->_appendBody(). '</div></div>';
 
     }
 }
