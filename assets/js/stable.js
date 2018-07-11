@@ -11,7 +11,7 @@ const scanInputs = () => {
 
   const els = [document.getElementById('von'), document.getElementById('bis'), document.getElementById('außer-haus')];
 
-  [...document.querySelectorAll('#creation-tbody input')].forEach(el => els.push(el));
+  document.querySelectorAll('#creation-tbody input').forEach(el => els.push(el));
 
   els.forEach(el => {
     if (el.value !== '') {
@@ -86,7 +86,7 @@ const minutesCalculator = () => {
   const resultTarget = document.getElementById('tagessumme');
   let result = 0;
 
-  [...document.querySelectorAll('[id^="minuten-"]')].forEach(el => {
+  document.querySelectorAll('[id^="minuten-"]').forEach(el => {
     if (el.id !== 'minuten-890') result += extractInputVal(el);
   });
 
@@ -119,7 +119,7 @@ const minutesCalculatorEventListenerHelper = nextRowId => {
   if (nextRowId) {
     minutesCalculatorEventListener(document.getElementById(`minuten-${nextRowId}`));
   } else {
-    [...document.querySelectorAll('[id^="minuten-"]')].forEach(el => {
+    document.querySelectorAll('[id^="minuten-"]').forEach(el => {
       if (el.id !== 'minuten-890') minutesCalculatorEventListener(el);
     });
   }
@@ -144,7 +144,7 @@ const toggleSaveButtons = () => {
  * @param {number} nextRowId
  */
 const addTREventListeners = nextRowId => {
-  const elements = [...document.querySelectorAll(`[id*="-${nextRowId}"]`)];
+  const elements = document.querySelectorAll(`[id*="-${nextRowId}"]`);
 
   elements.forEach(el => {
     if (elements.indexOf(el) !== 5) {
@@ -238,7 +238,7 @@ const addAußerHausEventListener = () => {
 const addTR = () => {
   const tbody = document.querySelector('#creation-tbody');
 
-  const currentTRCount = [...document.querySelectorAll('#creation-tbody tr')].length;
+  const currentTRCount = document.querySelectorAll('#creation-tbody tr').length;
   const nextRowId = currentTRCount + 1;
 
   const template = `
@@ -344,7 +344,7 @@ const insertEditData = response => {
  * @param {string} selectedNav
  */
 const switchActiveNavigationLink = selectedNav => {
-  [...document.querySelectorAll('.navbar-item[data-target]')].forEach(navLink => {
+  document.querySelectorAll('.navbar-item[data-target]').forEach(navLink => {
     const target = document.getElementById(navLink.dataset.target).classList;
 
     selectedNav === navLink.id ? target.add('is-active') : target.contains('is-active') ? target.remove('is-active') : void 0;
@@ -357,7 +357,7 @@ const switchActiveNavigationLink = selectedNav => {
  * @param {string} targetId
  */
 const switchActiveModule = targetId => {
-  [...document.querySelectorAll('main > div')].forEach(moduleEl => (moduleEl.style.display = targetId === moduleEl.id ? 'block' : 'none'));
+  document.querySelectorAll('main > div').forEach(moduleEl => (moduleEl.style.display = targetId === moduleEl.id ? 'block' : 'none'));
 };
 
 /**
@@ -401,7 +401,7 @@ const addPausenListener = () => {
 const removeContent = () => {
   const elArray = [document.getElementById('von'), document.getElementById('bis'), document.getElementById('minuten-890'), document.getElementById('außer-haus')];
 
-  [...document.querySelectorAll('#creation-tbody input')].forEach(el => elArray.push(el));
+  document.querySelectorAll('#creation-tbody input').forEach(el => elArray.push(el));
 
   elArray.forEach(el => (el.value = ''));
 
@@ -431,7 +431,7 @@ const workEventListeners = () => {
 };
 
 const unhidePermSaveTRs = () => {
-  [...document.querySelectorAll('#perm-save tr')].forEach(tr => {
+  document.querySelectorAll('#perm-save tr').forEach(tr => {
     if (tr.classList.contains('hidden-tr')) tr.classList.remove('hidden-tr');
   });
 
@@ -537,7 +537,7 @@ const adminDeleteKSLAListener = target => {
     deleteBtn.addEventListener('click', e => {
       e.preventDefault();
 
-      const value = [...document.querySelector(`#${target}-select`).selectedOptions][0].innerText.split(' – ')[0];
+      const value = document.querySelector(`#${target}-select`).selectedOptions[0].innerText.split(' – ')[0];
 
       swal({
         title: 'Sicher?',
@@ -564,7 +564,7 @@ const adminDeleteKSLAListener = target => {
 
               if (json.success) {
                 const select = document.querySelector(`#${target}-select`);
-                [...select.selectedOptions][0].remove();
+                select.selectedOptions[0].remove();
                 select.selectedIndex = 0;
               }
 
@@ -675,7 +675,7 @@ const adminCreateUserListener = () => {
 
       const formParent = 'form[action="api/options/createNewUser.php"]';
 
-      const inputs = [...document.querySelectorAll(`${formParent} input, ${formParent} select`)];
+      const inputs = document.querySelectorAll(`${formParent} input, ${formParent} select`);
       const faultyEls = inputs.filter(el => el.required && el.value.length === 0);
 
       faultyEls.length === 0 ? adminCreateNewUser(inputs, btn) : adminHighlightFaultyElements(faultyEls, btn);
@@ -698,7 +698,7 @@ const adminEventListener = () => {
  * Mobile Nav Hamburger
  */
 const initHamburger = () => {
-  const navbarBurgers = [...document.querySelectorAll('.navbar-burger')];
+  const navbarBurgers = document.querySelectorAll('.navbar-burger');
 
   if (navbarBurgers.length > 0) {
     navbarBurgers.forEach(el => {
@@ -713,7 +713,7 @@ const initHamburger = () => {
  * Initiiert TabSwitcher...
  */
 const initTabswitcher = () => {
-  [...document.querySelectorAll('.navbar-item[data-target')].forEach(el => {
+  document.querySelectorAll('.navbar-item[data-target').forEach(el => {
     el.addEventListener('click', () => {
       toggleTab(el.id, el.dataset.target);
     });
@@ -889,11 +889,11 @@ const addEventListeners = () => {
 
   calendarListeners();
 
-  [...document.querySelectorAll('.perm-delete-btn')].forEach(el => addDeletionEventListener(el, 'permanent'));
-  [...document.querySelectorAll('.temp-delete-btn')].forEach(el => addDeletionEventListener(el, 'temporary'));
+  document.querySelectorAll('.perm-delete-btn').forEach(el => addDeletionEventListener(el, 'permanent'));
+  document.querySelectorAll('.temp-delete-btn').forEach(el => addDeletionEventListener(el, 'temporary'));
 
-  [...document.querySelectorAll('.perm-edit-btn')].forEach(el => addEditEventListener(el, 'permanent'));
-  [...document.querySelectorAll('.temp-edit-btn')].forEach(el => addEditEventListener(el, 'temporary'));
+  document.querySelectorAll('.perm-edit-btn').forEach(el => addEditEventListener(el, 'permanent'));
+  document.querySelectorAll('.temp-edit-btn').forEach(el => addEditEventListener(el, 'temporary'));
 };
 
 document.addEventListener('DOMContentLoaded', () => {

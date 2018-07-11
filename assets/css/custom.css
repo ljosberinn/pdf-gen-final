@@ -84,9 +84,22 @@ button.is-loading {
   transform: rotate(-45deg);
 }
 
+.calendar.is-large .calendar-body .calendar-date {
+  min-height: 2.76rem;
+  height: auto;
+}
+
 /* https://codepen.io/AllThingsSmitty/pen/MyqmdM */
 
 @media screen and (max-width: 1088px) {
+
+  .calendar-events span.icon {
+    display: none;
+  }
+  .calendar-events span:not(.icon) {
+    font-size: .75rem;
+  }
+
   table {
     border: 0;
   }

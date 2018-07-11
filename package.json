@@ -23,7 +23,11 @@
     "type": "git",
     "url": "git+https://github.com/ljosberinn/pdf-gen-final.git"
   },
-  "keywords": ["pdf", "generator", "tageszettel"],
+  "keywords": [
+    "pdf",
+    "generator",
+    "tageszettel"
+  ],
   "author": "Gerrit Alex",
   "license": "MIT",
   "bugs": {
