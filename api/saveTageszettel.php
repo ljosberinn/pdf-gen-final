@@ -28,18 +28,20 @@ if (isset($_POST)) {
     $_POST['mittagspause'] == 'on' ? ($minutesWorked -= 30 xor $mittagspause = 1) : $mittagspause = 0;
 
     $außerHaus = $_POST['außer-haus'];
-    if ($außerHaus == "") $außerHaus = 0;
+    if ($außerHaus == "") {
+        $außerHaus = 0;
+    }
 
     $resultingData = [];
 
     $posten = [
-      'kostenstelle',
-      'auftragsnummer',
-      'kunde',
-      'leistungsart',
-      'minuten',
-      'anzahl',
-      'materialnummer',
+        'kostenstelle',
+        'auftragsnummer',
+        'kunde',
+        'leistungsart',
+        'minuten',
+        'anzahl',
+        'materialnummer',
     ];
 
     foreach ($posten as $name) {
@@ -55,14 +57,14 @@ if (isset($_POST)) {
     }
 
     $secondaryInformation = [
-      'day',
-      'created',
-      'startTimestamp',
-      'endTimestamp',
-      'minutesWorked',
-      'frühstückspause',
-      'mittagspause',
-      'außerHaus',
+        'day',
+        'created',
+        'startTimestamp',
+        'endTimestamp',
+        'minutesWorked',
+        'frühstückspause',
+        'mittagspause',
+        'außerHaus',
     ];
 
     foreach ($secondaryInformation as $var) {
@@ -94,7 +96,7 @@ if (isset($_POST)) {
     $tables = ['archiv', 'zwischenspeicher'];
 
     foreach ($tables as $table) {
-        $deletionStatement =  "DELETE FROM `" .$_SESSION['personalnummer']. "_" .$table. "`  WHERE `day` = " .$day. "";
+        $deletionStatement =  "DELETE FROM `" .$_SESSION['personalnummer']. "_" .$table. "`  WHERE `day` = " .$day;
         $deletion = $conn->query($deletionStatement);
     }
 

@@ -324,7 +324,7 @@ const addTR = () => {
   */
 const insertEditData = response => {
   document.getElementById('nav-new').click();
-  document.getElementById('datepicker').value = response.day;
+  document.getElementById('datum').value = response.day;
   document.getElementById('von').value = response.startTimestamp;
   document.getElementById('bis').value = response.endTimestamp;
   document.getElementById('mittagspause').checked = response.mittagspause !== 0;
@@ -1000,7 +1000,7 @@ const addEventListeners = () => {
   const fileInput = document.querySelector('input[type="file"]');
   if (fileInput) fileInput.addEventListener('change', showUploadedFileName);
 
-  addEventListenerIfExists('datepicker', 'click', silenceDatepicker);
+  addEventListenerIfExists('datum', 'click', silenceDatepicker);
   addEventListenerIfExists('add-tr', 'click', addTR);
   addEventListenerIfExists('remove-contents', 'click', removeContent);
   addEventListenerIfExists('perm-save-toggler', 'click', unhidePermSaveTRs);

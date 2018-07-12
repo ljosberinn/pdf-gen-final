@@ -32,8 +32,7 @@ if (isset($_GET['pdfId'])
 
     $result = $result[0];
 
-    $result['day'] = date('d.m.Y', $result['day']);
-
+    $result['day'] = date('Y-m-d', $result['day']);
     $result['startTimestamp'] = date('H:i', $result['startTimestamp']);
     $result['endTimestamp'] = date('H:i', $result['endTimestamp']);
 

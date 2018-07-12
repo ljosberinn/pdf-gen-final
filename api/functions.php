@@ -292,7 +292,7 @@ function returnPDFBasics()
  */
 function returnAverageStartTime($conn, $personalnummer)
 {
-    $getStartEndAverages = 'SELECT ROUND(AVG(`startTimestamp`-  `day`)) AS `start` FROM `' .$personalnummer. '_archiv`';
+    $getStartEndAverages = "SELECT ROUND(AVG(`startTimestamp`-  `day`)) AS `start` FROM `" .$personalnummer. "_archiv`";
     $startEndAverages = $conn->query($getStartEndAverages);
 
     if ($startEndAverages->num_rows == 1) {

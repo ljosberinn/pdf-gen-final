@@ -1,5 +1,5 @@
 <?php
-ob_start();
+
 session_start();
 
 require 'fpdf181/fpdf.php';
@@ -14,10 +14,12 @@ if (isset($_POST['pdfId'])) {
     include 'db.php';
     include 'functions.php';
 
+    $outputMode = 'D';
+
     $conn = new mysqli($host, $user, $password, $database);
     $conn->set_charset('utf8');
 
-    $getPDFDataQuery = 'SELECT * FROM `' .$_SESSION['personalnummer']. '_archiv` WHERE `day` = ' .$_POST['pdfId'];
+    $getPDFDataQuery = "SELECT * FROM `" .$_SESSION['personalnummer']. "_archiv` WHERE `day` = " .$_POST['pdfId'];
     $getPDFData = $conn->query($getPDFDataQuery);
 
     $data = $resultingData = [];
@@ -41,22 +43,21 @@ if (isset($_POST['pdfId'])) {
     ];
 
     foreach ($posten as $name) {
-      ${$name} = [];
+        ${$name} = [];
     }
 
     for ($i = 1; $i <= 22; $i += 1) {
-
-      if (!empty($data['minuten-' .$i])) {
-        foreach ($posten as $var) {
-          if ($data[$var. '-' .$i] != 0) {
-            array_push(${$var}, $data[$var. '-' .$i]);
-          }
+        if (!empty($data['minuten-' .$i])) {
+            foreach ($posten as $var) {
+                if ($data[$var. '-' .$i] != 0) {
+                    array_push(${$var}, $data[$var. '-' .$i]);
+                }
+            }
         }
-      }
     }
 
     foreach ($posten as $var) {
-      $resultingData[$var] = ${$var};
+        $resultingData[$var] = ${$var};
     }
 
     $secondaryInformation = [
@@ -76,6 +77,8 @@ if (isset($_POST['pdfId'])) {
     }
 
     $length = count($resultingData['minuten']);
+} else {
+    $outputMode = 'I';
 }
 
 $pdf = returnPDFBasics();
@@ -96,7 +99,7 @@ $basicMethods = [
 
 
 foreach ($basicMethods as $method => $value) {
-  call_user_func([$pdf, $method], $value);
+    call_user_func([$pdf, $method], $value);
 }
 
 
@@ -114,11 +117,11 @@ $methods = [
 // execute row insertions
 for ($i = 0; $i <= ($length - 1); $i += 1) {
 
-  $yCoord = 36 + $i * 7.7725;
+    $yCoord = 36 + $i * 7.7725;
 
-  foreach ($methods as $method => $array) {
-    call_user_func_array([$pdf, $method], [$array[$i], $yCoord]);
-  }
+    foreach ($methods as $method => $array) {
+        call_user_func_array([$pdf, $method], [$array[$i], $yCoord]);
+    }
 }
 
 // occasionally add special row
@@ -146,25 +149,19 @@ if ($außerHaus > 0) {
 
 // OPA / OMI
 if ($frühstückspause == 0 || $mittagspause == 0) {
-    if ($mittagspause == 0 && $frühstückspause == 0) $pausenString = 'OPA & OMI';
-
-    if ($mittagspause == 0 && $frühstückspause != 0) $pausenString = 'OMI';
-
-    if ($frühstückspause == 0 && $mittagspause != 0) $pausenString = 'OPA';
+    if ($mittagspause == 0 && $frühstückspause == 0) {
+        $pausenString = 'OPA & OMI';
+    }
+    if ($mittagspause == 0 && $frühstückspause != 0) {
+        $pausenString = 'OMI';
+    }
+    if ($frühstückspause == 0 && $mittagspause != 0) {
+        $pausenString = 'OPA';
+    }
 
     $pdf->placePause($pausenString);
 }
 
-isset($_POST['pdfId']) ? $pdf->output($description. '.pdf', 'D') : $pdf->output($description. '.pdf', 'I');
-
-/*
-
-if (isset($_POST['pdfId'])) {
-  $pdf->output($description. '.pdf', 'D');
-} else {
-  $pdf->output($description. '.pdf', 'I');
-}*/
-
-ob_end_clean();
+$pdf->output($description. '.pdf', $outputMode);
 
 ?>
