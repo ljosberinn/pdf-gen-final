@@ -2,7 +2,7 @@
 
   <div class="columns">
     <h1 class="column">
-      <strong class="">Urlaubsverwaltung – verbleibende Urlaubstage: <?php echo $_SESSION['remaining_vacation']; ?></strong>
+      <strong>Urlaubsverwaltung – verbleibende Urlaubstage: <?php echo $_SESSION['remaining_vacation']; ?></strong>
     </h1>
   </div>
 
@@ -53,9 +53,11 @@
 
   <hr>
 
+  <?php require 'content/upcomingVacation.php'; ?>
+
   <div id="calendar-container">
-  <?php
-    require 'api/calendar.php';
-  ?>
+
+    <?php require 'api/calendar.php'; ?>
+
   </div>
 </div>

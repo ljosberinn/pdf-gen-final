@@ -2,6 +2,16 @@ let gearbeiteteMinuten = 0;
 let arbeitszeit = 0;
 
 /**
+ * Togglet ['is-loading', 'is-warning'] des gewählten Elements
+ *
+ * @param {HTMLButtonElement} el
+ * @param {string} mode
+ */
+const toggleIsLoadingWarning = (el, mode) => {
+  ['is-loading', 'is-warning'].forEach(className => (mode === 'remove' ? el.classList.remove(className) : el.classList.add(className)));
+};
+
+/**
  * Scannt alle #creation-tbody-Felder nach Inhalten und gibt "true" zurück falls etwas eingegeben wurde
  *
  * @returns {boolean}
@@ -430,6 +440,9 @@ const workEventListeners = () => {
   });
 };
 
+/**
+ * Zeigt alle unsichtbaren Table Rows an
+ */
 const unhidePermSaveTRs = () => {
   document.querySelectorAll('#perm-save tr').forEach(tr => {
     if (tr.classList.contains('hidden-tr')) tr.classList.remove('hidden-tr');
@@ -438,6 +451,13 @@ const unhidePermSaveTRs = () => {
   document.getElementById('perm-save-tr').remove();
 };
 
+/**
+ *
+ * Löscht temporäre oder permanente Daten
+ *
+ * @param {HTMLElement} el
+ * @param {string} mode
+ */
 const addDeletionEventListener = (el, mode) => {
   el.addEventListener('click', () => {
     const tr = el.closest('tr');
@@ -504,6 +524,10 @@ const toggleButtonDisabledOnInput = function () {
   document.getElementById(`${this.id}-btn`).disabled = this.value.length === 0;
 };
 
+/**
+ *
+ * @param {string} target
+ */
 const adminToggleKSLAAdd = target => {
   const number = document.getElementById(`${target}-number-add`);
   const desc = document.getElementById(`${target}-desc-add`);
@@ -517,6 +541,10 @@ const adminToggleKSLAAdd = target => {
   }
 };
 
+/**
+ *
+ * @param {string} target
+ */
 const adminToggleKSLATarget = target => {
   const select = document.getElementById(`${target}-select`);
 
@@ -527,13 +555,20 @@ const adminToggleKSLATarget = target => {
   }
 };
 
+/**
+ *
+ * @param {string} word
+ */
 const capitalize = word => word.charAt(0).toUpperCase() + word.slice(1);
 
+/**
+ *
+ * @param {string} target
+ */
 const adminDeleteKSLAListener = target => {
   const deleteBtn = document.getElementById(`${target}-btn-delete`);
 
   if (deleteBtn) {
-    const btnCL = deleteBtn.classList;
     deleteBtn.addEventListener('click', e => {
       e.preventDefault();
 
@@ -549,8 +584,8 @@ const adminDeleteKSLAListener = target => {
         confirmButtonText: 'löschen',
       }).then(result => {
         if (result.value) {
-          btnCL.remove('is-danger');
-          ['is-loading', 'is-warning'].forEach(className => btnCL.add(className));
+          deleteBtn.classList.remove('is-danger');
+          toggleIsLoadingWarning(deleteBtn, 'remove');
 
           fetch('api/options/deleteKSLA.php', {
             method: 'POST',
@@ -560,7 +595,7 @@ const adminDeleteKSLAListener = target => {
           })
             .then(response => response.json())
             .then(json => {
-              ['is-loading', 'is-warning'].forEach(className => btnCL.remove(className));
+              toggleIsLoadingWarning(deleteBtn, 'remove');
 
               if (json.success) {
                 const select = document.querySelector(`#${target}-select`);
@@ -568,11 +603,11 @@ const adminDeleteKSLAListener = target => {
                 select.selectedIndex = 0;
               }
 
-              btnCL.add(json.success ? 'is-success' : 'is-danger');
+              deleteBtn.classList.add(json.success ? 'is-success' : 'is-danger');
               deleteBtn.innerText = json.success ? 'Erfolg' : `Fehler! Info: ${json.error}`;
 
               setTimeout(() => {
-                if (btnCL.contains('is-success')) btnCL.replace('is-success', 'is-danger');
+                if (deleteBtn.classList.contains('is-success')) deleteBtn.classList.replace('is-success', 'is-danger');
                 deleteBtn.innerText = `${capitalize(target)} löschen`;
               }, 5000);
             });
@@ -581,18 +616,19 @@ const adminDeleteKSLAListener = target => {
     });
   }
 };
-
+/**
+ *
+ * @param {string} target
+ */
 const adminAddKSLAListener = target => {
   const btn = document.getElementById(`${target}-btn-add`);
 
   if (btn) {
-    const btnCL = btn.classList;
-
     btn.addEventListener('click', e => {
       e.preventDefault();
 
-      btnCL.remove('is-success');
-      ['is-loading', 'is-warning'].forEach(className => btnCL.add(className));
+      btn.classList.remove('is-success');
+      toggleIsLoadingWarning(btn, 'add');
 
       const value = document.getElementById(`${target}-number-add`).value;
       const desc = document.getElementById(`${target}-desc-add`).value;
@@ -605,13 +641,13 @@ const adminAddKSLAListener = target => {
       })
         .then(response => response.json())
         .then(json => {
-          ['is-loading', 'is-warning'].forEach(className => btnCL.remove(className));
+          toggleIsLoadingWarning(btn, 'remove');
 
-          btnCL.add(json.success ? 'is-success' : 'is-danger');
+          btn.classList.add(json.success ? 'is-success' : 'is-danger');
           btn.innerText = json.success ? 'Erfolg' : `Fehler! Info: ${json.error}`;
 
           setTimeout(() => {
-            if (btnCL.contains('is-danger')) btnCL.replace('is-danger', 'is-success');
+            if (btn.classList.contains('is-danger')) btn.classList.replace('is-danger', 'is-success');
             btn.innerText = `${capitalize(target)} hinzufügen`;
           }, 5000);
         });
@@ -619,21 +655,36 @@ const adminAddKSLAListener = target => {
   }
 };
 
+/**
+ * Entfernt EventListener von this
+ */
 const faultyElementListener = function () {
   this.classList.remove('is-danger');
   this.removeEventListener('input', faultyElementListener);
 };
 
+/**
+ *
+ * @param {array} elements
+ * @param {HTMLButtonElement} btn
+ */
 const adminHighlightFaultyElements = (elements, btn) => {
   elements[0].focus();
+
   elements.forEach(el => {
     el.classList.add('is-danger');
     el.addEventListener('input', faultyElementListener);
   });
-  ['is-loading', 'is-warning'].forEach(className => btn.classList.remove(className));
+
+  toggleIsLoadingWarning(btn, 'remove');
   btn.classList.add('is-primary');
 };
 
+/**
+ *
+ * @param {array} inputs
+ * @param {HTMLButtonElement} btn
+ */
 const adminCreateNewUser = (inputs, btn) => {
   let bodyString = '';
 
@@ -651,7 +702,7 @@ const adminCreateNewUser = (inputs, btn) => {
   })
     .then(response => response.json())
     .then(json => {
-      ['is-loading', 'is-warning'].forEach(className => btn.classList.remove(className));
+      toggleIsLoadingWarning(btn, 'remove');
 
       btn.classList.add(json.success ? 'is-success' : 'is-danger');
       btn.innerText = json.success ? 'Erfolg' : `Fehler! Info: ${json.error}`;
@@ -663,6 +714,9 @@ const adminCreateNewUser = (inputs, btn) => {
     });
 };
 
+/**
+ *
+ */
 const adminCreateUserListener = () => {
   const btn = document.getElementById('create-user-btn');
 
@@ -671,7 +725,7 @@ const adminCreateUserListener = () => {
       e.preventDefault();
 
       btn.classList.remove('is-primary');
-      ['is-loading', 'is-warning'].forEach(className => btn.classList.add(className));
+      toggleIsLoadingWarning(btn, 'add');
 
       const formParent = 'form[action="api/options/createNewUser.php"]';
 
@@ -683,6 +737,9 @@ const adminCreateUserListener = () => {
   }
 };
 
+/**
+ *
+ */
 const adminEventListener = () => {
   ['kostenstelle', 'leistungsart'].forEach(target => {
     adminToggleKSLAAdd(target);
@@ -720,11 +777,20 @@ const initTabswitcher = () => {
   });
 };
 
+/**
+ *
+ * @param {string} id
+ * @param {string} type
+ * @param {string} eventListener
+ */
 const addEventListenerIfExists = (id, type, eventListener) => {
   const element = document.getElementById(id);
   if (element) element.addEventListener(type, eventListener);
 };
 
+/**
+ *
+ */
 const calendarListeners = () => {
   const buttons = [document.querySelector('.calendar-nav-previous-month button'), document.querySelector('.calendar-nav-next-month button')];
   const selects = [document.getElementById('calendar-month'), document.getElementById('calendar-year')];
@@ -753,6 +819,11 @@ const calendarListeners = () => {
   }
 };
 
+/**
+ *
+ * @param {number} year
+ * @param {number} month
+ */
 const getCalendarData = (year, month) => {
   fetch('api/calendar.php', {
     method: 'POST',
@@ -767,6 +838,9 @@ const getCalendarData = (year, month) => {
     });
 };
 
+/**
+ *
+ */
 const datePicker = () => {
   const datePickertarget = document.querySelector('[name="datum"]');
 
@@ -785,6 +859,11 @@ const datePicker = () => {
   }
 };
 
+/**
+ *
+ * @param {number} startDate
+ * @param {number} endDate
+ */
 const getBusinessDateCount = (startDate, endDate) => {
   const ifThen = (a, b, c) => (a === b ? c : a);
 
@@ -800,6 +879,9 @@ const getBusinessDateCount = (startDate, endDate) => {
   return Math.ceil(elapsed);
 };
 
+/**
+ *
+ */
 const vacationDiffParser = () => {
   const startEl = document.querySelector('[name="vacation-start"]');
   const endEl = document.querySelector('[name="vacation-end"]');
@@ -825,10 +907,10 @@ const vacationDiffParser = () => {
     btn.addEventListener('click', function (e) {
       e.preventDefault();
       this.disabled = true;
-      ['is-loading', 'is-warning'].forEach(className => this.classList.add(className));
+      toggleIsLoadingWarning(this, 'add');
       this.classList.remove('is-success');
 
-      const span = document.querySelector('#vacation-btn span:nth-of-type(2)');
+      const span = this.querySelector('span:nth-of-type(2)');
 
       fetch('api/vacation.php', {
         method: 'POST',
@@ -838,7 +920,8 @@ const vacationDiffParser = () => {
       })
         .then(response => response.json())
         .then(response => {
-          ['is-loading', 'is-warning'].forEach(className => this.classList.remove(className));
+          toggleIsLoadingWarning(this, 'remove');
+
           if (response.success) {
             this.classList.add('is-success');
             span.innerText = 'Erfolgreich eingetragen.';
@@ -848,12 +931,56 @@ const vacationDiffParser = () => {
           }
 
           setTimeout(() => {
-            this.classList.remove(this.classList.contains('is-success') ? 'is-success' : 'is-warning');
+            toggleIsLoadingWarning(this, 'remove');
             this.classList.add('is-success');
             span.innerText = 'Urlaub eintragen';
             this.disabled = false;
           }, 3000);
         });
+    });
+  }
+};
+
+/**
+ *
+ */
+const vacationRemoveListener = () => {
+  const btns = document.querySelectorAll('button.vacation-delete-btn');
+
+  if (btns.length > 0) {
+    btns.forEach(btn => {
+      btn.addEventListener('click', function () {
+        this.disabled = true;
+
+        const span = this.querySelector('span:nth-of-type(2)');
+
+        toggleIsLoadingWarning(this, 'add');
+        this.classList.remove('is-danger');
+
+        fetch('api/deleteVacation.php', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: { 'Content-type': 'application/x-www-form-urlencoded' },
+          body: `start=${this.dataset.start}`,
+        })
+          .then(response => response.json())
+          .then(response => {
+            toggleIsLoadingWarning(this, 'remove');
+
+            if (response.success) {
+              document.querySelector(`tr[data-start="${this.dataset.start}"`).remove();
+            } else {
+              this.classList.add('is-warning');
+              span.innerText = response.error;
+
+              setTimeout(() => {
+                this.disabled = false;
+                span.innerText = 'entfernen';
+                this.classList.add('is-success');
+              }, 3000);
+            }
+          });
+      });
     });
   }
 };
@@ -886,6 +1013,7 @@ const addEventListeners = () => {
   addPausenListener();
   addAußerHausEventListener();
   minutesCalculatorEventListenerHelper();
+  vacationRemoveListener();
 
   calendarListeners();
 
