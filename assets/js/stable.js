@@ -1,4 +1,4 @@
-import 'sweetalert2';
+import swal from 'sweetalert2';
 import bulmaCalendar from 'bulma-calendar';
 
 let gearbeiteteMinuten = 0;
@@ -482,8 +482,9 @@ const addDeletionEventListener = (el, mode) => {
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
           credentials: 'same-origin',
           body: `pdfId=${pdfId}&mode=${mode}`,
+        }).then(() => {
+          tr.remove();
         });
-        tr.style.opacity = 0;
       }
     });
   });

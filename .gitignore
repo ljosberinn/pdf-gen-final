@@ -1,10 +1,11 @@
-.vscode/sftp.json
 api/db.php
-node_modules
 api/convertOldToNew.php
-vendor
-package-lock.json
-assets/js/bundle.js
+
 assets/js/bundle.min.js
-assets/js/bundle.js.map
+assets/js/bundle.min.js.map
 assets/css/custom.min.css
+
+package-lock.json
+
+node_modules
+vendor

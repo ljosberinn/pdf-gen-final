@@ -1,10 +1,7 @@
 module.exports = {
   extends: 'airbnb-base',
   env: {
-    browser: true,
-    es6: true,
-    node: true,
-    jquery: true,
+    browser: true
   },
   parserOptions: {
     sourceType: 'module',
@@ -31,8 +28,5 @@ module.exports = {
     'no-unused-expressions': 'off',
     'no-param-reassign': 'off',
     'prefer-destructuring': 'off'
-  },
-  globals: {
-    swal: true
   }
 };
