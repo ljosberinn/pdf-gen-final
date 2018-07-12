@@ -37,8 +37,6 @@ function setHeaders()
 /**
  * Appends scripts to page with $lastModified timestamp, thus always fetching the newest version, preventing caching
  *
- * @method public appendJSFiles
- *
  * @param [array] $files [$ownJSFiles, relative links to file]
  *
  * @return string [script link]
@@ -51,15 +49,6 @@ function appendFiles($files)
         $link .= '?' .filemtime($link);
 
         echo $type === 'js' ? '<script src="' .$link. '"></script>' : '<link rel="stylesheet" href="' .$link. '" />';
-
-        /*
-        if ($type == 'js') {
-            echo '
-            <script src="' .$link. '"></script>';
-        } else if ($type == 'css') {
-            echo '
-            <link rel="stylesheet" href="' .$link. '" />';
-        }*/
     }
 }
 
@@ -219,7 +208,9 @@ function buildInsertionStatement($personalnummer, $type, $length, $has890)
         $insertionStatement .= '`kostenstelle-' .$i. '`, `auftragsnummer-' .$i. '`, `kunde-' .$i. '`, `leistungsart-' .$i. '`, `minuten-' .$i. '`, `anzahl-' .$i . '`, `materialnummer-' .$i. '`, ';
     }
 
-    if ($has890 > 0) $insertionStatement .= '`minuten-890`, ';
+    if ($has890 > 0) {
+        $insertionStatement .= '`minuten-890`, ';
+    }
 
     return $insertionStatement;
 }
@@ -391,7 +382,13 @@ function secondsToTime($minutes)
     $dtF = new \DateTime('@0');
     $dtT = new \DateTime("@$minutes");
     $result = $dtF->diff($dtT);
-    return $result->h . ':' . $result->i;
+    $min = $result->i;
+
+    if ($min == 0) {
+        $min = '00';
+    }
+
+    return $result->h . ':' . $min;
 }
 
 /**
@@ -407,9 +404,10 @@ function microtime_float()
 /**
  * @method returnUsedVacationDays
  *
- * @param object $conn  [mysqli object]
- * @param int    $start [unix timestamp]
- * @param int    $end   [unix timestamp]
+ * @param object $conn           [mysqli object]
+ * @param int    $start          [unix timestamp]
+ * @param int    $end            [unix timestamp]
+ * @param int    $personalnummer [personalnummer]
  *
  * @return int $usedVacationDays
  */

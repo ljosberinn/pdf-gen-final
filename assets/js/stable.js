@@ -733,7 +733,7 @@ const adminCreateUserListener = () => {
 
       const formParent = 'form[action="api/options/createNewUser.php"]';
 
-      const inputs = document.querySelectorAll(`${formParent} input, ${formParent} select`);
+      const inputs = [...document.querySelectorAll(`${formParent} input, ${formParent} select`)];
       const faultyEls = inputs.filter(el => el.required && el.value.length === 0);
 
       faultyEls.length === 0 ? adminCreateNewUser(inputs, btn) : adminHighlightFaultyElements(faultyEls, btn);
