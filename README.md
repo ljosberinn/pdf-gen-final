@@ -1,10 +1,12 @@
-`git clone https://github.com/ljosberinn/pdf-gen-final
+```sh
+git clone https://github.com/ljosberinn/pdf-gen-final
 
 cd pdf-gen-final
 
 npm install
 
-composer install`
+composer install
+```
 
 #Workaround to import wonky bulmaCalendar properly
 
