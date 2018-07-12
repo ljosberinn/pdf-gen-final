@@ -17,28 +17,28 @@
         <?php
 
         $navBarStartItems = [
-          '<button type="button" class="button"><span class="icon is-small"><i class="far fa-file-pdf"></i></span> <span>Neuen Tageszettel erstellen</span></button>' => [
+          '<span class="button"><span class="icon is-small"><i class="far fa-file-pdf"></i></span> <span>Neuen Tageszettel erstellen</span></span>' => [
             'id'          => 'nav-new',
             'class'       => 'navbar-item',
             'data-target' => 'new-pdf',
             'href'        => '',
             'login'       => 'required',
           ],
-          '<button type="button" class="button"><span class="icon is-small"><i class="fas fa-step-forward"></i></span> <span>Zwischenspeicher</span></button>' => [
+          '<span class="button"><span class="icon is-small"><i class="fas fa-step-forward"></i></span> <span>Zwischenspeicher</span></span>' => [
             'id'          => 'nav-temp',
             'class'       => 'navbar-item',
             'data-target' => 'temp-save',
             'href'        => '',
             'login'       => 'required',
           ],
-          '<button type="button" class="button"><span class="icon is-small"><i class="fas fa-archive"></i></span> <span>Archiv</span></button>' => [
+          '<span class="button"><span class="icon is-small"><i class="fas fa-archive"></i></span> <span>Archiv</span></span>' => [
             'id'          => 'nav-perm',
             'class'       => 'navbar-item',
             'data-target' => 'perm-save',
             'href'        => '',
             'login'       => 'required',
           ],
-          '<button type="button" class="button"><span class="icon is-small"><i class="far fa-calendar-alt"></i></span> <span>Kalender</span></button>' => [
+          '<span class="button"><span class="icon is-small"><i class="far fa-calendar-alt"></i></span> <span>Kalender</span></span>' => [
             'id'          => 'nav-calendar',
             'class'       => 'navbar-item',
             'data-target' => 'calendar',
@@ -57,28 +57,28 @@
         <?php
 
         $navBarEndItems = [
-          '<button type="button" class="button"><span class="icon is-small"><i class="fas fa-search"></i></span> <span>Suche</span></button>' => [
+          '<span class="button"><span class="icon is-small"><i class="fas fa-search"></i></span> <span>Suche</span></span>' => [
             'id'          => '',
             'class'       => 'navbar-item',
             'data-target' => 'search',
             'href'        => '',
             'login'       => 'required',
           ],
-          '<button type="button" class="button"><span class="icon is-small"><i class="fas fa-sliders-h"></i></span> <span>Optionen</span></button>' => [
+          '<span class="button"><span class="icon is-small"><i class="fas fa-sliders-h"></i></span> <span>Optionen</span></span>' => [
             'id'          => '',
             'class'       => 'navbar-item',
             'data-target' => 'options',
             'href'        => '',
             'login'       => 'required',
           ],
-          '<button type="button" class="button"><span class="icon is-small"><i class="fas fa-sign-in-alt"></i></span> <span>Login</span></button>' => [
+          '<span class="button"><span class="icon is-small"><i class="fas fa-sign-in-alt"></i></span> <span>Login</span></span>' => [
             'id'          => '',
             'class'       => 'navbar-item',
             'data-target' => '',
             'href'        => '',
             'login'       => '',
           ],
-          '<button type="button" class="button"><span class="icon is-small"><i class="fas fa-sign-out-alt"></i></span> <span>Logout</span></button>' => [
+          '<span class="button"><span class="icon is-small"><i class="fas fa-sign-out-alt"></i></span> <span>Logout</span></span>' => [
             'id'          => '',
             'class'       => 'navbar-item',
             'data-target' => '',
