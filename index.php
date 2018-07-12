@@ -49,17 +49,13 @@ ob_end_flush();
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>PDF-Generator & Urlaubsverwaltung</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.0/css/bulma.min.css"/>
-  <script src="https://unpkg.com/sweetalert2@7.19.3/dist/sweetalert2.all.min.js"></script>
-  <!--<script src="https://use.fontawesome.com/releases/v5.0.7/js/all.js"></script>-->
-  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
 
     <?php
 
       $localFiles = [
-        'bulma.helper' => 'css',
-        'bulma-calendar.min' => 'css',
         'custom' => 'css',
+
+        'bundle' => 'js',
       ];
 
       appendFiles($localFiles);
@@ -93,12 +89,6 @@ ob_end_flush();
 
         echo "</$tag>";
     }
-
-    $lateScripts = [
-      'bundle' => 'js',
-    ];
-
-    appendFiles($lateScripts);
 
     ?>
 

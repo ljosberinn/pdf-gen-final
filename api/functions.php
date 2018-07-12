@@ -47,7 +47,7 @@ function appendFiles($files)
 {
     foreach ($files as $filename => $type) {
 
-        $link = 'assets/' .$type. '/' .$filename. '.' .$type;
+        $link = 'assets/' .$type. '/' .$filename. '.min.' .$type;
         $link .= '?' .filemtime($link);
 
         echo $type === 'js' ? '<script src="' .$link. '"></script>' : '<link rel="stylesheet" href="' .$link. '" />';

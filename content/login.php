@@ -14,7 +14,7 @@
 
         if (isset($_GET['loginError'])) {
             echo '
-            <p class="help is-danger">Personalnummer existiert nicht. Zur Neuanlegung bitte bei registriertem Kollegen melden.</p>';
+            <p class="help is-danger">Personalnummer existiert nicht. Zur Neuanlegung bitte bei Abteilungsleiter melden.</p>';
         }
 
         ?>

@@ -2,7 +2,9 @@
 api/db.php
 node_modules
 api/convertOldToNew.php
-assets/css/*.min.css
 vendor
 package-lock.json
 assets/js/bundle.js
+assets/js/bundle.min.js
+assets/js/bundle.js.map
+assets/css/custom.min.css

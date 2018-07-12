@@ -1,3 +1,6 @@
+import 'sweetalert2';
+import bulmaCalendar from 'bulma-calendar';
+
 let gearbeiteteMinuten = 0;
 let arbeitszeit = 0;
 
@@ -1029,3 +1032,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
   update890Row();
 });
+
