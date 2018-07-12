@@ -22,19 +22,18 @@ $tableColumnKeys = array_keys($tableColumns);
 <?php
 
 foreach ($tableColumns as $rowDescription => $class) {
-  if ($class != "") {
-    $class = 'class="' .$class. '"';
-  } else {
-    $class = '';
-  }
+    if ($class != "") {
+        $class = 'class="' .$class. '"';
+    } else {
+        $class = '';
+    }
 
-  echo '
-  <td ' .$class. '>' .$rowDescription. '</td>';
+    echo '<td ' .$class. '>' .$rowDescription. '</td>';
 }
 
 ?>
 
-<td colspan="3"></td>
+<td <?php empty($tableColumns) ? '' : 'colspan="3"'; ?>></td>
 
 </tr>
 </thead>

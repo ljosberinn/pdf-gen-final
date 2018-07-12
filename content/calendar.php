@@ -12,7 +12,7 @@
       <div class="field">
         <div class="control">
           <label for="vacation-start" class="label heading">Startdatum </label>
-          <input name="vacation-start" type="date" class="input" required>
+          <input id="vacation-start" type="date" class="input" required>
         </div>
       </div>
     </div>
@@ -21,7 +21,7 @@
       <div class="field">
         <div class="control">
           <label for="vacation-end" class="label heading">Enddatum </label>
-          <input name="vacation-end" type="date" class="input" required>
+          <input id="vacation-end" type="date" class="input" required>
         </div>
       </div>
     </div>
@@ -30,7 +30,7 @@
       <div class="field">
         <div class="control">
           <label for="vacation-days" class="label heading">Anzahl an Tagen </label>
-          <input name="vacation-days" type="number" class="input" required>
+          <input id="vacation-days" type="number" class="input" required>
           <p class="help">bei eingeschlossenen Feiertagen korrigieren!</p>
         </div>
       </div>

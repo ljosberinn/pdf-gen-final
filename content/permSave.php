@@ -185,7 +185,7 @@ echo '
   <span class="tag is-warning">außer Haus: ' .$außerHaus. '</span>
 </td>
 <td class="has-text-right ' .$arbeitszeitClass. '">Ø ' .$averageArbeitszeitSumme. ' ' .$addendum. '<br />' .$theoreticalOutput. '</td>
-<td colspan="2"></td>';
+<td colspan="3"></td>';
 
 ?>
 </tr>

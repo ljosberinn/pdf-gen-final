@@ -29,8 +29,8 @@ foreach ($tableColumnKeys as $tableColumnKey) {
       <div class="level-item level-left">
         <div class="field">
           <div class="control">
-            <label for="datepicker" class="label heading">Datum </label>
-            <input name="datum" type="date" class="input" required />
+            <label for="datum" class="label heading">Datum </label>
+            <input id="datum" type="date" class="input" required />
           </div>
         </div>
       </div>
@@ -39,7 +39,7 @@ foreach ($tableColumnKeys as $tableColumnKey) {
         <div class="field">
           <div class="control">
             <label for="von" class="label heading">Von </label>
-            <input id="von" name="von" class="input" required value="<?php echo $_SESSION['startAvg']; ?>" list="von-list" />
+            <input id="von" name="von" class="input" required value="<?php echo $_SESSION['startAvg']; ?>" />
           </div>
         </div>
       </div>
@@ -48,7 +48,7 @@ foreach ($tableColumnKeys as $tableColumnKey) {
         <div class="field">
           <div class="control">
             <label for="bis" class="label heading">Bis </label>
-            <input id="bis" name="bis" class="input" required list="bis-list" value="<?php echo $_SESSION['endAvg']; ?>" />
+            <input id="bis" name="bis" class="input" required value="<?php echo $_SESSION['endAvg']; ?>" />
           </div>
         </div>
       </div>

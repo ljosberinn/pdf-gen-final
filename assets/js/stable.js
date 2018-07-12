@@ -846,7 +846,7 @@ const getCalendarData = (year, month) => {
  *
  */
 const datePicker = () => {
-  const datePickertarget = document.querySelector('[name="datum"]');
+  const datePickertarget = document.getElementById('datum');
 
   if (datePickertarget) {
     const datepickerOptions = {
@@ -854,10 +854,10 @@ const datePicker = () => {
       lang: 'de',
     };
 
-    ['[name="vacation-start"]', '[name="vacation-end"]', '[name="datum"]'].forEach(selector => bulmaCalendar.attach(selector), datepickerOptions);
+    ['#vacation-start', '#vacation-end', '#datum'].forEach(selector => bulmaCalendar.attach(selector), datepickerOptions);
 
     setTimeout(() => {
-      document.querySelector('[name="datum"]').click();
+      datePickertarget.click();
       document.querySelector('button.date-item.is-today.is-active').click();
     }, 1000);
   }
@@ -887,9 +887,9 @@ const getBusinessDateCount = (startDate, endDate) => {
  *
  */
 const vacationDiffParser = () => {
-  const startEl = document.querySelector('[name="vacation-start"]');
-  const endEl = document.querySelector('[name="vacation-end"]');
-  const daysTarget = document.querySelector('[name="vacation-days"]');
+  const startEl = document.getElementById('vacation-start');
+  const endEl = document.getElementById('vacation-end');
+  const daysTarget = document.getElementById('vacation-days');
   const btn = document.getElementById('vacation-btn');
 
   if (startEl && endEl) {
@@ -1007,6 +1007,7 @@ const addEventListeners = () => {
   addEventListenerIfExists('überminuten', 'input', toggleButtonDisabledOnInput);
   datePicker();
   vacationDiffParser();
+  vacationRemoveListener();
 
   // admin
   adminEventListener();
@@ -1017,7 +1018,6 @@ const addEventListeners = () => {
   addPausenListener();
   addAußerHausEventListener();
   minutesCalculatorEventListenerHelper();
-  vacationRemoveListener();
 
   calendarListeners();
 
@@ -1030,7 +1030,6 @@ const addEventListeners = () => {
 
 document.addEventListener('DOMContentLoaded', () => {
   addEventListeners();
-
   update890Row();
 });
 
