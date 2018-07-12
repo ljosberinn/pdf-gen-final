@@ -8,7 +8,7 @@ npm install
 composer install
 ```
 
-#Workaround to import wonky bulmaCalendar properly
+## Workaround to import wonky bulmaCalendar properly
 
 go to node_modules/bulma-calendar
 
