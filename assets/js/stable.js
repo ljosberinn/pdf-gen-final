@@ -359,8 +359,9 @@ const insertEditData = response => {
 const switchActiveNavigationLink = selectedNav => {
   document.querySelectorAll('.navbar-item[data-target]').forEach(navLink => {
     const target = document.getElementById(navLink.dataset.target).classList;
+    const isAct = 'is-active';
 
-    selectedNav === navLink.id ? target.add('is-active') : target.contains('is-active') ? target.remove('is-active') : void 0;
+    selectedNav === navLink.id ? [target, navLink.classList].forEach(classList => classList.add(isAct)) : target.contains(isAct) ? [target, navLink.classList].forEach(classList => classList.remove(isAct)) : void 0;
   });
 };
 

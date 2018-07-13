@@ -1,25 +1,25 @@
 {
   "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-preset-env": "^1.7.0",
-    "babel-preset-minify": "^0.2.0",
-    "eslint": "^5.0.1",
-    "eslint-config-airbnb-base": "^12.1.0",
-    "eslint-plugin-import": "^2.11.0",
-    "npx": "^10.2.0",
-    "stylelint-config-recommended": "^2.1.0",
-    "webpack-cli": "^3.0.8"
+    "babel-cli": "6.26.0",
+    "babel-preset-env": "1.7.0",
+    "babel-preset-minify": "0.2.0",
+    "eslint": "5.0.1",
+    "eslint-config-airbnb-base": "12.1.0",
+    "eslint-plugin-import": "2.11.0",
+    "npx": "10.2.0",
+    "stylelint-config-recommended": "2.1.0",
+    "webpack-cli": "3.0.8"
   },
   "name": "pdf-gen-final",
   "version": "1.0.0",
   "description": "Tageszettelgenerator 3.0 - FINAL",
   "main": "index.php",
   "dependencies": {
-    "babel-core": "^6.26.3",
-    "babel-loader": "^7.1.5",
-    "bulma-calendar": "^4.0.1",
-    "sweetalert2": "^7.25.0",
-    "webpack": "^4.16.0"
+    "babel-core": "6.26.3",
+    "babel-loader": "7.1.5",
+    "bulma-calendar": "4.0.1",
+    "sweetalert2": "7.25.0",
+    "webpack": "4.16.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

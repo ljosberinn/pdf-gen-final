@@ -103,13 +103,31 @@ button.is-loading {
 
 .calendar.is-large .calendar-date:nth-of-type(7n-1),
 .calendar.is-large .calendar-date:nth-of-type(7n) {
-    max-width: 7.14%;
+  max-width: 7.14%;
 }
 
 .calendar .calendar-body .calendar-date,
 .calendar .calendar-header .calendar-date {
-    flex: 0 0 17.136%;
-    max-width: 17.136%;
+  flex: 0 0 17.136%;
+  max-width: 17.136%;
+}
+
+.button {
+  transition: all 0.22s;
+}
+
+.navbar-item.is-active > span,
+.button:hover {
+  filter: brightness(110%);
+  transform: translateY(-2px);
+  box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
+}
+
+.navbar-link.is-active,
+.navbar-link:hover,
+a.navbar-item.is-active,
+a.navbar-item:hover {
+  background-color: transparent;
 }
 
 /* https://codepen.io/AllThingsSmitty/pen/MyqmdM */

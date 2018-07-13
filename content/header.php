@@ -19,7 +19,7 @@
         $navBarStartItems = [
           '<span class="button"><span class="icon is-small"><i class="far fa-file-pdf"></i></span> <span>Neuen Tageszettel erstellen</span></span>' => [
             'id'          => 'nav-new',
-            'class'       => 'navbar-item',
+            'class'       => 'navbar-item is-active',
             'data-target' => 'new-pdf',
             'href'        => '',
             'login'       => 'required',
@@ -45,6 +45,20 @@
             'href'        => '',
             'login'       => 'required',
           ],
+          '<span class="button"><span class="icon is-small"><i class="fas fa-search"></i></span> <span>Suche</span></span>' => [
+            'id'          => 'nav-search',
+            'class'       => 'navbar-item',
+            'data-target' => 'search',
+            'href'        => '',
+            'login'       => 'required',
+          ],
+          '<span class="button"><span class="icon is-small"><i class="fas fa-sliders-h"></i></span> <span>Optionen</span></span>' => [
+            'id'          => 'nav-options',
+            'class'       => 'navbar-item',
+            'data-target' => 'options',
+            'href'        => '',
+            'login'       => 'required',
+          ],
         ];
 
         appendNavItems($navBarStartItems);
@@ -57,20 +71,6 @@
         <?php
 
         $navBarEndItems = [
-          '<span class="button"><span class="icon is-small"><i class="fas fa-search"></i></span> <span>Suche</span></span>' => [
-            'id'          => '',
-            'class'       => 'navbar-item',
-            'data-target' => 'search',
-            'href'        => '',
-            'login'       => 'required',
-          ],
-          '<span class="button"><span class="icon is-small"><i class="fas fa-sliders-h"></i></span> <span>Optionen</span></span>' => [
-            'id'          => '',
-            'class'       => 'navbar-item',
-            'data-target' => 'options',
-            'href'        => '',
-            'login'       => 'required',
-          ],
           '<span class="button"><span class="icon is-small"><i class="fas fa-sign-in-alt"></i></span> <span>Login</span></span>' => [
             'id'          => '',
             'class'       => 'navbar-item',

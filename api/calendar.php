@@ -85,8 +85,8 @@ class Calendar
                 <button data-action="-1" class="button is-small is-text"><svg viewBox="0 0 50 80" xml:space="preserve"><polyline fill="none" stroke-width=".5em" stroke-linecap="round" stroke-linejoin="round" points="45.63,75.8 0.375,38.087 45.63,0.375 "></polyline></svg></button>
             </div>
             <div class="calendar-month">
-                <select class="select" id="calendar-month">' . $monthOptions . '</select>
-                <select class="select" id="calendar-year">' . $yearOptions . '</select>
+                <div class="select is-medium"><select class="select" id="calendar-month">' . $monthOptions . '</select></div>
+                <div class="select is-medium"><select class="select" id="calendar-year">' . $yearOptions . '</select></div>
             </div>
             <div class="calendar-nav-next-month">
                 <button data-action="1" class="button is-small is-text"><svg viewBox="0 0 50 80" xml:space="preserve"><polyline fill="none" stroke-width=".5em" stroke-linecap="round" stroke-linejoin="round" points="0.375,0.375 45.63,38.087 0.375,75.8 "></polyline></svg></button>
