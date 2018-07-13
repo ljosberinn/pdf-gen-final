@@ -5,7 +5,6 @@ session_start();
 require 'fpdf181/fpdf.php';
 require 'fpdi161/fpdi.php';
 
-
 /**
 * Alle in dieser Datei erwähnten eigenen <public methods> (placeKostenstelle, placePersonalnummer, etc.) sind in /fpdi161/fpdi.php am Ende angefügt (ab Zeile 691)
 */
@@ -101,7 +100,6 @@ $basicMethods = [
 foreach ($basicMethods as $method => $value) {
     call_user_func([$pdf, $method], $value);
 }
-
 
 // prepare row insertions
 $methods = [

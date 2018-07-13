@@ -665,4 +665,3 @@ function filterEntries($entries, $type, $value, $leistungsarten)
 
 
 ?>
-
