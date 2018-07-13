@@ -1,15 +1,16 @@
 <?php
-
+ob_clean();
 session_start();
 
-if (isset($_POST['string'])) {
-    include '../functions.php';
+if (isset($_POST['type']) && isset($_POST['value'])) {
+    include 'functions.php';
     $start = microtime_float();
     header("Content-type: application/json; charset=utf-8");
 
-    $string = filter_input(INPUT_POST, 'string', FILTER_SANITIZE_STRING);
+    $type = filter_input(INPUT_POST, 'type', FILTER_SANITIZE_STRING);
+    $value = filter_input(INPUT_POST, 'value', FILTER_SANITIZE_STRING);
 
-    include '../db.php';
+    include 'db.php';
 
     $conn = new mysqli($host, $user, $password, $database);
     $conn->set_charset('utf8');
@@ -26,9 +27,9 @@ if (isset($_POST['string'])) {
     }
 
     if (!empty($personalnummern)) {
-        $entries = [];
+        $entries = [1=>2];
 
-        
+
 
 
 
@@ -47,3 +48,4 @@ if (isset($_POST['string'])) {
 } else {
     header('HTTP/1.0 403 Forbidden');
 }
+ob_end_clean();

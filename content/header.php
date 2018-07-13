@@ -19,7 +19,7 @@
         $navBarStartItems = [
           '<span class="button"><span class="icon is-small"><i class="far fa-file-pdf"></i></span> <span>Neuen Tageszettel erstellen</span></span>' => [
             'id'          => 'nav-new',
-            'class'       => 'navbar-item is-active',
+            'class'       => 'navbar-item',
             'data-target' => 'new-pdf',
             'href'        => '',
             'login'       => 'required',

@@ -17,10 +17,10 @@
       <div class="field">
         <p class="control has-icons-right">
           <input class="input" type="text" placeholder="..." id="search-value">
-          <span class="icon is-small is-right" id="search-icon">
+          <span class="icon is-small is-right" id="search-icons">
             <i class="fas fa-spinner"></i>
-            <i class="fas fa-check" style="display: none;"></i>
-            <i class="fas fa-times" style="display: none;"></i>
+            <i class="fas fa-check"></i>
+            <i class="fas fa-times"></i>
           </span>
         </p>
       </div>

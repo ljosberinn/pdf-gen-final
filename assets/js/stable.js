@@ -885,6 +885,23 @@ const getBusinessDateCount = (startDate, endDate) => {
 };
 
 /**
+ * Aktualisiert Kalender sollte der hinzugefügte oder entfernte Urlaub in diesem Monat sein
+ *
+ * @param {start} timestamp
+ */
+const refreshCalendar = start => {
+  const today = new Date();
+  const thisYear = today.getFullYear();
+  const thisMonth = today.getMonth();
+  const startOfMonth = new Date(thisYear, thisMonth, 1);
+  const endOfMonth = new Date(thisYear, thisMonth + 1, 0);
+
+  if (new Date(start) > startOfMonth && new Date(start) < endOfMonth) {
+    getCalendarData(document.getElementById('calendar-year').value, document.getElementById('calendar-month').value);
+  }
+};
+
+/**
  *
  */
 const vacationDiffParser = () => {
@@ -930,6 +947,7 @@ const vacationDiffParser = () => {
           if (response.success) {
             this.classList.add('is-success');
             span.innerText = 'Erfolgreich eingetragen.';
+            refreshCalendar(startEl.value);
           } else {
             this.classList.add('is-warning');
             span.innerText = response.error;
@@ -975,11 +993,9 @@ const vacationRemoveListener = () => {
 
             if (response.success) {
               document.querySelector(`tr[data-start="${start}"`).remove();
-              const today = new Date();
-              const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-              const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-              if (start * 1000 > startOfMonth && start * 1000 < endOfMonth) {
-                getCalendarData(document.getElementById('calendar-year').value, document.getElementById('calendar-month').value);
+              refreshCalendar(start * 1000);
+              if (document.querySelectorAll('#calendar table tbody tr').length === 0) {
+                document.querySelector('#calendar table').remove();
               }
             } else {
               this.classList.add('is-warning');
@@ -993,6 +1009,86 @@ const vacationRemoveListener = () => {
             }
           });
       });
+    });
+  }
+};
+
+/**
+ * Setzt Sichtbarkeit aller Suchicons zurück
+ */
+const resetSearchIcons = icons => {
+  icons.forEach(icon => icon.style.display = 'none');
+};
+
+/**
+ * Ändert Sichtbarkeit des Suchicons
+ */
+const toggleSearchIcon = (icon, state) => {
+  icon.style.display = state;
+};
+
+const emptyTbody = tbody => {
+  while (tbody.hasChildNodes()) {
+    tbody.removeChild(tbody.lastChild);
+  }
+};
+
+const processSearch = (response, icons) => {
+  console.log(response);
+
+  const table = document.getElementById('search-table');
+
+  toggleSearchIcon(icons[0], 'none');
+
+  if (Object.keys(response.data).length > 0) {
+    table.style.display = 'table';
+    const tbody = table.querySelector('tbody');
+    const currentRows = tbody.querySelectorAll('tr');
+    if (currentRows.length > 0) {
+      emptyTbody(tbody);
+    }
+    toggleSearchIcon(icons[1], 'inline-block');
+
+    // add trs
+  } else {
+    table.style.display = 'none';
+    toggleSearchIcon(icons[2], 'inline-block');
+  }
+};
+
+const search = (mode, value) => {
+  const icons = document.querySelectorAll('#search-icons i');
+
+  resetSearchIcons(icons);
+  toggleSearchIcon(icons[0], 'inline-block');
+
+  fetch('api/search.php', {
+    method: 'POST',
+    credentials: 'same-origin',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: `type=${mode}&value=${value}`,
+  })
+    .then(response => response.json())
+    .then(response => {
+      processSearch(response, icons);
+    });
+};
+
+const searchEventListener = () => {
+  const value = document.getElementById('search-value');
+  const mode = document.getElementById('search-type');
+
+  if (value) {
+    value.addEventListener('input', function () {
+      if (this.value.length > 1) {
+        search(mode.value, this.value);
+      }
+    });
+
+    mode.addEventListener('change', function () {
+      if (value.value.length > 1) {
+        search(this.value, value.value);
+      }
     });
   }
 };
@@ -1016,6 +1112,7 @@ const addEventListeners = () => {
   datePicker();
   vacationDiffParser();
   vacationRemoveListener();
+  searchEventListener();
 
   // admin
   adminEventListener();

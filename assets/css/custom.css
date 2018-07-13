@@ -130,6 +130,24 @@ a.navbar-item:hover {
   background-color: transparent;
 }
 
+#search-icons i {
+  display: none;
+}
+
+.fas.fa-spinner {
+  animation: rotate 1000ms infinite linear;
+}
+
+@keyframes rotate {
+  0% {
+    transform: rotate(-360deg);
+  }
+
+  100% {
+    transform: rotate(0);
+  }
+}
+
 /* https://codepen.io/AllThingsSmitty/pen/MyqmdM */
 
 @media screen and (max-width: 1088px) {
