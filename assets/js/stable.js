@@ -1033,9 +1033,28 @@ const emptyTbody = tbody => {
   }
 };
 
-const processSearch = (response, icons) => {
-  console.log(response);
+const returnSearchTR = data => {
 
+  const createdAt = data.day;
+  const createdBy = data.createdBy;
+
+  let string = '';
+
+  data.rows.forEach(row => {
+    string += `<tr>
+    <td class="has-text-right">${createdAt}</td>
+    <td class="has-text-right">${row.auftragsnummer}</td>
+    <td>${row.kunde}</td>
+    <td class="has-text-right">${row.leistungsart}</td>
+    <td class="has-text-right">${row.minuten}</td>
+    <td>${createdBy}</td>
+    </tr>`;
+  });
+
+  return string;
+};
+
+const processSearch = (response, icons) => {
   const table = document.getElementById('search-table');
 
   toggleSearchIcon(icons[0], 'none');
@@ -1049,7 +1068,12 @@ const processSearch = (response, icons) => {
     }
     toggleSearchIcon(icons[1], 'inline-block');
 
-    // add trs
+    let string = '';
+    Object.values(response.data).forEach(dataset => {
+      string += returnSearchTR(dataset);
+    });
+
+    tbody.insertAdjacentHTML('beforeend', string);
   } else {
     table.style.display = 'none';
     toggleSearchIcon(icons[2], 'inline-block');

@@ -31,12 +31,12 @@
 
   <table class="table is-hoverable is-striped is-fullwidth" id="search-table">
     <thead>
-      <th>berabeitet von</th>
-      <th>bearbeitet am</th>
-      <th>Auftragsnummer</th>
+      <th class="has-text-right">berabeitet am</th>
+      <th class="has-text-right">Auftragsnummer</th>
       <th>Kunde</th>
-      <th>Leistungsart</th>
-      <th>Minuten</th>
+      <th class="has-text-right">Leistungsart</th>
+      <th class="has-text-right">Minuten</th>
+      <th>bearbeitet von</th>
     </thead>
     <tbody></tbody>
     <tfoot></tfoot>

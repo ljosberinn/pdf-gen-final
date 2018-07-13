@@ -57,12 +57,45 @@ if (isset($_POST['type']) && isset($_POST['value'])) {
             'materialnummer',
         ];
 
+        $constantRemovals = [
+            'created',
+            'startTimestamp',
+            'endTimestamp',
+            'frühstückspause',
+            'mittagspause',
+            'minuten-890',
+            'kostenstelle-890',
+            'leistungsart-890',
+            'minutesWorked',
+            'außer-haus',
+            'kostenstelle',
+        ];
+
+        $iteratableRemovals = [
+            'kostenstelle',
+            'materialnummer',
+            'anzahl',
+        ];
+
+        // Array nach Erstelldatum absteigend sortieren
+        usort($entries, function ($x, $y) {
+            if ($x['day'] === $y['day']) {
+                return 0;
+            }
+            return $x['day'] > $y['day'] ? 0 : 1;
+        });
+
         foreach ($entries as $entry) {
             $index = array_search($entry, $entries);
+            $entry['rows'] = [];
 
             // loopt alle möglichen Spalten und entfernt leere Einträge, falls der Wert nicht in der gesuchten Spalte zu finden ist
             for ($i = 1; $i <= 22; $i += 1) {
                 $empty = false;
+
+                foreach ($iteratableRemovals as $key) {
+                    unset($entry[$key. '-' .$i]);
+                }
 
                 foreach ($checkForEmpty as $key) {
                     if ($key == $type && strpos($entry[$key. "-" .$i], $value) === false) {
@@ -71,12 +104,28 @@ if (isset($_POST['type']) && isset($_POST['value'])) {
                     }
                 }
 
-                if ($empty) {
-                    foreach ($checkForEmpty as $key) {
-                        unset($entry[$key. "-" .$i]);
-                    }
+                if (!$empty) {
+                    array_push(
+                        $entry['rows'],
+                        [
+                            'kunde' => $entry['kunde-' .$i],
+                            'auftragsnummer' => $entry['auftragsnummer-' .$i],
+                            'leistungsart' => $entry['leistungsart-' .$i],
+                            'minuten' => $entry['minuten-' .$i],
+                        ]
+                    );
+                }
+
+                foreach ($checkForEmpty as $key) {
+                    unset($entry[$key. "-" .$i]);
                 }
             }
+
+            foreach ($constantRemovals as $key) {
+                unset($entry[$key]);
+            }
+
+            $entry['day'] = date('d.m.Y', $entry['day']);
 
             $entries[$index] = $entry;
         }
@@ -88,7 +137,6 @@ if (isset($_POST['type']) && isset($_POST['value'])) {
     }
 
     $response ? ($response['success'] = true) : ($response['error'] = $conn->error);
-
 
     echo json_encode($response, JSON_NUMERIC_CHECK);
 

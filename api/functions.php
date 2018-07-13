@@ -427,7 +427,5 @@ function returnUsedVacationDays($conn, $start, $end, $personalnummer)
     return $usedVacationDays;
 }
 
-
-
 ?>
 
