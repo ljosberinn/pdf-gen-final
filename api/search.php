@@ -20,7 +20,7 @@ if (isset($_POST['type']) && isset($_POST['value'])) {
 
     if (!empty($personalnummern)) {
 
-        $entries = getEntries($conn, $personalnummern, $type);
+        $entries = getEntries($conn, $personalnummern, $type, $value);
         $leistungsarten = returnPlainLeistungsarten($conn);
 
         // Array nach Erstelldatum absteigend sortieren
@@ -33,11 +33,9 @@ if (isset($_POST['type']) && isset($_POST['value'])) {
             }
         );
 
-        $entries = filterEntries($entries, $type, $value, $leistungsarten);
-
         $response = [
             'completed_in' => microtime_float() - $start,
-            'data' => $entries
+            'data' => filterEntries($entries, $type, $value, $leistungsarten)
         ];
     }
 

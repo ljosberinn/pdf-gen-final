@@ -479,10 +479,11 @@ function getPersonalnummern($conn)
  * @param object $conn            [mysqli object]
  * @param array  $personalnummern [array via getPersonalnummern]
  * @param string $type            [search type]
+ * @param string $value           [search value]
  *
  * @return array $entries [gefundene Daten]
  */
-function getEntries($conn, $personalnummern, $type)
+function getEntries($conn, $personalnummern, $type, $value)
 {
     $entries = [];
 
@@ -507,12 +508,118 @@ function getEntries($conn, $personalnummern, $type)
 }
 
 /**
+ * @method removeIteratables
+ *
+ * @param array $entry [currently looped entry]
+ * @param int   $i     [current iteration]
+ *
+ * @return array $entry [modified entry]
+ */
+function removeIteratables($entry, $i)
+{
+    foreach (['kostenstelle', 'materialnummer', 'anzahl'] as $key) {
+        unset($entry[$key . '-' . $i]);
+    }
+
+    return $entry;
+}
+
+/**
+ * @method checkForEmptiness
+ *
+ * @param array  $entry         [current dataset]
+ * @param int    $i             [iteration]
+ * @param string $type          [search type]
+ * @param string $value         [search value]
+ * @param array  $checkForEmpty [constants]
+ *
+ * @return bool
+ */
+function isEmpty($entry, $i, $type, $value, $checkForEmpty)
+{
+    foreach ($checkForEmpty as $key) {
+        if ($key == $type && strpos($entry[$key . "-" . $i], $value) === false) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * @method  returnRowData
+ *
+ * @param array $entry          [currently looped entry]
+ * @param int   $i              [current iteration]
+ * @param array $leistungsarten [array via getPlainleistungsarten]
+ *
+ * @return array [entries['rows'] data]
+ */
+function returnRowData($entry, $i, $leistungsarten)
+{
+    return [
+        'kunde' => $entry['kunde-' . $i],
+        'auftragsnummer' => $entry['auftragsnummer-' . $i],
+        'leistungsart' => $entry['leistungsart-' . $i] . ' <small>(' . $leistungsarten[$entry['leistungsart-' . $i]] . ')</small>',
+        'minuten' => $entry['minuten-' . $i],
+    ];
+}
+
+/**
+ * @method unsetBasicData
+ *
+ * @param array $entry         [currently looped entry]
+ * @param int   $i             [current iteration]
+ * @param array $checkForEmpty [values to be removed]
+ *
+ * @return array $entry [modified $entry]
+ */
+function unsetBasicData($entry, $i, $checkForEmpty)
+{
+    foreach ($checkForEmpty as $key) {
+        unset($entry[$key . "-" . $i]);
+    }
+
+    return $entry;
+}
+
+/**
+ * @method removeConstants
+ *
+ * @param array $entry [currently iterated entry]
+ *
+ * @return array $entry [modified entry]
+ */
+function removeConstants($entry)
+{
+    foreach ([
+        'created',
+        'startTimestamp',
+        'endTimestamp',
+        'frühstückspause',
+        'mittagspause',
+        'minuten-890',
+        'kostenstelle-890',
+        'leistungsart-890',
+        'minutesWorked',
+        'außer-haus',
+        'kostenstelle',
+    ] as $key) {
+        unset($entry[$key]);
+    }
+
+    return $entry;
+}
+
+
+/**
  * @method filterEntries
  *
  * @param array  $entries        [data via getEntries]
  * @param string $type           [search type]
  * @param string $value          [search value]
  * @param array  $leistungsarten [array via getLeistungsarten]
+ *
+ * @return array $entries [search result]
  */
 function filterEntries($entries, $type, $value, $leistungsarten)
 {
@@ -527,70 +634,31 @@ function filterEntries($entries, $type, $value, $leistungsarten)
         'materialnummer',
     ];
 
-    $constantRemovals = [
-        'created',
-        'startTimestamp',
-        'endTimestamp',
-        'frühstückspause',
-        'mittagspause',
-        'minuten-890',
-        'kostenstelle-890',
-        'leistungsart-890',
-        'minutesWorked',
-        'außer-haus',
-        'kostenstelle',
-    ];
-
-    $iteratableRemovals = [
-        'kostenstelle',
-        'materialnummer',
-        'anzahl',
-    ];
-
     foreach ($entries as $entry) {
         $index = array_search($entry, $entries);
         $entry['rows'] = [];
 
         // loopt alle möglichen Spalten und entfernt leere Einträge, falls der Wert nicht in der gesuchten Spalte zu finden ist
         for ($i = 1; $i <= 22; $i += 1) {
-            $empty = false;
 
-            foreach ($iteratableRemovals as $key) {
-                unset($entry[$key . '-' . $i]);
+            $entry = removeIteratables($entry, $i);
+
+            if (!isEmpty($entry, $i, $type, $value, $checkForEmpty)) {
+                array_push($entry['rows'], returnRowData($entry, $i, $leistungsarten));
             }
 
-            foreach ($checkForEmpty as $key) {
-                if ($key == $type && strpos($entry[$key . "-" . $i], $value) === false) {
-                    $empty = true;
-                    break;
-                }
-            }
-
-            if (!$empty) {
-                array_push(
-                    $entry['rows'],
-                    [
-                        'kunde' => $entry['kunde-' . $i],
-                        'auftragsnummer' => $entry['auftragsnummer-' . $i],
-                        'leistungsart' => $entry['leistungsart-' . $i] . ' <small>(' . $leistungsarten[$entry['leistungsart-' . $i]] . ')</small>',
-                        'minuten' => $entry['minuten-' . $i],
-                    ]
-                );
-            }
-
-            foreach ($checkForEmpty as $key) {
-                unset($entry[$key . "-" . $i]);
-            }
+            $entry = unsetBasicData($entry, $i, $checkForEmpty);
         }
 
-        foreach ($constantRemovals as $key) {
-            unset($entry[$key]);
-        }
+        $entry = removeConstants($entry);
 
         $entry['day'] = date('d.m.Y', $entry['day']);
 
-        $entries[$index] = $entry;
-
+        if (empty($entry['rows'])) {
+            unset($entries[$index]);
+        } else {
+            $entries[$index] = $entry;
+        }
     }
     return $entries;
 }
