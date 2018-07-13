@@ -427,5 +427,174 @@ function returnUsedVacationDays($conn, $start, $end, $personalnummer)
     return $usedVacationDays;
 }
 
+
+/**
+ * @method returnPlainLeistungsarten
+ *
+ * @param object $conn [mysqli object]
+ *
+ * @return array $leistungsarten
+ */
+function returnPlainLeistungsarten($conn)
+{
+    $leistungsarten = [];
+
+    $selectLeistungsartenStmt = "SELECT * FROM `leistungsarten`";
+    $selectLeistungsarten = $conn->query($selectLeistungsartenStmt);
+
+    if ($selectLeistungsarten->num_rows > 0) {
+        while ($data = $selectLeistungsarten->fetch_assoc()) {
+            $leistungsarten[$data['leistungsart']] = $data['beschreibung'];
+        }
+    }
+
+    return $leistungsarten;
+}
+
+/**
+ * @method getPersonalnummern
+ *
+ * @param object $conn [mysqli object]
+ *
+ * @return array $personalnummern
+ */
+function getPersonalnummern($conn)
+{
+    $personalnummern = [];
+
+    $getPersonalnummernStmt = "SELECT `personalnummer`, `name` FROM `personal`";
+    $getPersonalnummern = $conn->query($getPersonalnummernStmt);
+
+    if ($getPersonalnummern->num_rows > 0) {
+        while ($data = $getPersonalnummern->fetch_assoc()) {
+            array_push($personalnummern, ['personalnummer' => $data['personalnummer'], 'name' => $data['name']]);
+        }
+    }
+    return $personalnummern;
+}
+
+/**
+ * @method getEntries
+ *
+ * @param object $conn            [mysqli object]
+ * @param array  $personalnummern [array via getPersonalnummern]
+ * @param string $type            [search type]
+ *
+ * @return array $entries [gefundene Daten]
+ */
+function getEntries($conn, $personalnummern, $type)
+{
+    $entries = [];
+
+    foreach ($personalnummern as $dataset) {
+        $searchQuery = "SELECT * FROM `" . $dataset['personalnummer'] . "_archiv` WHERE ";
+        for ($i = 1; $i <= 22; $i += 1) {
+            $searchQuery .= "`" . $type . "-" . $i . "` LIKE '%" . $value . "%' OR ";
+        }
+        $searchQuery = substr($searchQuery, 0, -4);
+
+        $search = $conn->query($searchQuery);
+
+        if ($search->num_rows > 0) {
+            while ($data = $search->fetch_assoc()) {
+                $data['createdBy'] = $dataset['name'];
+                array_push($entries, $data);
+            }
+        }
+    }
+
+    return $entries;
+}
+
+/**
+ * @method filterEntries
+ *
+ * @param array  $entries        [data via getEntries]
+ * @param string $type           [search type]
+ * @param string $value          [search value]
+ * @param array  $leistungsarten [array via getLeistungsarten]
+ */
+function filterEntries($entries, $type, $value, $leistungsarten)
+{
+
+    $checkForEmpty = [
+        'kostenstelle',
+        'auftragsnummer',
+        'kunde',
+        'leistungsart',
+        'minuten',
+        'anzahl',
+        'materialnummer',
+    ];
+
+    $constantRemovals = [
+        'created',
+        'startTimestamp',
+        'endTimestamp',
+        'frühstückspause',
+        'mittagspause',
+        'minuten-890',
+        'kostenstelle-890',
+        'leistungsart-890',
+        'minutesWorked',
+        'außer-haus',
+        'kostenstelle',
+    ];
+
+    $iteratableRemovals = [
+        'kostenstelle',
+        'materialnummer',
+        'anzahl',
+    ];
+
+    foreach ($entries as $entry) {
+        $index = array_search($entry, $entries);
+        $entry['rows'] = [];
+
+        // loopt alle möglichen Spalten und entfernt leere Einträge, falls der Wert nicht in der gesuchten Spalte zu finden ist
+        for ($i = 1; $i <= 22; $i += 1) {
+            $empty = false;
+
+            foreach ($iteratableRemovals as $key) {
+                unset($entry[$key . '-' . $i]);
+            }
+
+            foreach ($checkForEmpty as $key) {
+                if ($key == $type && strpos($entry[$key . "-" . $i], $value) === false) {
+                    $empty = true;
+                    break;
+                }
+            }
+
+            if (!$empty) {
+                array_push(
+                    $entry['rows'],
+                    [
+                        'kunde' => $entry['kunde-' . $i],
+                        'auftragsnummer' => $entry['auftragsnummer-' . $i],
+                        'leistungsart' => $entry['leistungsart-' . $i] . ' <small>(' . $leistungsarten[$entry['leistungsart-' . $i]] . ')</small>',
+                        'minuten' => $entry['minuten-' . $i],
+                    ]
+                );
+            }
+
+            foreach ($checkForEmpty as $key) {
+                unset($entry[$key . "-" . $i]);
+            }
+        }
+
+        foreach ($constantRemovals as $key) {
+            unset($entry[$key]);
+        }
+
+        $entry['day'] = date('d.m.Y', $entry['day']);
+
+        $entries[$index] = $entry;
+
+    }
+    return $entries;
+}
+
+
 ?>
 
