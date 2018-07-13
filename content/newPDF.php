@@ -39,7 +39,7 @@ foreach ($tableColumnKeys as $tableColumnKey) {
         <div class="field">
           <div class="control">
             <label for="von" class="label heading">Von </label>
-            <input id="von" name="von" class="input" required value="<?php echo $_SESSION['startAvg']; ?>" />
+            <input id="von" name="von" class="input" required placeholder="08:00" value="<?php echo $_SESSION['startAvg']; ?>" />
           </div>
         </div>
       </div>
@@ -48,7 +48,7 @@ foreach ($tableColumnKeys as $tableColumnKey) {
         <div class="field">
           <div class="control">
             <label for="bis" class="label heading">Bis </label>
-            <input id="bis" name="bis" class="input" required value="<?php echo $_SESSION['endAvg']; ?>" />
+            <input id="bis" name="bis" class="input" required placeholder="16:30" value="<?php echo $_SESSION['endAvg']; ?>" />
           </div>
         </div>
       </div>

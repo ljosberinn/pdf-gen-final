@@ -18,9 +18,9 @@
         <p class="control has-icons-right">
           <input class="input" type="text" placeholder="..." id="search-value">
           <span class="icon is-small is-right" id="search-icons">
-            <i class="fas fa-spinner"></i>
-            <i class="fas fa-check"></i>
-            <i class="fas fa-times"></i>
+            <i class="fas fa-spinner has-text-info"></i>
+            <i class="fas fa-check has-text-success"></i>
+            <i class="fas fa-times has-text-danger"></i>
           </span>
         </p>
       </div>
@@ -35,13 +35,11 @@
       <th>bearbeitet am</th>
       <th>Auftragsnummer</th>
       <th>Kunde</th>
+      <th>Leistungsart</th>
+      <th>Minuten</th>
     </thead>
-    <tbody>
-
-    </tbody>
-    <tfoot>
-
-    </tfoot>
+    <tbody></tbody>
+    <tfoot></tfoot>
   </table>
 
 </div>
