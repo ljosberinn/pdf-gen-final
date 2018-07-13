@@ -1,10 +1,22 @@
 <div id="search" class="m-t-lg m-b-lg m-l-lg m-r-lg">
 
+  <h1>
+    <strong>Suche</strong>
+  </h1>
   <div class="columns">
+    <div class="column">
+      <div class="select">
+        <select id="search-type">
+          <option disabled>Suche in...</option>
+          <option value="auftragsnummer">Auftragsnummer</option>
+          <option value="kunde">Kunde</option>
+        </select>
+      </div>
+    </div>
     <div class="column">
       <div class="field">
         <p class="control has-icons-right">
-          <input class="input" type="text" placeholder="Email">
+          <input class="input" type="text" placeholder="..." id="search-value">
           <span class="icon is-small is-right" id="search-icon">
             <i class="fas fa-spinner"></i>
             <i class="fas fa-check" style="display: none;"></i>

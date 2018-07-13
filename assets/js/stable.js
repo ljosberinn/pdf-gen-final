@@ -957,6 +957,7 @@ const vacationRemoveListener = () => {
         this.disabled = true;
 
         const span = this.querySelector('span:nth-of-type(2)');
+        const start = this.dataset.start;
 
         toggleIsLoadingWarning(this, 'add');
         this.classList.remove('is-danger');
@@ -965,14 +966,20 @@ const vacationRemoveListener = () => {
           method: 'POST',
           credentials: 'same-origin',
           headers: { 'Content-type': 'application/x-www-form-urlencoded' },
-          body: `start=${this.dataset.start}`,
+          body: `start=${start}`,
         })
           .then(response => response.json())
           .then(response => {
             toggleIsLoadingWarning(this, 'remove');
 
             if (response.success) {
-              document.querySelector(`tr[data-start="${this.dataset.start}"`).remove();
+              document.querySelector(`tr[data-start="${start}"`).remove();
+              const today = new Date();
+              const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+              const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+              if (start * 1000 > startOfMonth && start * 1000 < endOfMonth) {
+                getCalendarData(document.getElementById('calendar-year').value, document.getElementById('calendar-month').value);
+              }
             } else {
               this.classList.add('is-warning');
               span.innerText = response.error;
@@ -1032,4 +1039,3 @@ document.addEventListener('DOMContentLoaded', () => {
   addEventListeners();
   update890Row();
 });
-
