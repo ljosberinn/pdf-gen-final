@@ -189,7 +189,7 @@ class Calendar
      */
     private function _scanForVacationThisMonth()
     {
-        $scanForVacationThisMonthStmt = "SELECT SUM(`days`) AS `days` FROM `vacation` WHERE `start` >= " . $this->_firstDay . " AND `end` <= " . $this->_lastDay. " AND (`person` = " . $_SESSION['personalnummer'] . " OR `person` = 0)";
+        $scanForVacationThisMonthStmt = "SELECT SUM(`days`) AS `days` FROM `vacation` WHERE `start` >= " . $this->_firstDay . " AND `end` <= " . $this->_lastDay. " AND `person` = " . $_SESSION['personalnummer'];
         $scanForVacationThisMonth = $this->_conn->query($scanForVacationThisMonthStmt);
 
         $days = 0;
@@ -203,6 +203,25 @@ class Calendar
     }
 
     /**
+     * @method private _scanForHolidaysThisMonth
+     *
+     * @return int $holidays [amount of holidays this month]
+     */
+    private function _scanForHolidaysThisMonth() {
+        $scanForHolidaysThisMonthStmt = "SELECT SUM(`days`) AS `days` FROM `vacation` WHERE `start` >= " . $this->_firstDay . " AND `end` <= " . $this->_lastDay . " AND `person` = 0";
+        $scanForHolidaysThisMonth = $this->_conn->query($scanForHolidaysThisMonthStmt);
+
+        $holidays = 0;
+        if ($scanForHolidaysThisMonth->num_rows > 0) {
+            while ($data = $scanForHolidaysThisMonth->fetch_assoc()) {
+                $holidays = $data['days'];
+            }
+        }
+
+        return $holidays;
+    }
+
+    /**
      * @method private _appendFooter
      *
      * @param int $workDaysInMonth [workdays of this month]
@@ -210,15 +229,17 @@ class Calendar
      *
      * @return string [html P element]
      */
-    private function _appendFooter($workDaysInMonth = 0, $workTimeOfMonth = 0)
+    private function _appendFooter($workDaysInMonth = 0, $workedTimeOfMonth = 0)
     {
 
-        $maximumPossibleWorkTime = ($_SESSION['arbeitszeit'] * $workDaysInMonth) - ($_SESSION['arbeitszeit'] * $this->_scanForVacationThisMonth());
+        $curatedWorkdaysThisMonth = $workDaysInMonth - $this->_scanForHolidaysThisMonth();
+        $vacationDaysThisMonth = $this->_scanForVacationThisMonth();
+        $maximumPossibleWorkTime = ($_SESSION['arbeitszeit'] * $curatedWorkdaysThisMonth) - ($_SESSION['arbeitszeit'] * $vacationDaysThisMonth);
 
-        $workTimeQuota = round($workTimeOfMonth / $maximumPossibleWorkTime, 3) * 100;
-        $missingMinutes = round((($maximumPossibleWorkTime - $workTimeOfMonth) * -1) / 60, 2);
+        $workTimeQuota = round($workedTimeOfMonth / $maximumPossibleWorkTime, 3) * 100;
+        $missingMinutes = round((($maximumPossibleWorkTime - $workedTimeOfMonth) * -1) / 60, 2);
 
-        return '<p>Über-/Unterstunden diesen Monat: <span class="' . ($missingMinutes < 0 ? 'has-text-danger' : 'has-text-success') . '">' . number_format($missingMinutes) . '</span> (<strong>' . $workTimeQuota . '%</strong> des Solls erreicht)</p>';
+        return '<p>Über-/Unterstunden diesen Monat: <span class="' . ($missingMinutes < 0 ? 'has-text-danger' : 'has-text-success') . '">' . $missingMinutes . '</span> (<strong>' . $workTimeQuota . '%</strong> des Solls erreicht)</p>';
     }
 
     /**
