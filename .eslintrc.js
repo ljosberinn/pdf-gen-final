@@ -27,6 +27,7 @@ module.exports = {
     'no-nested-ternary': 'off',
     'no-unused-expressions': 'off',
     'no-param-reassign': 'off',
-    'prefer-destructuring': 'off'
+    'prefer-destructuring': 'off',
+    'comma-dangle': 'off'
   }
 };

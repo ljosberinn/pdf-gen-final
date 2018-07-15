@@ -14,13 +14,15 @@ if (isset($_POST['start']) && isset($_POST['end']) && isset($_POST['days'])) {
 
     $response = [];
 
+    $value = isset($_POST['daysOff']) ? '0000' : $_SESSION['personalnummer'];
+
     if ($start && $end && $days) {
         include 'db.php';
 
         $conn = new mysqli($host, $user, $password, $database);
         $conn->set_charset('utf8');
 
-        $vacationStmt = "INSERT INTO `vacation` (`person`, `start`, `end`, `days`) VALUES(" .$_SESSION['personalnummer']. ", " .$start. ", " .$end. ", " .$days. ")";
+        $vacationStmt = "INSERT INTO `vacation` (`person`, `start`, `end`, `days`) VALUES(" .$value. ", " .$start. ", " .$end. ", " .$days. ")";
         $execution = $conn->query($vacationStmt);
 
         $execution ? ($response['success'] = true) : ($response['error'] = $conn->error);

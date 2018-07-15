@@ -319,9 +319,9 @@ const addTR = () => {
 
 /**
  * Pflegt Daten des jeweiligen Zettels in Felder ein
-  *
+ *
  * @param { object } response
-  */
+ */
 const insertEditData = response => {
   document.getElementById('nav-new').click();
   document.getElementById('datum').value = response.day;
@@ -475,14 +475,14 @@ const addDeletionEventListener = (el, mode) => {
       cancelButtonText: 'Abbrechen',
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
-      confirmButtonText: 'löschen',
+      confirmButtonText: 'löschen'
     }).then(result => {
       if (result.value) {
         fetch('api/deletePDF.php', {
           method: 'POST',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
           credentials: 'same-origin',
-          body: `pdfId=${pdfId}&mode=${mode}`,
+          body: `pdfId=${pdfId}&mode=${mode}`
         }).then(() => {
           tr.remove();
         });
@@ -586,7 +586,7 @@ const adminDeleteKSLAListener = target => {
         cancelButtonText: 'Abbrechen',
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
-        confirmButtonText: 'löschen',
+        confirmButtonText: 'löschen'
       }).then(result => {
         if (result.value) {
           deleteBtn.classList.remove('is-danger');
@@ -596,7 +596,7 @@ const adminDeleteKSLAListener = target => {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             credentials: 'same-origin',
-            body: `target=${target}&id=${value}`,
+            body: `target=${target}&id=${value}`
           })
             .then(response => response.json())
             .then(json => {
@@ -642,7 +642,7 @@ const adminAddKSLAListener = target => {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         credentials: 'same-origin',
-        body: `target=${target}&id=${value}&desc=${desc}`,
+        body: `target=${target}&id=${value}&desc=${desc}`
       })
         .then(response => response.json())
         .then(json => {
@@ -703,7 +703,7 @@ const adminCreateNewUser = (inputs, btn) => {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     credentials: 'same-origin',
-    body: bodyString,
+    body: bodyString
   })
     .then(response => response.json())
     .then(json => {
@@ -834,7 +834,7 @@ const getCalendarData = (year, month) => {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     credentials: 'same-origin',
-    body: `year=${year}&month=${month}`,
+    body: `year=${year}&month=${month}`
   })
     .then(response => response.text())
     .then(response => {
@@ -852,10 +852,10 @@ const datePicker = () => {
   if (datePickertarget) {
     const datepickerOptions = {
       dateFormat: 'dd.mm.yyyy',
-      lang: 'de',
+      lang: 'de'
     };
 
-    ['#vacation-start', '#vacation-end', '#datum'].forEach(selector => bulmaCalendar.attach(selector), datepickerOptions);
+    ['#vacation-start', '#vacation-end', '#datum', '#day-off-start', '#day-off-end'].forEach(selector => bulmaCalendar.attach(selector), datepickerOptions);
 
     setTimeout(() => {
       datePickertarget.click();
@@ -878,7 +878,7 @@ const getBusinessDateCount = (startDate, endDate) => {
   const daysAfterLastSunday = endDate.getDay();
 
   elapsed -= daysBeforeFirstSunday + daysAfterLastSunday;
-  elapsed = elapsed / 7 * 5;
+  elapsed = (elapsed / 7) * 5;
   elapsed += ifThen(daysBeforeFirstSunday - 1, -1, 0) + ifThen(daysAfterLastSunday, 6, 5);
 
   return Math.ceil(elapsed);
@@ -901,6 +901,52 @@ const refreshCalendar = start => {
   }
 };
 
+const dateDifferenceEventListener = (startEl, endEl, daysTarget, btn) => {
+  [startEl, endEl].forEach(el => {
+    el.addEventListener('blur', () => {
+      setTimeout(() => {
+        const diff = getBusinessDateCount(new Date(startEl.value), new Date(endEl.value));
+
+        if (!isNaN(diff) && diff > 0) {
+          daysTarget.value = diff;
+          btn.disabled = false;
+        } else {
+          btn.disabled = true;
+        }
+      }, 750);
+    });
+  });
+};
+
+const fetchVacationResponse = (_this, body, startValue, span) => {
+  fetch('api/vacation.php', {
+    method: 'POST',
+    credentials: 'same-origin',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body
+  })
+    .then(response => response.json())
+    .then(response => {
+      toggleIsLoadingWarning(_this, 'remove');
+
+      if (response.success) {
+        _this.classList.add('is-success');
+        span.innerText = 'Erfolgreich eingetragen.';
+        refreshCalendar(startValue);
+      } else {
+        _this.classList.add('is-warning');
+        span.innerText = response.error;
+      }
+
+      setTimeout(() => {
+        toggleIsLoadingWarning(_this, 'remove');
+        _this.classList.add('is-success');
+        span.innerText = 'eintragen';
+        _this.disabled = false;
+      }, 3000);
+    });
+};
+
 /**
  *
  */
@@ -910,20 +956,25 @@ const vacationDiffParser = () => {
   const daysTarget = document.getElementById('vacation-days');
   const btn = document.getElementById('vacation-btn');
 
-  if (startEl && endEl) {
-    [startEl, endEl].forEach(el => {
-      el.addEventListener('blur', () => {
-        setTimeout(() => {
-          const diff = getBusinessDateCount(new Date(startEl.value), new Date(endEl.value));
+  const freeDayStart = document.getElementById('day-off-start');
+  const freeDayEnd = document.getElementById('day-off-end');
+  const freeDayTarget = document.getElementById('day-off-days');
+  const freeDayBtn = document.getElementById('day-off-btn');
 
-          if (!isNaN(diff) && diff > 0) {
-            daysTarget.value = diff;
-            btn.disabled = false;
-          } else {
-            btn.disabled = true;
-          }
-        }, 500);
-      });
+  if (startEl && endEl) {
+    dateDifferenceEventListener(startEl, endEl, daysTarget, btn);
+    dateDifferenceEventListener(freeDayStart, freeDayEnd, freeDayTarget, freeDayBtn);
+
+    freeDayBtn.addEventListener('click', function (e) {
+      e.preventDefault();
+      this.disabled = true;
+      toggleIsLoadingWarning(this, 'add');
+      this.classList.remove('is-success');
+
+      const span = this.querySelector('span:nth-of-type(2)');
+      const body = `start=${freeDayStart.value}&end=${freeDayEnd.value}&days=${freeDayTarget.value}&daysOff=true`;
+
+      fetchVacationResponse(this, body, freeDayStart.value, span);
     });
 
     btn.addEventListener('click', function (e) {
@@ -933,33 +984,9 @@ const vacationDiffParser = () => {
       this.classList.remove('is-success');
 
       const span = this.querySelector('span:nth-of-type(2)');
+      const body = `start=${startEl.value}&end=${endEl.value}&days=${daysTarget.value}`;
 
-      fetch('api/vacation.php', {
-        method: 'POST',
-        credentials: 'same-origin',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: `start=${startEl.value}&end=${endEl.value}&days=${daysTarget.value}`,
-      })
-        .then(response => response.json())
-        .then(response => {
-          toggleIsLoadingWarning(this, 'remove');
-
-          if (response.success) {
-            this.classList.add('is-success');
-            span.innerText = 'Erfolgreich eingetragen.';
-            refreshCalendar(startEl.value);
-          } else {
-            this.classList.add('is-warning');
-            span.innerText = response.error;
-          }
-
-          setTimeout(() => {
-            toggleIsLoadingWarning(this, 'remove');
-            this.classList.add('is-success');
-            span.innerText = 'Urlaub eintragen';
-            this.disabled = false;
-          }, 3000);
-        });
+      fetchVacationResponse(this, body, startEl.value, span);
     });
   }
 };
@@ -985,7 +1012,7 @@ const vacationRemoveListener = () => {
           method: 'POST',
           credentials: 'same-origin',
           headers: { 'Content-type': 'application/x-www-form-urlencoded' },
-          body: `start=${start}`,
+          body: `start=${start}`
         })
           .then(response => response.json())
           .then(response => {
@@ -1017,7 +1044,7 @@ const vacationRemoveListener = () => {
  * Setzt Sichtbarkeit aller Suchicons zurück
  */
 const resetSearchIcons = icons => {
-  icons.forEach(icon => icon.style.display = 'none');
+  icons.forEach(icon => (icon.style.display = 'none'));
 };
 
 /**
@@ -1034,7 +1061,6 @@ const emptyTbody = tbody => {
 };
 
 const returnSearchTR = data => {
-
   const createdAt = data.day;
   const createdBy = data.createdBy;
 
@@ -1090,7 +1116,7 @@ const search = (mode, value) => {
     method: 'POST',
     credentials: 'same-origin',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: `type=${mode}&value=${value}`,
+    body: `type=${mode}&value=${value}`
   })
     .then(response => response.json())
     .then(response => {
