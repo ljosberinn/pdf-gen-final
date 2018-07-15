@@ -189,7 +189,7 @@ class Calendar
      */
     private function _scanForVacationThisMonth()
     {
-        $scanForVacationThisMonthStmt = "SELECT SUM(`days`) AS `days` FROM `vacation` WHERE `person` = " . $_SESSION['personalnummer'] . " AND `start` >= " . $this->_firstDay . " AND `end` <= " . $this->_lastDay;
+        $scanForVacationThisMonthStmt = "SELECT SUM(`days`) AS `days` FROM `vacation` WHERE `start` >= " . $this->_firstDay . " AND `end` <= " . $this->_lastDay. " AND (`person` = " . $_SESSION['personalnummer'] . " OR `person` = 0)";
         $scanForVacationThisMonth = $this->_conn->query($scanForVacationThisMonthStmt);
 
         $days = 0;
