@@ -207,8 +207,21 @@ const arbeitszeitCalculator = () => {
 
   const frühstückspause = nimmtFrühstückspause() ? 15 : 0;
   const mittagspause = nimmtMittagspause() ? 30 : 0;
+  let newArbeitszeit = stundenToMinutes + minutenToMinutes;
 
-  const newArbeitszeit = stundenToMinutes + minutenToMinutes - frühstückspause - mittagspause;
+  const grundarbeitszeit = parseInt(document.getElementById('arbeitszeit').dataset.grundarbeitszeit);
+
+  if (grundarbeitszeit <= 360) {
+    if (frühstückspause === 15 && mittagspause === 0) {
+      newArbeitszeit -= 30;
+    } else if (frühstückspause === 0 && mittagspause === 30) {
+      newArbeitszeit -= 15;
+    } else if (frühstückspause === 0 && mittagspause === 0) {
+      newArbeitszeit -= 45;
+    }
+  } else {
+    newArbeitszeit -= (frühstückspause + mittagspause);
+  }
 
   if (!isNaN(newArbeitszeit)) arbeitszeit = newArbeitszeit;
 };
@@ -378,18 +391,14 @@ const toggleTab = (selectedNav, targetId) => {
  */
 const addPausenListener = () => {
   const checkboxes = [document.getElementById('frühstückspause'), document.getElementById('mittagspause')];
-  const pausenzeiten = [15, 30];
 
   checkboxes.forEach(el => {
     if (el) {
-      el.addEventListener('change', function () {
-        const i = checkboxes.indexOf(el);
-
-        !this.checked ? (arbeitszeit += pausenzeiten[i]) : (arbeitszeit -= pausenzeiten[i]);
-
+      el.addEventListener('change', () => {
         minutesCalculator();
         arbeitszeitCalculator();
         updateArbeitszeitValues();
+        update890Row();
       });
     }
   });

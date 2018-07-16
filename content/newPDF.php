@@ -202,7 +202,7 @@ for ($i = 1; $i <= 5; $i += 1) {
             </div>
           </td>
           <td colspan="2">
-            <input class="input" type="text" id="arbeitszeit" data-grundarbeitszeit="<?php echo $_SESSION['arbeitszeit']; ?>" readonly <?php echo $_SESSION['arbeitszeit'] <= 360 ? 'style="display: none;"' : '' ?> value="von <?php echo $_SESSION['arbeitszeit']; ?>" />
+            <input class="input" type="text" id="arbeitszeit" data-grundarbeitszeit="<?php echo $_SESSION['arbeitszeit']; ?>" readonly value="von <?php echo $_SESSION['arbeitszeit']; ?>" />
           </td>
         </tr>
         <tr>
