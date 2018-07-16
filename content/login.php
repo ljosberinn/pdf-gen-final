@@ -10,14 +10,13 @@
         </span>
       </div>
 
-        <?php
+<?php
 
-        if (isset($_GET['loginError'])) {
-            echo '
-            <p class="help is-danger">Personalnummer existiert nicht. Zur Neuanlegung bitte bei Abteilungsleiter melden.</p>';
-        }
+if (isset($_GET['loginError'])) {
+    echo '<p class="help is-danger">Personalnummer existiert nicht. Zur Neuanlegung bitte bei Abteilungsleiter melden.</p>';
+}
 
-        ?>
+?>
 
     </div>
 

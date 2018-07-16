@@ -1,19 +1,19 @@
 <?php
 
- /**
-  * Functions.php
-  *
-  * Contains all PHP-functions
-  *
-  * PHP version 7.2
-  *
-  * @category  Functions
-  * @package   API/functions.php
-  * @author    Gerrit Alex <admin@gerritalex.de>
-  * @copyright 2016-2018 Gerrit Alex
-  * @license   MIT (https://de.wikipedia.org/wiki/MIT-Lizenz)
-  * @link      https://gerritalex.de/tzfinal
-  */
+/**
+ * Functions.php
+ *
+ * Contains all PHP-functions
+ *
+ * PHP version 7.2
+ *
+ * @category  Functions
+ * @package   API/functions.php
+ * @author    Gerrit Alex <admin@gerritalex.de>
+ * @copyright 2016-2018 Gerrit Alex
+ * @license   MIT (https://de.wikipedia.org/wiki/MIT-Lizenz)
+ * @link      https://gerritalex.de/tzfinal
+ */
 
 /**
  * Defines general security headers preventing sniffing, x-framing and XSS-protection
@@ -45,10 +45,10 @@ function appendFiles($files)
 {
     foreach ($files as $filename => $type) {
 
-        $link = 'assets/' .$type. '/' .$filename. '.min.' .$type;
-        $link .= '?' .filemtime($link);
+        $link = 'assets/' . $type . '/' . $filename . '.min.' . $type;
+        $link .= '?' . filemtime($link);
 
-        echo $type === 'js' ? '<script src="' .$link. '"></script>' : '<link rel="stylesheet" href="' .$link. '" />';
+        echo $type === 'js' ? '<script src="' . $link . '"></script>' : '<link rel="stylesheet" href="' . $link . '" />';
     }
 }
 
@@ -65,16 +65,16 @@ function appendNavItems($elementArray)
         if (($specifications['login']
             && !isset($_SESSION['personalnummer']))
             || (empty($specifications['login'])
-            && isset($_SESSION['personalnummer']))
+                && isset($_SESSION['personalnummer']))
         ) {
             continue;
         }
 
         foreach (['class', 'href', 'data-target', 'id'] as $attribute) {
-            ${str_replace('-', '', $attribute)} = !empty($specifications[$attribute]) ? '' .$attribute. '="' .$specifications[$attribute]. '"': '';
+            ${str_replace('-', '', $attribute)} = !empty($specifications[$attribute]) ? '' . $attribute . '="' . $specifications[$attribute] . '"' : '';
         }
 
-        echo '<a ' .$href. ' ' .$datatarget. ' ' .$id. ' ' .$class. '>' .$navText. '</a>';
+        echo '<a ' . $href . ' ' . $datatarget . ' ' . $id . ' ' . $class . '>' . $navText . '</a>';
     }
 }
 
@@ -104,12 +104,12 @@ function returnConstants($conn, $type)
 
     $plural = $type === 'kostenstelle' ? 'kostenstellen' : 'leistungsarten';
 
-    $query = "SELECT * FROM `" .$plural. "` ORDER BY `" .$type. "` ASC";
+    $query = "SELECT * FROM `" . $plural . "` ORDER BY `" . $type . "` ASC";
     $execution = $conn->query($query);
 
     if ($execution->num_rows > 0) {
         while ($data = $execution->fetch_assoc()) {
-            array_push($arr, '<option value="' .$data[$type]. '">' .$data[$type]. ' – ' .$data['beschreibung']. '</option>');
+            array_push($arr, '<option value="' . $data[$type] . '">' . $data[$type] . ' – ' . $data['beschreibung'] . '</option>');
         }
     }
 
@@ -139,7 +139,7 @@ function returnUnixTSFromDate($date)
  */
 function getCreationStatement($type, $personalnummer)
 {
-    $statement = 'CREATE TABLE IF NOT EXISTS `' .$personalnummer. '_' .$type. '` (
+    $statement = 'CREATE TABLE IF NOT EXISTS `' . $personalnummer . '_' . $type . '` (
         `day` int(10) NOT NULL,
         `created` int(10) NOT NULL,
         `startTimestamp` int(10) NOT NULL,
@@ -151,13 +151,13 @@ function getCreationStatement($type, $personalnummer)
 
     for ($i = 1; $i <= 22; $i += 1) {
         $statement .= '
-        `kostenstelle-' .$i. '` mediumint(3) NOT NULL,
-        `auftragsnummer-' .$i. '` int(10) NOT NULL,
-        `kunde-' .$i. '` varchar(255) NOT NULL,
-        `leistungsart-' .$i. '` mediumint(3) NOT NULL,
-        `minuten-' .$i. '` mediumint(4) NOT NULL,
-        `anzahl-' .$i. '` int(10) NOT NULL,
-        `materialnummer-' .$i. '` int(10) NOT NULL, ';
+        `kostenstelle-' . $i . '` mediumint(3) NOT NULL,
+        `auftragsnummer-' . $i . '` int(10) NOT NULL,
+        `kunde-' . $i . '` varchar(255) NOT NULL,
+        `leistungsart-' . $i . '` mediumint(3) NOT NULL,
+        `minuten-' . $i . '` mediumint(4) NOT NULL,
+        `anzahl-' . $i . '` int(10) NOT NULL,
+        `materialnummer-' . $i . '` int(10) NOT NULL, ';
     }
 
     $statement .= '
@@ -200,12 +200,11 @@ function sanitizeInput($type, $input)
 function buildInsertionStatement($personalnummer, $type, $length, $has890)
 {
 
-    $insertionStatement = 'INSERT INTO `' .$personalnummer. '_' .$type. '`
+    $insertionStatement = 'INSERT INTO `' . $personalnummer . '_' . $type . '`
     (`day`, `created`, `startTimestamp`, `endTimestamp`, `minutesWorked`, `frühstückspause`, `mittagspause`, `außer-haus`, ';
 
-
     for ($i = 1; $i <= $length; $i += 1) {
-        $insertionStatement .= '`kostenstelle-' .$i. '`, `auftragsnummer-' .$i. '`, `kunde-' .$i. '`, `leistungsart-' .$i. '`, `minuten-' .$i. '`, `anzahl-' .$i . '`, `materialnummer-' .$i. '`, ';
+        $insertionStatement .= '`kostenstelle-' . $i . '`, `auftragsnummer-' . $i . '`, `kunde-' . $i . '`, `leistungsart-' . $i . '`, `minuten-' . $i . '`, `anzahl-' . $i . '`, `materialnummer-' . $i . '`, ';
     }
 
     if ($has890 > 0) {
@@ -247,21 +246,21 @@ function appendDataToInsertionStatement($insertionStatement, $data, $length, $ha
             }
 
             $insertionStatement .= '
-            ' .$kostenstelle. ',
-            ' .$auftragsnummer. ',
-            "' .$kunde. '",
-            ' .$leistungsart. ',
-            ' .$minuten. ',
-            ' .$anzahl. ',
-            ' .$materialnummer. ',';
+            ' . $kostenstelle . ',
+            ' . $auftragsnummer . ',
+            "' . $kunde . '",
+            ' . $leistungsart . ',
+            ' . $minuten . ',
+            ' . $anzahl . ',
+            ' . $materialnummer . ',';
         }
     }
 
     if ($has890 > 0) {
-        $insertionStatement .= $has890. ',';
+        $insertionStatement .= $has890 . ',';
     }
 
-    return substr($insertionStatement, 0, -1). ');';
+    return substr($insertionStatement, 0, -1) . ');';
 }
 
 /**
@@ -292,7 +291,7 @@ function returnPDFBasics()
  */
 function returnAverageStartTime($conn, $personalnummer)
 {
-    $getStartEndAverages = "SELECT ROUND(AVG(`startTimestamp`-  `day`)) AS `start` FROM `" .$personalnummer. "_archiv`";
+    $getStartEndAverages = "SELECT ROUND(AVG(`startTimestamp`-  `day`)) AS `start` FROM `" . $personalnummer . "_archiv`";
     $startEndAverages = $conn->query($getStartEndAverages);
 
     if ($startEndAverages->num_rows == 1) {
@@ -309,11 +308,11 @@ function returnAverageStartTime($conn, $personalnummer)
 
             foreach ($checkStrlen as $varName) {
                 if (strlen(${$varName}) == 1) {
-                    ${$varName} = '0' .${$varName};
+                    ${$varName} = '0' . ${$varName};
                 }
             }
 
-            $startAvg = $hour. ':' .$minutes;
+            $startAvg = $hour . ':' . $minutes;
 
         }
     } else {
@@ -426,7 +425,6 @@ function returnUsedVacationDays($conn, $start, $end, $personalnummer)
 
     return $usedVacationDays;
 }
-
 
 /**
  * @method returnPlainLeistungsarten
@@ -610,7 +608,6 @@ function removeConstants($entry)
     return $entry;
 }
 
-
 /**
  * @method filterEntries
  *
@@ -662,6 +659,3 @@ function filterEntries($entries, $type, $value, $leistungsarten)
     }
     return $entries;
 }
-
-
-?>

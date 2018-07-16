@@ -14,13 +14,13 @@ if (isset($_POST['personalnummer'])) {
         $conn = new mysqli($host, $user, $password, $database);
         $conn->set_charset('utf8');
 
-        $searchForUserQuery = "SELECT * FROM `personal` WHERE `personalnummer` = " .$personalnummer;
+        $searchForUserQuery = "SELECT * FROM `personal` WHERE `personalnummer` = " . $personalnummer;
         $searchForUser = $conn->query($searchForUserQuery);
 
         if ($searchForUser->num_rows === 1) {
 
             $currentlyUsedVacation = returnUsedVacationDays($conn, strtotime(date('Y-01-01')), strtotime(date('Y-12-31')), $personalnummer);
-            $usedVacationPreviousYear = returnUsedVacationDays($conn, strtotime(date('' .(date('Y') - 1). '-01-01')), strtotime(date('' .(date('Y') - 1). '-12-31')), $personalnummer);
+            $usedVacationPreviousYear = returnUsedVacationDays($conn, strtotime(date('' . (date('Y') - 1) . '-01-01')), strtotime(date('' . (date('Y') - 1) . '-12-31')), $personalnummer);
 
             while ($data = $searchForUser->fetch_assoc()) {
 
@@ -52,4 +52,3 @@ if (isset($_POST['personalnummer'])) {
 }
 
 ob_end_flush();
-?>

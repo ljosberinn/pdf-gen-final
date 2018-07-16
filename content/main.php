@@ -5,20 +5,17 @@ if (empty($_SESSION['personalnummer'])) {
         'login',
     ];
 
-
 } else if (!empty($_SESSION['personalnummer'])) {
     $additionalSubPages = [
-      'newPDF',
-      'tempSave',
-      'permSave',
-      'calendar',
-      'options',
-      'search',
+        'newPDF',
+        'tempSave',
+        'permSave',
+        'calendar',
+        'options',
+        'search',
     ];
 }
 
 foreach ($additionalSubPages as $subPage) {
-    include 'content/' .$subPage. '.php';
+    include 'content/' . $subPage . '.php';
 }
-
-?>

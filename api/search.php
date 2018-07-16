@@ -2,7 +2,6 @@
 ob_clean();
 session_start();
 
-
 if (isset($_POST['type']) && isset($_POST['value'])) {
     include 'functions.php';
     $start = microtime_float();
@@ -35,7 +34,7 @@ if (isset($_POST['type']) && isset($_POST['value'])) {
 
         $response = [
             'completed_in' => microtime_float() - $start,
-            'data' => filterEntries($entries, $type, $value, $leistungsarten)
+            'data' => filterEntries($entries, $type, $value, $leistungsarten),
         ];
     }
 

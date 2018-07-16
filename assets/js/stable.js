@@ -181,34 +181,18 @@ const updateArbeitszeitValues = () => {
 };
 
 /**
- * Prüft, ob Frühstückspause angeklickt ist und gibt Wert in Minuten zurück
+ * Prüft, ob Frühstückspause angeklickt ist und gibt true/false zurück
  *
- * @returns {number} Wert in Minuten
+ * @returns {boolean}
  */
-const returnFrühstückspauseValue = () => {
-  const checkbox = document.getElementById('frühstückspause');
-
-  if (checkbox.checked) {
-    return 15;
-  }
-
-  return 0;
-};
+const nimmtFrühstückspause = () => document.getElementById('frühstückspause').checked;
 
 /**
- * Prüft, ob Mittagspause angeklickt ist und gibt Wert in Minuten zurück
+ * Prüft, ob Mittagspause angeklickt ist und gibt true/false zurück
  *
- * @returns {number} Wert in Minuten
+ * @returns {boolean}
  */
-const returnMittagspauseValue = () => {
-  const checkbox = document.getElementById('mittagspause');
-
-  if (checkbox.checked) {
-    return 30;
-  }
-
-  return 0;
-};
+const nimmtMittagspause = () => document.getElementById('mittagspause').checked;
 
 /**
  * Berechnet Arbeitszeit neu
@@ -221,7 +205,10 @@ const arbeitszeitCalculator = () => {
   const stundenToMinutes = (parseInt(bisValue[0]) - parseInt(vonValue[0])) * 60;
   const minutenToMinutes = parseInt(bisValue[1]) - parseInt(vonValue[1]);
 
-  const newArbeitszeit = stundenToMinutes + minutenToMinutes - returnFrühstückspauseValue() - returnMittagspauseValue();
+  const frühstückspause = nimmtFrühstückspause() ? 15 : 0;
+  const mittagspause = nimmtMittagspause() ? 30 : 0;
+
+  const newArbeitszeit = stundenToMinutes + minutenToMinutes - frühstückspause - mittagspause;
 
   if (!isNaN(newArbeitszeit)) arbeitszeit = newArbeitszeit;
 };
@@ -878,7 +865,7 @@ const getBusinessDateCount = (startDate, endDate) => {
   const daysAfterLastSunday = endDate.getDay();
 
   elapsed -= daysBeforeFirstSunday + daysAfterLastSunday;
-  elapsed = (elapsed / 7) * 5;
+  elapsed = elapsed / 7 * 5;
   elapsed += ifThen(daysBeforeFirstSunday - 1, -1, 0) + ifThen(daysAfterLastSunday, 6, 5);
 
   return Math.ceil(elapsed);

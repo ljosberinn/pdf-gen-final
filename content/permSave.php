@@ -3,10 +3,10 @@
 session_start();
 
 $tableColumns = [
-  'Datum'               => 'has-text-right',
-  'von - bis'           => 'has-text-centered',
-  'Pausen & außer Haus' => '',
-  'Anwesenheit'         => 'has-text-right',
+    'Datum' => 'has-text-right',
+    'von - bis' => 'has-text-centered',
+    'Pausen & außer Haus' => '',
+    'Anwesenheit' => 'has-text-right',
 ];
 
 $tableColumnKeys = array_keys($tableColumns);
@@ -41,13 +41,12 @@ require 'api/db.php';
 $wochentage = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
 $weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
-
 if (!$conn) {
     $conn = new mysqli($host, $user, $password, $database);
     $conn->set_charset('utf8');
 }
 
-$getAllData = 'SELECT `day`, `startTimestamp`, `endTimestamp`, `frühstückspause`, `mittagspause`, `außer-haus`, `minutesWorked` FROM `' .$_SESSION['personalnummer']. '_archiv` ORDER BY `day` DESC';
+$getAllData = 'SELECT `day`, `startTimestamp`, `endTimestamp`, `frühstückspause`, `mittagspause`, `außer-haus`, `minutesWorked` FROM `' . $_SESSION['personalnummer'] . '_archiv` ORDER BY `day` DESC';
 $allData = $conn->query($getAllData);
 $data = [];
 
@@ -57,7 +56,7 @@ if ($allData->num_rows > 0) {
     }
 }
 
-$count = $frühstückspause = $mittagspause = $außerHaus =  $arbeitszeitSumme = 0;
+$count = $frühstückspause = $mittagspause = $außerHaus = $arbeitszeitSumme = 0;
 
 foreach ($data as $dataset) {
 
@@ -82,22 +81,22 @@ foreach ($data as $dataset) {
     $außerHaus += $dataset['außer-haus'];
 
     if ($dataset['außer-haus'] > 0) {
-        $pausenAußerHaus .= '<span class="tag is-warning">außer Haus: ' .$dataset['außer-haus']. '</span>';
+        $pausenAußerHaus .= '<span class="tag is-warning">außer Haus: ' . $dataset['außer-haus'] . '</span>';
     }
 
     $arbeitszeitSumme += $dataset['minutesWorked'];
 
     if ($dataset['minutesWorked'] < $_SESSION['arbeitszeit']) {
         $arbeitszeitClass = 'has-text-danger';
-        $addendum = '(-' .($_SESSION['arbeitszeit'] - $dataset['minutesWorked']). ')';
+        $addendum = '(-' . ($_SESSION['arbeitszeit'] - $dataset['minutesWorked']) . ')';
     } else if ($dataset['minutesWorked'] > $_SESSION['arbeitszeit']) {
         $arbeitszeitClass = 'has-text-success	';
-        $addendum = '(+' .($dataset['minutesWorked'] - $_SESSION['arbeitszeit']). ')';
+        $addendum = '(+' . ($dataset['minutesWorked'] - $_SESSION['arbeitszeit']) . ')';
     } else {
         $arbeitszeitClass = $addendum = '';
     }
 
-    $arbeitszeit = '<span class="' .$arbeitszeitClass. '">' .$dataset['minutesWorked']. ' ' .$addendum. '</span>';
+    $arbeitszeit = '<span class="' . $arbeitszeitClass . '">' . $dataset['minutesWorked'] . ' ' . $addendum . '</span>';
 
     $dayString = strftime('%a, %d.%m.%Y', $dataset['day']);
 
@@ -109,20 +108,20 @@ foreach ($data as $dataset) {
     }
 
     echo '
-    <tr ' .$trClass. '>
-      <td class="has-text-right">' .$dayString. '</td>
-      <td class="has-text-centered">' .date('H:i', $dataset['startTimestamp']). ' - ' .date('H:i', $dataset['endTimestamp']). '</td>
-      <td>' .$pausenAußerHaus. '</td>
-      <td class="has-text-right">' .$arbeitszeit. '</td>
+    <tr ' . $trClass . '>
+      <td class="has-text-right">' . $dayString . '</td>
+      <td class="has-text-centered">' . date('H:i', $dataset['startTimestamp']) . ' - ' . date('H:i', $dataset['endTimestamp']) . '</td>
+      <td>' . $pausenAußerHaus . '</td>
+      <td class="has-text-right">' . $arbeitszeit . '</td>
       <td>
-        <button class="button is-danger is-small perm-delete-btn" value="' .$dataset['day']. '">
+        <button class="button is-danger is-small perm-delete-btn" value="' . $dataset['day'] . '">
           <span class="icon">
             <i class="fas fa-trash-alt"></i>
           </span>
         </button>
       </td>
       <td>
-        <button class="button is-info is-small perm-edit-btn" name="pdfId" value="' .$dataset['day']. '">
+        <button class="button is-info is-small perm-edit-btn" name="pdfId" value="' . $dataset['day'] . '">
           <span class="icon">
             <i class="far fa-edit"></i>
           </span>
@@ -130,7 +129,7 @@ foreach ($data as $dataset) {
       </td>
       <td>
         <form action="api/createPDF.php" method="POST">
-          <button class="button is-warning is-small" name="pdfId" value="' .$dataset['day']. '">
+          <button class="button is-warning is-small" name="pdfId" value="' . $dataset['day'] . '">
             <span class="icon">
               <i class="fas fa-download"></i>
             </span>
@@ -160,31 +159,31 @@ $theoreticalMustHave = $_SESSION['arbeitszeit'] * $count;
 
 if ($arbeitszeitSumme < $theoreticalMustHave) {
     $hours = round(($theoreticalMustHave - $arbeitszeitSumme) / 60, 2);
-    $theoreticalOutput = '<span class="tag is-danger">' .$hours. ' Unterstunden</span>';
+    $theoreticalOutput = '<span class="tag is-danger">' . $hours . ' Unterstunden</span>';
 } else if ($arbeitszeitSumme > $theoreticalMustHave) {
-    $hours = round(( $arbeitszeitSumme - $theoreticalMustHave) / 60, 2);
-    $theoreticalOutput = '<span class="tag is-success">' .$hours. ' Überstunden</span>';
+    $hours = round(($arbeitszeitSumme - $theoreticalMustHave) / 60, 2);
+    $theoreticalOutput = '<span class="tag is-success">' . $hours . ' Überstunden</span>';
 }
 
 $arbeitszeitClass = $addendum = '';
 
 if ($averageArbeitszeitSumme < $_SESSION['arbeitszeit']) {
     $arbeitszeitClass = 'has-text-danger';
-    $addendum = '(-' .($_SESSION['arbeitszeit'] - $averageArbeitszeitSumme). ')';
+    $addendum = '(-' . ($_SESSION['arbeitszeit'] - $averageArbeitszeitSumme) . ')';
 } else if ($averageArbeitszeitSumme > $_SESSION['arbeitszeit']) {
     $arbeitszeitClass = 'has-text-success	';
-    $addendum = '(+' .($averageArbeitszeitSumme - $_SESSION['arbeitszeit']). ')';
+    $addendum = '(+' . ($averageArbeitszeitSumme - $_SESSION['arbeitszeit']) . ')';
 }
 
 echo '
-<td class="has-text-right">' .$count. ' Tageszettel</td>
+<td class="has-text-right">' . $count . ' Tageszettel</td>
 <td></td>
 <td>
-  <span class="tag is-info">OPA: ' .$frühstückspause. '</span>
-  <span class="tag is-primary">OMI: ' .$mittagspause. '</span>
-  <span class="tag is-warning">außer Haus: ' .$außerHaus. '</span>
+  <span class="tag is-info">OPA: ' . $frühstückspause . '</span>
+  <span class="tag is-primary">OMI: ' . $mittagspause . '</span>
+  <span class="tag is-warning">außer Haus: ' . $außerHaus . '</span>
 </td>
-<td class="has-text-right ' .$arbeitszeitClass. '">Ø ' .$averageArbeitszeitSumme. ' ' .$addendum. '<br />' .$theoreticalOutput. '</td>
+<td class="has-text-right ' . $arbeitszeitClass . '">Ø ' . $averageArbeitszeitSumme . ' ' . $addendum . '<br />' . $theoreticalOutput . '</td>
 <td colspan="3"></td>';
 
 ?>

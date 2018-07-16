@@ -189,7 +189,7 @@ class Calendar
      */
     private function _scanForVacationThisMonth()
     {
-        $scanForVacationThisMonthStmt = "SELECT SUM(`days`) AS `days` FROM `vacation` WHERE `start` >= " . $this->_firstDay . " AND `end` <= " . $this->_lastDay. " AND `person` = " . $_SESSION['personalnummer'];
+        $scanForVacationThisMonthStmt = "SELECT SUM(`days`) AS `days` FROM `vacation` WHERE `start` >= " . $this->_firstDay . " AND `end` <= " . $this->_lastDay . " AND `person` = " . $_SESSION['personalnummer'];
         $scanForVacationThisMonth = $this->_conn->query($scanForVacationThisMonthStmt);
 
         $days = 0;
@@ -207,7 +207,8 @@ class Calendar
      *
      * @return int $holidays [amount of holidays this month]
      */
-    private function _scanForHolidaysThisMonth() {
+    private function _scanForHolidaysThisMonth()
+    {
         $scanForHolidaysThisMonthStmt = "SELECT SUM(`days`) AS `days` FROM `vacation` WHERE `start` >= " . $this->_firstDay . " AND `end` <= " . $this->_lastDay . " AND `person` = 0";
         $scanForHolidaysThisMonth = $this->_conn->query($scanForHolidaysThisMonthStmt);
 
@@ -294,7 +295,7 @@ class Calendar
     private function _returnVacationButton($name, $icon)
     {
 
-        return '<button class="button calendar-event is-small ' .($name == 'Feiertag' ? 'is-primary' : 'is-danger'). '"><span class="icon is-small"><i class="fas fa-' . self::ICONS[$icon] . '"></i></span> <span>' . $name . '</span></button>';
+        return '<button class="button calendar-event is-small ' . ($name == 'Feiertag' ? 'is-primary' : 'is-danger') . '"><span class="icon is-small"><i class="fas fa-' . self::ICONS[$icon] . '"></i></span> <span>' . $name . '</span></button>';
     }
 
     /**

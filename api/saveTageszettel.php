@@ -1,7 +1,6 @@
 <?php
 
 if (isset($_POST)) {
-
     session_start();
     ob_start();
 
@@ -10,7 +9,7 @@ if (isset($_POST)) {
 
     if (isset($_POST['now'])) {
         $type = 'archiv';
-    } else if (isset($_POST['later'])) {
+    } elseif (isset($_POST['later'])) {
         $type = 'zwischenspeicher';
     }
 
@@ -20,12 +19,22 @@ if (isset($_POST)) {
 
     $created = time('now');
     $day = returnUnixTSFromDate($_POST['datum']);
-    $startTimestamp = returnUnixTSFromDate($_POST['datum']. ' ' .$_POST['von']);
-    $endTimestamp = returnUnixTSFromDate($_POST['datum']. ' ' .$_POST['bis']);
-    $minutesWorked = ($endTimestamp-$startTimestamp) / 60;
+    $startTimestamp = returnUnixTSFromDate($_POST['datum'] . ' ' . $_POST['von']);
+    $endTimestamp = returnUnixTSFromDate($_POST['datum'] . ' ' . $_POST['bis']);
+    $minutesWorked = ($endTimestamp - $startTimestamp) / 60;
 
     $_POST['frühstückspause'] == 'on' ? ($minutesWorked -= 15 xor $frühstückspause = 1) : $frühstückspause = 0;
     $_POST['mittagspause'] == 'on' ? ($minutesWorked -= 30 xor $mittagspause = 1) : $mittagspause = 0;
+
+    if ($_SESSION['arbeitszeit'] <= 360) {
+        if (!$_POST['frühstückspause']) {
+            $minutesWorked -= 15;
+        }
+
+        if (!$_POST['mittagspause']) {
+            $minutesWorked -= 30;
+        }
+    }
 
     $außerHaus = $_POST['außer-haus'];
     if ($außerHaus == "") {
@@ -49,9 +58,9 @@ if (isset($_POST)) {
     }
 
     for ($i = 1; $i <= 22; $i += 1) {
-        if (!empty($_POST["minuten-" .$i])) {
+        if (!empty($_POST["minuten-" . $i])) {
             foreach ($posten as $var) {
-                array_push(${$var}, $_POST[$var. '-' .$i]);
+                array_push(${$var}, $_POST[$var . '-' . $i]);
             }
         }
     }
@@ -87,7 +96,7 @@ if (isset($_POST)) {
 
     $insertionStatement = buildInsertionStatement($_SESSION['personalnummer'], $type, $length, $has890);
 
-    $insertionStatement = substr($insertionStatement, 0, -2). ') VALUES(' .$day. ', ' .$created. ', ' .$startTimestamp. ', ' .$endTimestamp. ', ' .$minutesWorked. ', ' .$frühstückspause. ', ' .$mittagspause. ', ' .$außerHaus. ', ';
+    $insertionStatement = substr($insertionStatement, 0, -2) . ') VALUES(' . $day . ', ' . $created . ', ' . $startTimestamp . ', ' . $endTimestamp . ', ' . $minutesWorked . ', ' . $frühstückspause . ', ' . $mittagspause . ', ' . $außerHaus . ', ';
 
     $insertionStatement = appendDataToInsertionStatement($insertionStatement, $resultingData, $length, $has890);
 
@@ -96,7 +105,7 @@ if (isset($_POST)) {
     $tables = ['archiv', 'zwischenspeicher'];
 
     foreach ($tables as $table) {
-        $deletionStatement =  "DELETE FROM `" .$_SESSION['personalnummer']. "_" .$table. "`  WHERE `day` = " .$day;
+        $deletionStatement = "DELETE FROM `" . $_SESSION['personalnummer'] . "_" . $table . "`  WHERE `day` = " . $day;
         $deletion = $conn->query($deletionStatement);
     }
 
@@ -108,5 +117,3 @@ if (isset($_POST)) {
 
     ob_end_flush();
 }
-
-?>

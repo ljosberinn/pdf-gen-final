@@ -1,13 +1,13 @@
 <?php
 
 $tableColumns = [
-  'Kostenstelle'   => '',
-  'Auftragsnummer' => '',
-  'Kunde'          => '',
-  'Leistungsart'   => '',
-  'Minuten'        => '',
-  'Anzahl'         => '',
-  'Materialnummer' => '',
+    'Kostenstelle' => '',
+    'Auftragsnummer' => '',
+    'Kunde' => '',
+    'Leistungsart' => '',
+    'Minuten' => '',
+    'Anzahl' => '',
+    'Materialnummer' => '',
 ];
 
 $tableColumnKeys = array_keys($tableColumns);
@@ -64,14 +64,14 @@ foreach ($tableColumnKeys as $tableColumnKey) {
 
       <div class="level-item level-right">
         <label class="checkbox">
-          <input type="checkbox" name="frühstückspause" id="frühstückspause" checked>
+          <input type="checkbox" name="frühstückspause" id="frühstückspause" <?php echo $_SESSION['arbeitszeit'] > 360 ? 'checked' : ''; ?>>
           Frühstückspause
         </label>
       </div>
 
       <div class="level-item level-right">
         <label class="checkbox">
-          <input type="checkbox" name="mittagspause" id="mittagspause" checked>
+          <input type="checkbox" name="mittagspause" id="mittagspause" <?php echo $_SESSION['arbeitszeit'] > 360 ? 'checked' : ''; ?>>
           Mittagspause
         </label>
       </div>
@@ -83,78 +83,78 @@ foreach ($tableColumnKeys as $tableColumnKey) {
         <tr>
             <?php
 
-            foreach ($tableColumns as $th => $classes) {
-                $class = !empty($classes) ? 'class="' .$classes. '"' : "";
+foreach ($tableColumns as $th => $classes) {
+    $class = !empty($classes) ? 'class="' . $classes . '"' : "";
 
-                echo '<th ' .$class. '>' .$th. '</th>';
-            }
+    echo '<th ' . $class . '>' . $th . '</th>';
+}
 
-            ?>
+?>
         </tr>
       </thead>
       <tbody id="creation-tbody">
 
         <?php
 
-        for ($i = 1; $i <= 5; $i += 1) {
+for ($i = 1; $i <= 5; $i += 1) {
 
-            echo '
+    echo '
         <tr>
-          <td data-label="' .$tableColumnKeys[0]. '" title="' .$tableColumnKeys[0]. '">
+          <td data-label="' . $tableColumnKeys[0] . '" title="' . $tableColumnKeys[0] . '">
             <div class="field">
               <div class="control">
-                <input id="' .$tableColumnKeys_lowerCase[0]. '-' .$i. '" name="' .$tableColumnKeys_lowerCase[0]. '-' .$i. '" min="0" class="input" list="kostenstelle" type="number" placeholder="' .$i. '" />
+                <input id="' . $tableColumnKeys_lowerCase[0] . '-' . $i . '" name="' . $tableColumnKeys_lowerCase[0] . '-' . $i . '" min="0" class="input" list="kostenstelle" type="number" placeholder="' . $i . '" />
               </div>
             </div>
           </td>
-          <td data-label="' .$tableColumnKeys[1]. '" title="' .$tableColumnKeys[1]. '">
+          <td data-label="' . $tableColumnKeys[1] . '" title="' . $tableColumnKeys[1] . '">
             <div class="field">
               <div class="control">
-                <input id="' .$tableColumnKeys_lowerCase[1]. '-' .$i. '" name="' .$tableColumnKeys_lowerCase[1]. '-' .$i. '" class="input" type="number" min="0" />
+                <input id="' . $tableColumnKeys_lowerCase[1] . '-' . $i . '" name="' . $tableColumnKeys_lowerCase[1] . '-' . $i . '" class="input" type="number" min="0" />
               </div>
             </div>
           </td>
-          <td data-label="' .$tableColumnKeys[2]. '" title="' .$tableColumnKeys[2]. '">
+          <td data-label="' . $tableColumnKeys[2] . '" title="' . $tableColumnKeys[2] . '">
             <div class="field">
               <div class="control">
-                <input id="' .$tableColumnKeys_lowerCase[2]. '-' .$i. '" name="' .$tableColumnKeys_lowerCase[2]. '-' .$i. '" class="input" type="text" />
+                <input id="' . $tableColumnKeys_lowerCase[2] . '-' . $i . '" name="' . $tableColumnKeys_lowerCase[2] . '-' . $i . '" class="input" type="text" />
               </div>
             </div>
           </td>
-          <td data-label="' .$tableColumnKeys[3]. '" title="' .$tableColumnKeys[3]. '">
+          <td data-label="' . $tableColumnKeys[3] . '" title="' . $tableColumnKeys[3] . '">
             <div class="field">
               <div class="control">
-                <input id="' .$tableColumnKeys_lowerCase[3]. '-' .$i. '" name="' .$tableColumnKeys_lowerCase[3]. '-' .$i. '" class="input" list="leistungsart" min="0" type="number" />
+                <input id="' . $tableColumnKeys_lowerCase[3] . '-' . $i . '" name="' . $tableColumnKeys_lowerCase[3] . '-' . $i . '" class="input" list="leistungsart" min="0" type="number" />
               </div>
             </div>
           </td>
-          <td data-label="' .$tableColumnKeys[4]. '" title="' .$tableColumnKeys[4]. '">
+          <td data-label="' . $tableColumnKeys[4] . '" title="' . $tableColumnKeys[4] . '">
             <div class="field">
               <div class="control">
-                <input id="' .$tableColumnKeys_lowerCase[4]. '-' .$i. '" name="' .$tableColumnKeys_lowerCase[4]. '-' .$i. '" class="input" type="number" min="0" />
+                <input id="' . $tableColumnKeys_lowerCase[4] . '-' . $i . '" name="' . $tableColumnKeys_lowerCase[4] . '-' . $i . '" class="input" type="number" min="0" />
               </div>
             </div>
           </td>
-          <td data-label="' .$tableColumnKeys[5]. '" title="' .$tableColumnKeys[5]. '">
+          <td data-label="' . $tableColumnKeys[5] . '" title="' . $tableColumnKeys[5] . '">
             <div class="field">
               <div class="control">
-                <input id="' .$tableColumnKeys_lowerCase[5]. '-' .$i. '" name="' .$tableColumnKeys_lowerCase[5]. '-' .$i. '" class="input" type="number" min="0" />
+                <input id="' . $tableColumnKeys_lowerCase[5] . '-' . $i . '" name="' . $tableColumnKeys_lowerCase[5] . '-' . $i . '" class="input" type="number" min="0" />
               </div>
             </div>
           </td>
-          <td data-label="' .$tableColumnKeys[6]. '" title="' .$tableColumnKeys[6]. '">
+          <td data-label="' . $tableColumnKeys[6] . '" title="' . $tableColumnKeys[6] . '">
             <div class="field">
               <div class="control">
-                <input id="' .$tableColumnKeys_lowerCase[6]. '-' .$i. '" name="' .$tableColumnKeys_lowerCase[6]. '-' .$i. '" class="input" type="number" min="0" />
+                <input id="' . $tableColumnKeys_lowerCase[6] . '-' . $i . '" name="' . $tableColumnKeys_lowerCase[6] . '-' . $i . '" class="input" type="number" min="0" />
               </div>
             </div>
           </td>
         </tr>
         ';
 
-        }
+}
 
-        ?>
+?>
 
       </tbody>
       <tfoot>
@@ -202,7 +202,7 @@ foreach ($tableColumnKeys as $tableColumnKey) {
             </div>
           </td>
           <td colspan="2">
-            <input class="input" type="text" id="arbeitszeit" readonly value="von <?php echo $_SESSION['arbeitszeit']; ?>" />
+            <input class="input" type="text" id="arbeitszeit" data-grundarbeitszeit="<?php echo $_SESSION['arbeitszeit']; ?>" readonly <?php echo $_SESSION['arbeitszeit'] <= 360 ? 'style="display: none;"' : '' ?> value="von <?php echo $_SESSION['arbeitszeit']; ?>" />
           </td>
         </tr>
         <tr>
@@ -233,20 +233,20 @@ foreach ($tableColumnKeys as $tableColumnKey) {
     <datalist id="kostenstelle">
         <?php
 
-        foreach ($kostenstellen as $kostenstelle) {
-            echo $kostenstelle;
-        }
+foreach ($kostenstellen as $kostenstelle) {
+    echo $kostenstelle;
+}
 
-        ?>
+?>
     </datalist>
     <datalist id="leistungsart">
         <?php
 
-        foreach ($leistungsarten as $leistungsart) {
-            echo $leistungsart;
-        }
+foreach ($leistungsarten as $leistungsart) {
+    echo $leistungsart;
+}
 
-        ?>
+?>
     </datalist>
   </form>
 

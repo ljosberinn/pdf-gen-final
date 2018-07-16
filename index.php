@@ -2,23 +2,23 @@
 
 ob_start();
 
- /**
-  * Core file
-  *
-  * Whole page follows:
-  * PHP: PEAR coding standards (line length exempted)
-  * JS: ES6+
-  * Indentation: 2 spaces, single-quotes
-  *
-  * PHP version 5.6
-  *
-  * @category  Index
-  * @package   Index
-  * @author    Gerrit Alex <admin@gerritalex.de>
-  * @copyright 2016-2018 Gerrit Alex
-  * @license   MIT (https://de.wikipedia.org/wiki/MIT-Lizenz)
-  * @link      https://gerritalex.de/tzfinal
-  */
+/**
+ * Core file
+ *
+ * Whole page follows:
+ * PHP: PSR2 coding standards (indentation excluded)
+ * JS: ES6+
+ * Indentation: 2 spaces, single-quotes
+ *
+ * PHP version 5.6
+ *
+ * @category  Index
+ * @package   Index
+ * @author    Gerrit Alex <admin@gerritalex.de>
+ * @copyright 2016-2018 Gerrit Alex
+ * @license   MIT (https://de.wikipedia.org/wiki/MIT-Lizenz)
+ * @link      https://github.com/ljosberinn/pdf-gen-final
+ */
 
 require 'api/db.php';
 require 'api/functions.php';
@@ -50,47 +50,47 @@ ob_end_flush();
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>PDF-Generator & Urlaubsverwaltung</title>
 
-    <?php
+<?php
 
-      $localFiles = [
-        'custom' => 'css',
+$localFiles = [
+    'custom' => 'css',
 
-        'bundle' => 'js',
-      ];
+    'bundle' => 'js',
+];
 
-      appendFiles($localFiles);
+appendFiles($localFiles);
 
-    ?>
+?>
 
 
 </head>
 
 <body>
 
-    <?php
+<?php
 
-    $coreTags = [
-      'header' => '',
-      'main' => 'container',
-      'footer' => 'footer has-text-centered',
-    ];
+$coreTags = [
+    'header' => '',
+    'main' => 'container',
+    'footer' => 'footer has-text-centered',
+];
 
-    foreach ($coreTags as $tag => $class) {
+foreach ($coreTags as $tag => $class) {
 
-        if (!empty($class)) {
-            $class = 'class="' .$class. '"';
-        } else {
-            $class = '';
-        }
-
-        echo "<$tag $class>";
-
-        include 'content/' .$tag. '.php';
-
-        echo "</$tag>";
+    if (!empty($class)) {
+        $class = 'class="' . $class . '"';
+    } else {
+        $class = '';
     }
 
-    ?>
+    echo "<$tag $class>";
+
+    include 'content/' . $tag . '.php';
+
+    echo "</$tag>";
+}
+
+?>
 
 </body>
 

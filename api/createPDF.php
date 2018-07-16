@@ -6,8 +6,8 @@ require 'fpdf181/fpdf.php';
 require 'fpdi161/fpdi.php';
 
 /**
-* Alle in dieser Datei erwähnten eigenen <public methods> (placeKostenstelle, placePersonalnummer, etc.) sind in /fpdi161/fpdi.php am Ende angefügt (ab Zeile 691)
-*/
+ * Alle in dieser Datei erwähnten eigenen <public methods> (placeKostenstelle, placePersonalnummer, etc.) sind in /fpdi161/fpdi.php am Ende angefügt (ab Zeile 691)
+ */
 
 if (isset($_POST['pdfId'])) {
     include 'db.php';
@@ -18,7 +18,7 @@ if (isset($_POST['pdfId'])) {
     $conn = new mysqli($host, $user, $password, $database);
     $conn->set_charset('utf8');
 
-    $getPDFDataQuery = "SELECT * FROM `" .$_SESSION['personalnummer']. "_archiv` WHERE `day` = " .$_POST['pdfId'];
+    $getPDFDataQuery = "SELECT * FROM `" . $_SESSION['personalnummer'] . "_archiv` WHERE `day` = " . $_POST['pdfId'];
     $getPDFData = $conn->query($getPDFDataQuery);
 
     $data = $resultingData = [];
@@ -32,13 +32,13 @@ if (isset($_POST['pdfId'])) {
     $data = $data[0];
 
     $posten = [
-      'kostenstelle',
-      'auftragsnummer',
-      'kunde',
-      'leistungsart',
-      'minuten',
-      'anzahl',
-      'materialnummer',
+        'kostenstelle',
+        'auftragsnummer',
+        'kunde',
+        'leistungsart',
+        'minuten',
+        'anzahl',
+        'materialnummer',
     ];
 
     foreach ($posten as $name) {
@@ -46,10 +46,10 @@ if (isset($_POST['pdfId'])) {
     }
 
     for ($i = 1; $i <= 22; $i += 1) {
-        if (!empty($data['minuten-' .$i])) {
+        if (!empty($data['minuten-' . $i])) {
             foreach ($posten as $var) {
-                if ($data[$var. '-' .$i] != 0) {
-                    array_push(${$var}, $data[$var. '-' .$i]);
+                if ($data[$var . '-' . $i] != 0) {
+                    array_push(${$var}, $data[$var . '-' . $i]);
                 }
             }
         }
@@ -60,14 +60,14 @@ if (isset($_POST['pdfId'])) {
     }
 
     $secondaryInformation = [
-      'day',
-      'created',
-      'startTimestamp',
-      'endTimestamp',
-      'minutesWorked',
-      'frühstückspause',
-      'mittagspause',
-      'außerHaus',
+        'day',
+        'created',
+        'startTimestamp',
+        'endTimestamp',
+        'minutesWorked',
+        'frühstückspause',
+        'mittagspause',
+        'außerHaus',
     ];
 
     foreach ($secondaryInformation as $var) {
@@ -83,19 +83,18 @@ if (isset($_POST['pdfId'])) {
 $pdf = returnPDFBasics();
 
 $date = date('Y-m-d', $day);
-$description = $date. ' - ' .$_SESSION['name'];
+$description = $date . ' - ' . $_SESSION['name'];
 
 $basicMethods = [
-  'SetAuthor'           => $_SESSION['name'],
-  'SetTitle'            => $description,
-  'placeName'           => $_SESSION['name'],
-  'SetCreator'          => $_SESSION['name'],
-  'placePersonalnummer' => $_SESSION['personalnummer'],
-  'placeDate'           => $day,
-  'placeStartEndTime'   => [$startTimestamp, $endTimestamp],
-  'SetFontSize'         => 16,
+    'SetAuthor' => $_SESSION['name'],
+    'SetTitle' => $description,
+    'placeName' => $_SESSION['name'],
+    'SetCreator' => $_SESSION['name'],
+    'placePersonalnummer' => $_SESSION['personalnummer'],
+    'placeDate' => $day,
+    'placeStartEndTime' => [$startTimestamp, $endTimestamp],
+    'SetFontSize' => 16,
 ];
-
 
 foreach ($basicMethods as $method => $value) {
     call_user_func([$pdf, $method], $value);
@@ -103,13 +102,13 @@ foreach ($basicMethods as $method => $value) {
 
 // prepare row insertions
 $methods = [
-  'placeKostenstelle'   => $resultingData['kostenstelle'],
-  'placeAuftragsnummer' => $resultingData['auftragsnummer'],
-  'placeKunde'          => $resultingData['kunde'],
-  'placeLeistungsart'   => $resultingData['leistungsart'],
-  'placeMinuten'        => $resultingData['minuten'],
-  'placeAnzahl'         => $resultingData['anzahl'],
-  'placeMaterialnummer' => $resultingData['materialnummer'],
+    'placeKostenstelle' => $resultingData['kostenstelle'],
+    'placeAuftragsnummer' => $resultingData['auftragsnummer'],
+    'placeKunde' => $resultingData['kunde'],
+    'placeLeistungsart' => $resultingData['leistungsart'],
+    'placeMinuten' => $resultingData['minuten'],
+    'placeAnzahl' => $resultingData['anzahl'],
+    'placeMaterialnummer' => $resultingData['materialnummer'],
 ];
 
 // execute row insertions
@@ -126,9 +125,9 @@ for ($i = 0; $i <= ($length - 1); $i += 1) {
 if ($has890 > 0) {
 
     $add890Data = [
-      'placeKostenstelle' => 890,
-      'placeLeistungsart' => 996,
-      'placeMinuten' => $has890,
+        'placeKostenstelle' => 890,
+        'placeLeistungsart' => 996,
+        'placeMinuten' => $has890,
     ];
 
     foreach ($add890Data as $method => $value) {
@@ -142,7 +141,7 @@ $pdf->placeMinuten($minutesWorked, 214.7675);
 
 if ($außerHaus > 0) {
     $pdf->SetXY(70.97, 214.7675);
-    $pdf->MultiCell(53.55, 3.5, iconv('UTF-8', 'windows-1252', 'außer Haus ' .$außerHaus));
+    $pdf->MultiCell(53.55, 3.5, iconv('UTF-8', 'windows-1252', 'außer Haus ' . $außerHaus));
 }
 
 // OPA / OMI
@@ -160,6 +159,4 @@ if ($frühstückspause == 0 || $mittagspause == 0) {
     $pdf->placePause($pausenString);
 }
 
-$pdf->output($description. '.pdf', $outputMode);
-
-?>
+$pdf->output($description . '.pdf', $outputMode);

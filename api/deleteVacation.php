@@ -14,7 +14,7 @@ if (isset($_POST['start'])) {
     $conn = new mysqli($host, $user, $password, $database);
     $conn->set_charset('utf8');
 
-    $deleteStmt = "DELETE FROM `vacation`  WHERE `person` = " .$_SESSION['personalnummer']. " AND `start` = " .$start;
+    $deleteStmt = "DELETE FROM `vacation`  WHERE `person` = " . $_SESSION['personalnummer'] . " AND `start` = " . $start;
     $delete = $conn->query($deleteStmt);
 
     $response = [
@@ -24,7 +24,6 @@ if (isset($_POST['start'])) {
     $delete ? ($response['success'] = true) : ($response['error'] = $conn->error);
 
     echo json_encode($response);
-
 } else {
     header('http/1.0 403 Forbidden');
 }
