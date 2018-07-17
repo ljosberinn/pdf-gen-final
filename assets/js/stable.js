@@ -1022,6 +1022,7 @@ const vacationRemover = (_this, body) => {
 const vacationRemoveListener = () => {
   const vacationButtons = document.querySelectorAll('button.vacation-delete-btn');
   const holidayButtons = document.querySelectorAll('button.holiday-delete-btn');
+  const illnessButtons = document.querySelectorAll('button.illness-delete-btn');
 
   if (vacationButtons.length > 0) {
     vacationButtons.forEach(btn => {
@@ -1035,6 +1036,14 @@ const vacationRemoveListener = () => {
     holidayButtons.forEach(btn => {
       btn.addEventListener('click', function () {
         vacationRemover(this, `start=${this.dataset.start}&type=holiday`);
+      });
+    });
+  }
+
+  if (illnessButtons.length > 0) {
+    illnessButtons.forEach(btn => {
+      btn.addEventListener('click', function () {
+        vacationRemover(this, `start=${this.dataset.start}&type=illness`);
       });
     });
   }

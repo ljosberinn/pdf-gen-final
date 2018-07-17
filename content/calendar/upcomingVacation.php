@@ -2,7 +2,7 @@
 
 <?php
 
-$getYourVacationStmt = "SELECT `start`, `end`, `days` FROM `vacation` WHERE `person` = " . $_SESSION['personalnummer'] . " AND `start` >= " . (time('now') - 86400);
+$getYourVacationStmt = "SELECT `start`, `end`, `days` FROM `vacation` WHERE `person` = " . $_SESSION['personalnummer'] . " AND `start` >= " . (time('now') - 86400). " AND `days` > 0";
 $getYourVacation = $conn->query($getYourVacationStmt);
 
 $vacation = [];

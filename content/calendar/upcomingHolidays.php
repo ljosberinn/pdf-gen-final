@@ -9,13 +9,15 @@ $holidays = [];
 
 if ($getHolidays->num_rows > 0) {
     while ($data = $getHolidays->fetch_assoc()) {
-        array_push(
-            $holidays, [
-                'start' => $data['start'],
-                'end' => $data['end'],
-                'days' => $data['days'],
-            ]
-        );
+        if ($data['days'] > 0) {
+            array_push(
+                $holidays, [
+                    'start' => $data['start'],
+                    'end' => $data['end'],
+                    'days' => $data['days'],
+                ]
+            );
+        }
     }
 }
 

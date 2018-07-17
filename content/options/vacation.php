@@ -6,7 +6,7 @@
         <p class="help"><strong>Gesamtzahl</strong> jährlicher Urlaubstage
       </div>
       <div class="column">
-        <button class="button is-primary">Urlaubsbezogene Daten sichern</button>
+        <button class="button is-primary">Sichern</button>
       </div>
     </div>
   </div>

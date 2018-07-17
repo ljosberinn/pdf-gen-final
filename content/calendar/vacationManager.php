@@ -1,8 +1,6 @@
 <div class="columns">
   <h1 class="column">
-    <strong>Urlaubsverwaltung – verbleibende Urlaubstage:
-      <?php echo $_SESSION['remaining_vacation']; ?>
-    </strong>
+    <strong>Urlaubsverwaltung</strong>
   </h1>
 </div>
 

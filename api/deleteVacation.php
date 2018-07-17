@@ -10,14 +10,14 @@ if (isset($_POST['start']) && isset($_POST['type'])) {
     $start = validateInt($_POST['start']);
     $type = filter_input(INPUT_POST, 'type', FILTER_SANITIZE_STRING);
 
-    $person = $type == 'vacation' ? $_SESSION['personalnummer'] : 0;
+    $person = in_array($type, ['vacation', 'illness']) ? $_SESSION['personalnummer'] : 0;
 
     include 'db.php';
 
     $conn = new mysqli($host, $user, $password, $database);
     $conn->set_charset('utf8');
 
-    $deleteStmt = "DELETE FROM `vacation`  WHERE `person` = " . $person . " AND `start` = " . $start;
+    $deleteStmt = "DELETE FROM `vacation` WHERE `person` = " . $person . " AND `start` = " . $start;
     $delete = $conn->query($deleteStmt);
 
     $response = [

@@ -16,5 +16,7 @@
 
   <?php require 'calendar/illnessManager.html';?>
 
+  <?php require 'calendar/upcomingIllness.php';?>
+  
 </div>
 
