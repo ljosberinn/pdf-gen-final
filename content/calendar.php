@@ -1,8 +1,8 @@
 <div id="calendar" class="m-t-lg m-b-lg m-l-lg m-r-lg">
 
-  <?php require 'vacationManager.php';?>
+  <?php require 'calendar/vacationManager.php';?>
 
-  <?php require 'upcomingVacation.php';?>
+  <?php require 'calendar/upcomingVacation.php';?>
 
   <div id="calendar-container">
 
@@ -10,11 +10,11 @@
 
   </div>
 
-  <?php require 'holidaysManager.html';?>
+  <?php require 'calendar/holidaysManager.html';?>
 
-  <?php require 'upcomingHolidays.php';?>
+  <?php require 'calendar/upcomingHolidays.php';?>
 
-  <?php require 'illnessManager.html';?>
+  <?php require 'calendar/illnessManager.html';?>
 
 </div>
 

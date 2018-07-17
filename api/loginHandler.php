@@ -32,6 +32,16 @@ if (isset($_POST['personalnummer'])) {
                 $_SESSION['startAvg'] = roundMinutes(returnAverageStartTime($conn, $personalnummer));
                 $_SESSION['überminuten'] = $data['überminuten'];
 
+                $possibleFileFormats = ['jpg', 'png'];
+
+                foreach ($possibleFileFormats as $format) {
+                    if (!$_SESSION['signatur']) {
+                        $link = 'signatures/' . $_SESSION['personalnummer'] . '.' . $format;
+                        if (file_exists('../' .$link)) {
+                            $_SESSION['signatur'] = $link;
+                        }
+                    }
+                }
                 $_SESSION['admin'] = $data['rolle'] == 1;
 
                 $_SESSION['urlaubstage'] = $data['urlaubstage'];

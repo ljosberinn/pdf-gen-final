@@ -1143,6 +1143,23 @@ const searchEventListener = () => {
   }
 };
 
+const removeSignatureListener = () => {
+  const image = document.getElementById('signatur-img');
+
+  if (image) {
+    image.addEventListener('click', () => {
+      fetch('api/deleteSignatur.php', {
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+      })
+        .then(response => response.json())
+        .then(response => {
+          if (response.success) image.closest('table').remove();
+        });
+    });
+  }
+};
+
 /**
  * Fügt alle relevanten EventListener hinzu
  */
@@ -1174,6 +1191,7 @@ const addEventListeners = () => {
   minutesCalculatorEventListenerHelper();
 
   calendarListeners();
+  removeSignatureListener();
 
   document.querySelectorAll('.perm-delete-btn').forEach(el => addDeletionEventListener(el, 'permanent'));
   document.querySelectorAll('.temp-delete-btn').forEach(el => addDeletionEventListener(el, 'temporary'));
@@ -1182,7 +1200,34 @@ const addEventListeners = () => {
   document.querySelectorAll('.temp-edit-btn').forEach(el => addEditEventListener(el, 'temporary'));
 };
 
+const checkForErrorGet = () => {
+  const validateErrors = window.location.search.replace(/\?/g, '').split('=');
+
+  if (validateErrors[0] === 'errors') {
+    const errors = validateErrors[1].split(',');
+    let string = '';
+
+    errors.forEach(error => {
+      switch (error) {
+        case 'wrongFileType':
+          string += '- Datei ist weder jpg/jpeg noch png<br />';
+          break;
+        case 'fileTooLarge':
+          string += '- Datei ist zu groß<br />';
+          break;
+        default:
+          string += 'Hoppla, ein unbekannter Fehler ist aufgetreten<br />';
+          break;
+      }
+    });
+
+    swal('Fehler', string, 'error');
+  }
+};
+
 document.addEventListener('DOMContentLoaded', () => {
   addEventListeners();
   update890Row();
+
+  checkForErrorGet();
 });

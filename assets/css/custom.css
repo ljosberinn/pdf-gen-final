@@ -148,6 +148,12 @@ a.navbar-item:hover {
   }
 }
 
+#signatur-img {
+  border: 1px solid coral;
+  padding: 1px;
+  cursor: pointer;
+}
+
 /* https://codepen.io/AllThingsSmitty/pen/MyqmdM */
 
 @media screen and (max-width: 1088px) {
