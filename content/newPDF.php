@@ -30,7 +30,7 @@ foreach ($tableColumnKeys as $tableColumnKey) {
         <div class="field">
           <div class="control">
             <label for="datum" class="label heading">Datum </label>
-            <input id="datum" name="datum" type="date" class="input" required />
+            <input id="datum" name="datum" type="date" class="input" required value="<?php echo date('Y-m-d', time('now')); ?>" />
           </div>
         </div>
       </div>

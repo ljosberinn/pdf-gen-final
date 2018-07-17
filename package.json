@@ -17,7 +17,6 @@
   "dependencies": {
     "babel-core": "6.26.3",
     "babel-loader": "7.1.5",
-    "bulma-calendar": "4.0.1",
     "sweetalert2": "7.25.0",
     "webpack": "4.16.0"
   },

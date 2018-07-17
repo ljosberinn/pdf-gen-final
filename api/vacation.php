@@ -14,7 +14,11 @@ if (isset($_POST['start']) && isset($_POST['end']) && isset($_POST['days'])) {
 
     $response = [];
 
-    $value = isset($_POST['daysOff']) ? '0000' : $_SESSION['personalnummer'];
+    $value = isset($_POST['daysOff']) ? 0 : $_SESSION['personalnummer'];
+
+    if(isset($_POST['illness'])) {
+        $days *= -1;
+    }
 
     if ($start && $end && $days) {
         include 'db.php';

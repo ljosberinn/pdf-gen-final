@@ -2,7 +2,7 @@
 
   <?php require 'vacationManager.php';?>
 
-  <?php require 'content/upcomingVacation.php';?>
+  <?php require 'upcomingVacation.php';?>
 
   <div id="calendar-container">
 
@@ -10,7 +10,11 @@
 
   </div>
 
-  <?php require 'freeDaysManager.html';?>
+  <?php require 'holidaysManager.html';?>
+
+  <?php require 'upcomingHolidays.php';?>
+
+  <?php require 'illnessManager.html';?>
 
 </div>
 

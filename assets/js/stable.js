@@ -1,5 +1,4 @@
 import swal from 'sweetalert2';
-import bulmaCalendar from 'bulma-calendar';
 
 let gearbeiteteMinuten = 0;
 let arbeitszeit = 0;
@@ -220,7 +219,7 @@ const arbeitszeitCalculator = () => {
       newArbeitszeit -= 45;
     }
   } else {
-    newArbeitszeit -= (frühstückspause + mittagspause);
+    newArbeitszeit -= frühstückspause + mittagspause;
   }
 
   if (!isNaN(newArbeitszeit)) arbeitszeit = newArbeitszeit;
@@ -841,27 +840,6 @@ const getCalendarData = (year, month) => {
 
 /**
  *
- */
-const datePicker = () => {
-  const datePickertarget = document.getElementById('datum');
-
-  if (datePickertarget) {
-    const datepickerOptions = {
-      dateFormat: 'dd.mm.yyyy',
-      lang: 'de'
-    };
-
-    ['#vacation-start', '#vacation-end', '#datum', '#day-off-start', '#day-off-end'].forEach(selector => bulmaCalendar.attach(selector), datepickerOptions);
-
-    setTimeout(() => {
-      datePickertarget.click();
-      document.querySelector('button.date-item.is-today.is-active').click();
-    }, 1000);
-  }
-};
-
-/**
- *
  * @param {number} startDate
  * @param {number} endDate
  */
@@ -899,17 +877,15 @@ const refreshCalendar = start => {
 
 const dateDifferenceEventListener = (startEl, endEl, daysTarget, btn) => {
   [startEl, endEl].forEach(el => {
-    el.addEventListener('blur', () => {
-      setTimeout(() => {
-        const diff = getBusinessDateCount(new Date(startEl.value), new Date(endEl.value));
+    el.addEventListener('change', () => {
+      const diff = getBusinessDateCount(new Date(startEl.value), new Date(endEl.value));
 
-        if (!isNaN(diff) && diff > 0) {
-          daysTarget.value = diff;
-          btn.disabled = false;
-        } else {
-          btn.disabled = true;
-        }
-      }, 750);
+      if (!isNaN(diff) && diff > 0) {
+        daysTarget.value = diff;
+        btn.disabled = false;
+      } else {
+        btn.disabled = true;
+      }
     });
   });
 };
@@ -957,9 +933,27 @@ const vacationDiffParser = () => {
   const freeDayTarget = document.getElementById('day-off-days');
   const freeDayBtn = document.getElementById('day-off-btn');
 
+  const illnessStart = document.getElementById('illness-start');
+  const illnessEnd = document.getElementById('illness-end');
+  const illnessTarget = document.getElementById('illness-days');
+  const illnessBtn = document.getElementById('illness-btn');
+
   if (startEl && endEl) {
     dateDifferenceEventListener(startEl, endEl, daysTarget, btn);
     dateDifferenceEventListener(freeDayStart, freeDayEnd, freeDayTarget, freeDayBtn);
+    dateDifferenceEventListener(illnessStart, illnessEnd, illnessTarget, illnessBtn);
+
+    illnessBtn.addEventListener('click', function (e) {
+      e.preventDefault();
+      this.disabled = true;
+      toggleIsLoadingWarning(this, 'add');
+      this.classList.remove('is-success');
+
+      const span = this.querySelector('span:nth-of-type(2)');
+      const body = `start=${illnessStart.value}&end=${illnessEnd.value}&days=${illnessTarget.value}&illness=true`;
+
+      fetchVacationResponse(this, body, illnessStart.value, span);
+    });
 
     freeDayBtn.addEventListener('click', function (e) {
       e.preventDefault();
@@ -987,50 +981,60 @@ const vacationDiffParser = () => {
   }
 };
 
+const vacationRemover = (_this, body) => {
+  _this.disabled = true;
+
+  const span = _this.querySelector('span:nth-of-type(2)');
+  const start = _this.dataset.start;
+
+  toggleIsLoadingWarning(_this, 'add');
+  _this.classList.remove('is-danger');
+
+  fetch('api/deleteVacation.php', {
+    method: 'POST',
+    credentials: 'same-origin',
+    headers: { 'Content-type': 'application/x-www-form-urlencoded' },
+    body
+  })
+    .then(response => response.json())
+    .then(response => {
+      toggleIsLoadingWarning(_this, 'remove');
+
+      if (response.success) {
+        document.querySelector(`tr[data-start="${start}"`).remove();
+        refreshCalendar(start * 1000);
+      } else {
+        _this.classList.add('is-warning');
+        span.innerText = response.error;
+
+        setTimeout(() => {
+          _this.disabled = false;
+          span.innerText = 'entfernen';
+          _this.classList.add('is-success');
+        }, 3000);
+      }
+    });
+};
+
 /**
  *
  */
 const vacationRemoveListener = () => {
-  const btns = document.querySelectorAll('button.vacation-delete-btn');
+  const vacationButtons = document.querySelectorAll('button.vacation-delete-btn');
+  const holidayButtons = document.querySelectorAll('button.holiday-delete-btn');
 
-  if (btns.length > 0) {
-    btns.forEach(btn => {
+  if (vacationButtons.length > 0) {
+    vacationButtons.forEach(btn => {
       btn.addEventListener('click', function () {
-        this.disabled = true;
+        vacationRemover(this, `start=${this.dataset.start}&type=vacation`);
+      });
+    });
+  }
 
-        const span = this.querySelector('span:nth-of-type(2)');
-        const start = this.dataset.start;
-
-        toggleIsLoadingWarning(this, 'add');
-        this.classList.remove('is-danger');
-
-        fetch('api/deleteVacation.php', {
-          method: 'POST',
-          credentials: 'same-origin',
-          headers: { 'Content-type': 'application/x-www-form-urlencoded' },
-          body: `start=${start}`
-        })
-          .then(response => response.json())
-          .then(response => {
-            toggleIsLoadingWarning(this, 'remove');
-
-            if (response.success) {
-              document.querySelector(`tr[data-start="${start}"`).remove();
-              refreshCalendar(start * 1000);
-              if (document.querySelectorAll('#calendar table tbody tr').length === 0) {
-                document.querySelector('#calendar table').remove();
-              }
-            } else {
-              this.classList.add('is-warning');
-              span.innerText = response.error;
-
-              setTimeout(() => {
-                this.disabled = false;
-                span.innerText = 'entfernen';
-                this.classList.add('is-success');
-              }, 3000);
-            }
-          });
+  if (holidayButtons.length > 0) {
+    holidayButtons.forEach(btn => {
+      btn.addEventListener('click', function () {
+        vacationRemover(this, `start=${this.dataset.start}&type=holiday`);
       });
     });
   }
@@ -1155,7 +1159,6 @@ const addEventListeners = () => {
   addEventListenerIfExists('remove-contents', 'click', removeContent);
   addEventListenerIfExists('perm-save-toggler', 'click', unhidePermSaveTRs);
   addEventListenerIfExists('überminuten', 'input', toggleButtonDisabledOnInput);
-  datePicker();
   vacationDiffParser();
   vacationRemoveListener();
   searchEventListener();

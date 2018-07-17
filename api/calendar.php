@@ -16,6 +16,7 @@ class Calendar
         'end' => 'plane-arrival',
         'one-day' => 'umbrella-beach',
         'day-off' => 'calendar-check',
+        'illness' => 'medkit',
     ];
 
     private $_conn;
@@ -183,13 +184,36 @@ class Calendar
     }
 
     /**
+     * @method private _scanForIllnessThisMonth
+     *
+     * @return int $days [amount of free days]
+     */
+    private function _scanForIllnessThisMonth()
+    {
+        $scanForIllnessThisMonthStmt = "SELECT SUM(`days`)  AS `days` FROM `vacation` WHERE `start` >= " . $this->_firstDay . " AND `end` <= " . $this->_lastDay . " AND `person` = " . $_SESSION['personalnummer'] . " AND `days` < 0";
+        $scanForIllnessThisMonth = $this->_conn->query($scanForIllnessThisMonthStmt);
+
+        $days = 0;
+        if ($scanForIllnessThisMonth->num_rows > 0) {
+            while ($data = $scanForIllnessThisMonth->fetch_assoc()) {
+                $days = $data['days'];
+            }
+        }
+
+        // convert negative value (as illness days are stored as negatives)
+        $days *= -1;
+
+        return $days;
+    }
+
+    /**
      * @method private _scanForVacationThisMonth
      *
      * @return int $days [amount of free days]
      */
     private function _scanForVacationThisMonth()
     {
-        $scanForVacationThisMonthStmt = "SELECT SUM(`days`) AS `days` FROM `vacation` WHERE `start` >= " . $this->_firstDay . " AND `end` <= " . $this->_lastDay . " AND `person` = " . $_SESSION['personalnummer'];
+        $scanForVacationThisMonthStmt = "SELECT SUM(`days`) AS `days` FROM `vacation` WHERE `start` >= " . $this->_firstDay . " AND `end` <= " . $this->_lastDay . " AND `person` = " . $_SESSION['personalnummer'] . " AND `days` > 0";
         $scanForVacationThisMonth = $this->_conn->query($scanForVacationThisMonthStmt);
 
         $days = 0;
@@ -209,7 +233,7 @@ class Calendar
      */
     private function _scanForHolidaysThisMonth()
     {
-        $scanForHolidaysThisMonthStmt = "SELECT SUM(`days`) AS `days` FROM `vacation` WHERE `start` >= " . $this->_firstDay . " AND `end` <= " . $this->_lastDay . " AND `person` = 0";
+        $scanForHolidaysThisMonthStmt = "SELECT SUM(`days`) AS `days` FROM `vacation` WHERE `start` >= " . $this->_firstDay . " AND `end` <= " . $this->_lastDay . " AND `person` = 0 AND `days` > 0";
         $scanForHolidaysThisMonth = $this->_conn->query($scanForHolidaysThisMonthStmt);
 
         $holidays = 0;
@@ -233,9 +257,9 @@ class Calendar
     private function _appendFooter($workDaysInMonth = 0, $workedTimeOfMonth = 0)
     {
 
-        $curatedWorkdaysThisMonth = $workDaysInMonth - $this->_scanForHolidaysThisMonth();
-        $vacationDaysThisMonth = $this->_scanForVacationThisMonth();
-        $maximumPossibleWorkTime = ($_SESSION['arbeitszeit'] * $curatedWorkdaysThisMonth) - ($_SESSION['arbeitszeit'] * $vacationDaysThisMonth);
+        $curatedWorkdaysThisMonth = $workDaysInMonth - $this->_scanForHolidaysThisMonth() - $this->_scanForVacationThisMonth() - $this->_scanForIllnessThisMonth();
+
+        $maximumPossibleWorkTime = ($_SESSION['arbeitszeit'] * $curatedWorkdaysThisMonth);
 
         $workTimeQuota = round($workedTimeOfMonth / $maximumPossibleWorkTime, 3) * 100;
         $missingMinutes = round((($maximumPossibleWorkTime - $workedTimeOfMonth) * -1) / 60, 2);
@@ -272,10 +296,10 @@ class Calendar
                     }
 
                     $length = sizeof($response[$name]);
-                    $response[$name][$length] = ['start' => $data['start'], 'end' => $data['end']];
+                    $response[$name][$length] = ['start' => $data['start'], 'end' => $data['end'], 'days' => $data['days']];
                 } else {
                     $length = sizeof($response['Feiertag']);
-                    $response['Feiertag'][$length] = ['start' => $data['start'], 'end' => $data['end']];
+                    $response['Feiertag'][$length] = ['start' => $data['start'], 'end' => $data['end'], 'days' => $data['days']];
                 }
 
             }
@@ -294,7 +318,6 @@ class Calendar
      */
     private function _returnVacationButton($name, $icon)
     {
-
         return '<button class="button calendar-event is-small ' . ($name == 'Feiertag' ? 'is-primary' : 'is-danger') . '"><span class="icon is-small"><i class="fas fa-' . self::ICONS[$icon] . '"></i></span> <span>' . $name . '</span></button>';
     }
 
@@ -338,9 +361,8 @@ class Calendar
                     foreach ($vacation as $vacationInfo) {
                         // one-day vacation exemption
                         if ($vacationInfo['start'] == $currentDay && $vacationInfo['end'] == $currentDay) {
-                            array_push($eventButtons, $this->_returnVacationButton($name, 'one-day'));
+                            array_push($eventButtons, $this->_returnVacationButton($name, $vacationInfo['days'] < 0 ? 'illness' : 'one-day'));
                         } else if ($vacationInfo['end'] >= $currentDay) {
-
                             // start only if:
                             // vacation end is still ahead
                             if ($vacationInfo['end'] > $currentDay) {
@@ -349,7 +371,9 @@ class Calendar
                                 // condition 2: vacation start is WITHIN LAST month, vacation end is WITHIN THIS month
                                 $ongoing = $vacationInfo['start'] >= $this->_startOfLastMonth && $vacationInfo['start'] < $this->_firstDay && $vacationInfo['end'] > $this->_endOfLastMonth;
 
-                                if ($start && !$ongoing) {
+                                if ($vacationInfo['days'] < 0) {
+                                    $icon = 'illness';
+                                } else if ($start && !$ongoing) {
                                     $icon = 'start';
                                 } else if (!$startCondition_1 && $ongoing) {
                                     $icon = 'ongoing';
@@ -379,7 +403,8 @@ class Calendar
                             // if vacation is ending today
                             if ($vacationInfo['end'] == $currentDay) {
                                 $ongoingBtn = $this->_returnVacationButton($name, 'ongoing');
-                                $endBtn = $this->_returnVacationButton($name, 'end');
+                                $endBtn = $this->_returnVacationButton($name, $vacationInfo['days'] < 0 ? 'illness' : 'end');
+
                                 // for the special case of: first day of month = final day of vacation
                                 if (in_array($ongoingBtn, $eventButtons)) {
                                     $index = array_search($ongoingBtn, $eventButtons);
