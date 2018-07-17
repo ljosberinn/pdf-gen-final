@@ -86,14 +86,14 @@ $date = date('Y-m-d', $day);
 $description = $date . ' - ' . $_SESSION['name'];
 
 $basicMethods = [
-    'SetAuthor' => $_SESSION['name'],
-    'SetTitle' => $description,
-    'placeName' => $_SESSION['name'],
-    'SetCreator' => $_SESSION['name'],
+    'SetAuthor'           => $_SESSION['name'],
+    'SetTitle'            => $description,
+    'placeName'           => $_SESSION['name'],
+    'SetCreator'          => $_SESSION['name'],
     'placePersonalnummer' => $_SESSION['personalnummer'],
-    'placeDate' => $day,
-    'placeStartEndTime' => [$startTimestamp, $endTimestamp],
-    'SetFontSize' => 16,
+    'placeDate'           => $day,
+    'placeStartEndTime'   => [$startTimestamp, $endTimestamp],
+    'SetFontSize'         => 16,
 ];
 
 foreach ($basicMethods as $method => $value) {
@@ -102,12 +102,12 @@ foreach ($basicMethods as $method => $value) {
 
 // prepare row insertions
 $methods = [
-    'placeKostenstelle' => $resultingData['kostenstelle'],
+    'placeKostenstelle'   => $resultingData['kostenstelle'],
     'placeAuftragsnummer' => $resultingData['auftragsnummer'],
-    'placeKunde' => $resultingData['kunde'],
-    'placeLeistungsart' => $resultingData['leistungsart'],
-    'placeMinuten' => $resultingData['minuten'],
-    'placeAnzahl' => $resultingData['anzahl'],
+    'placeKunde'          => $resultingData['kunde'],
+    'placeLeistungsart'   => $resultingData['leistungsart'],
+    'placeMinuten'        => $resultingData['minuten'],
+    'placeAnzahl'         => $resultingData['anzahl'],
     'placeMaterialnummer' => $resultingData['materialnummer'],
 ];
 
@@ -157,6 +157,12 @@ if ($frühstückspause == 0 || $mittagspause == 0) {
     }
 
     $pdf->placePause($pausenString);
+}
+
+// Signatur
+
+if ($_SESSION['signatur']) {
+    $pdf->Image('../' . $_SESSION['signatur'], 20.75, 221, 45, 14.5);
 }
 
 $pdf->output($description . '.pdf', $outputMode);
