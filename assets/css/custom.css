@@ -94,8 +94,6 @@ button.is-loading {
   min-height: 6rem;
 }
 
-.datepicker.is-active .calendar-body .calendar-date:nth-of-type(7n) button,
-.datepicker.is-active .calendar-body .calendar-date:nth-of-type(7n + 1) button,
 .calendar.is-large .calendar-date:nth-of-type(7n - 1) button,
 .calendar.is-large .calendar-date:nth-of-type(7n) button {
   color: #b5b5b5;

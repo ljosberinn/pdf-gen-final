@@ -1215,6 +1215,9 @@ const checkForErrorGet = () => {
         case 'fileTooLarge':
           string += '- Datei ist zu groß<br />';
           break;
+        case 'dataUpdateFailure':
+          string += '- konnte Daten nicht aktualisieren - ungültige Werte?<br />';
+          break;
         default:
           string += 'Hoppla, ein unbekannter Fehler ist aufgetreten<br />';
           break;

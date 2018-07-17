@@ -157,13 +157,20 @@ foreach ($data as $dataset) {
 $averageArbeitszeitSumme = round($arbeitszeitSumme / $count);
 $theoreticalMustHave = $_SESSION['arbeitszeit'] * $count;
 
+// Überminuten für Gesamtstatistik berücksichtigen
+$arbeitszeitSumme += $_SESSION['überminuten'];
+
 if ($arbeitszeitSumme < $theoreticalMustHave) {
     $hours = round(($theoreticalMustHave - $arbeitszeitSumme) / 60, 2);
-    $theoreticalOutput = '<span class="tag is-danger">' . $hours . ' Unterstunden</span>';
+    $prefix = 'Unter';
+    $thOutputClass = 'is-danger';
 } else if ($arbeitszeitSumme > $theoreticalMustHave) {
     $hours = round(($arbeitszeitSumme - $theoreticalMustHave) / 60, 2);
-    $theoreticalOutput = '<span class="tag is-success">' . $hours . ' Überstunden</span>';
+    $prefix = 'Über';
+    $thOutputClass = 'is-success';
 }
+
+$theoreticalOutput = '<span class="tag ' .$thOutputClass. '">' .$hours. ' ' .$prefix. 'stunden</span>';
 
 $arbeitszeitClass = $addendum = '';
 
