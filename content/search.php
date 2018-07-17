@@ -31,7 +31,7 @@
 
   <table class="table is-hoverable is-striped is-fullwidth" id="search-table">
     <thead>
-      <th class="has-text-right">berabeitet am</th>
+      <th class="has-text-right">bearbeitet am</th>
       <th class="has-text-right">Auftragsnummer</th>
       <th>Kunde</th>
       <th class="has-text-right">Leistungsart</th>
