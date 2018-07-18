@@ -485,10 +485,12 @@ function getEntries($conn, $personalnummern, $type, $value)
 {
     $entries = [];
 
+    $oneYearBack = time('now') - 365 * 86400;
+
     foreach ($personalnummern as $dataset) {
         $searchQuery = "SELECT * FROM `" . $dataset['personalnummer'] . "_archiv` WHERE ";
         for ($i = 1; $i <= 22; $i += 1) {
-            $searchQuery .= "`" . $type . "-" . $i . "` LIKE '%" . $value . "%' OR ";
+            $searchQuery .= "`day` >= " .$oneYearBack. " AND `" . $type . "-" . $i . "` LIKE '%" . $value . "%' OR ";
         }
         $searchQuery = substr($searchQuery, 0, -4);
 
