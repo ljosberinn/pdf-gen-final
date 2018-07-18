@@ -5,7 +5,7 @@ module.exports = {
   entry: './assets/js/stable.js',
   output: {
     path: path.resolve(__dirname, 'assets/js'),
-    filename: 'bundle.min.js',
+    filename: 'bundle.min.js'
   },
   devtool: 'source-map',
   module: {
@@ -16,10 +16,19 @@ module.exports = {
         use: {
           loader: 'babel-loader',
           options: {
-            presets: ['env'],
-          },
-        },
-      },
-    ],
-  },
+            presets: [
+              [
+                'env',
+                {
+                  targets: {
+                    browsers: ['last 2 versions', 'safari >= 7']
+                  }
+                }
+              ]
+            ]
+          }
+        }
+      }
+    ]
+  }
 };

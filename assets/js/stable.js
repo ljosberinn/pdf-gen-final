@@ -156,7 +156,7 @@ const toggleSaveButtons = () => {
  * @param {number} nextRowId
  */
 const addTREventListeners = nextRowId => {
-  const elements = document.querySelectorAll(`[id*="-${nextRowId}"]`);
+  const elements = [...document.querySelectorAll(`[id*="-${nextRowId}"]`)];
 
   elements.forEach(el => {
     if (elements.indexOf(el) !== 5) {
