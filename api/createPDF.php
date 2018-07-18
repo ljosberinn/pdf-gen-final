@@ -48,9 +48,9 @@ if (isset($_POST['pdfId'])) {
     for ($i = 1; $i <= 22; $i += 1) {
         if (!empty($data['minuten-' . $i])) {
             foreach ($posten as $var) {
-                if ($data[$var . '-' . $i] != 0) {
+                //if ($data[$var . '-' . $i] != 0) {
                     array_push(${$var}, $data[$var . '-' . $i]);
-                }
+                //}
             }
         }
     }
@@ -117,7 +117,9 @@ for ($i = 0; $i <= ($length - 1); $i += 1) {
     $yCoord = 36 + $i * 7.7725;
 
     foreach ($methods as $method => $array) {
-        call_user_func_array([$pdf, $method], [$array[$i], $yCoord]);
+        if($array[$i] != 0) {
+            call_user_func_array([$pdf, $method], [$array[$i], $yCoord]);
+        }
     }
 }
 
