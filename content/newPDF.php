@@ -103,7 +103,7 @@ for ($i = 1; $i <= 5; $i += 1) {
           <td data-label="' . $tableColumnKeys[0] . '" title="' . $tableColumnKeys[0] . '">
             <div class="field">
               <div class="control">
-                <input id="' . $tableColumnKeys_lowerCase[0] . '-' . $i . '" name="' . $tableColumnKeys_lowerCase[0] . '-' . $i . '" min="0" class="input" list="kostenstelle" type="number" placeholder="' . $i . '" />
+                <input id="' . $tableColumnKeys_lowerCase[0] . '-' . $i . '" name="' . $tableColumnKeys_lowerCase[0] . '-' . $i . '" class="input" list="kostenstelle" placeholder="' . $i . '" />
               </div>
             </div>
           </td>
@@ -124,7 +124,7 @@ for ($i = 1; $i <= 5; $i += 1) {
           <td data-label="' . $tableColumnKeys[3] . '" title="' . $tableColumnKeys[3] . '">
             <div class="field">
               <div class="control">
-                <input id="' . $tableColumnKeys_lowerCase[3] . '-' . $i . '" name="' . $tableColumnKeys_lowerCase[3] . '-' . $i . '" class="input" list="leistungsart" min="0" type="number" />
+                <input id="' . $tableColumnKeys_lowerCase[3] . '-' . $i . '" name="' . $tableColumnKeys_lowerCase[3] . '-' . $i . '" class="input" list="leistungsart" />
               </div>
             </div>
           </td>
