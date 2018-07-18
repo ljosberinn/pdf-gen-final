@@ -5,14 +5,14 @@
  *
  * Contains all PHP-functions
  *
- * PHP version 7.2
+ * PHP version 5.6
  *
  * @category  Functions
  * @package   API/functions.php
  * @author    Gerrit Alex <admin@gerritalex.de>
  * @copyright 2016-2018 Gerrit Alex
  * @license   MIT (https://de.wikipedia.org/wiki/MIT-Lizenz)
- * @link      https://gerritalex.de/tzfinal
+ * @link      https://github.com/ljosberinn/pdf-gen-final
  */
 
 /**
