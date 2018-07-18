@@ -123,6 +123,9 @@ for ($i = 0; $i <= ($length - 1); $i += 1) {
     }
 }
 
+$totalMinutenWorked = array_sum($resultingData['minuten']);
+$has890 = $minutesWorked - $totalMinutenWorked;
+
 // occasionally add special row
 if ($has890 > 0) {
 
