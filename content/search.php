@@ -39,7 +39,12 @@
       <th>bearbeitet von</th>
     </thead>
     <tbody></tbody>
-    <tfoot></tfoot>
+    <tfoot>
+      <tr>
+        <td colspan="4" class="has-text-right" id="search-tfoot"></td>
+        <td colspan="2"></td>
+      </tr>
+    </tfoot>
   </table>
 
 </div>

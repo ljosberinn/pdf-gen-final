@@ -1075,7 +1075,18 @@ const returnSearchTR = data => {
 
   let string = '';
 
+  const keys = [];
+  const values = [];
+
   data.rows.forEach(row => {
+
+    if (!keys.includes(row.leistungsart)) {
+      keys.push(row.leistungsart);
+      values.push(row.minuten);
+    } else {
+      keys[keys.indexOf(row.leistungsart)] += row.minuten;
+    }
+
     string += `<tr>
     <td class="has-text-right">${createdAt}</td>
     <td class="has-text-right">${row.auftragsnummer}</td>
@@ -1086,7 +1097,7 @@ const returnSearchTR = data => {
     </tr>`;
   });
 
-  return string;
+  return { string, keys, values };
 };
 
 const processSearch = (response, icons) => {
@@ -1104,11 +1115,34 @@ const processSearch = (response, icons) => {
     toggleSearchIcon(icons[1], 'inline-block');
 
     let string = '';
+
+    const tFootData = {
+      keys: [],
+      values: []
+    };
+
     Object.values(response.data).forEach(dataset => {
-      string += returnSearchTR(dataset);
+      const searchData = returnSearchTR(dataset);
+      string += searchData.string;
+
+      searchData.keys.forEach(key => {
+        if (!tFootData.keys.includes(key)) {
+          tFootData.keys.push(key);
+          tFootData.values.push(searchData.values[searchData.keys.indexOf(key)]);
+        } else {
+          tFootData.values[tFootData.keys.indexOf(key)] += searchData.values[searchData.keys.indexOf(key)];
+        }
+      });
     });
 
     tbody.insertAdjacentHTML('beforeend', string);
+
+    let tFootString = '';
+    tFootData.keys.forEach(key => {
+      tFootString += `<p>${key}: ${tFootData.values[tFootData.keys.indexOf(key)].toLocaleString('en-US')}</p>`;
+    });
+
+    document.getElementById('search-tfoot').innerHTML = tFootString;
   } else {
     table.style.display = 'none';
     toggleSearchIcon(icons[2], 'inline-block');
