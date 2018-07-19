@@ -117,7 +117,7 @@ for ($i = 0; $i <= ($length - 1); $i += 1) {
     $yCoord = 36 + $i * 7.7725;
 
     foreach ($methods as $method => $array) {
-        if($array[$i] != 0) {
+        if(!empty($array[$i])) {
             call_user_func_array([$pdf, $method], [$array[$i], $yCoord]);
         }
     }
