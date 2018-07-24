@@ -392,7 +392,7 @@ class Calendar
                             if ($vacationInfo['start'] <= ($currentDay - 86400) && $vacationInfo['end'] >= ($currentDay + 86400)) {
                                 // show warning for currently ongoing vacations
                                 foreach ($this->_currentlyActiveVacation as $activeName) {
-                                    $indivBtn = $this->_returnVacationButton($activeName, 'ongoing');
+                                    $indivBtn = $this->_returnVacationButton($activeName, $vacationInfo['days'] < 0 ? 'illness' : 'ongoing');
 
                                     if (!in_array($indivBtn, $eventButtons) && !$isDayOff) {
                                         array_push($eventButtons, $indivBtn);

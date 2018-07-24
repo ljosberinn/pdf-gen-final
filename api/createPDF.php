@@ -131,7 +131,7 @@ if ($has890 > 0) {
 
     $add890Data = [
         'placeKostenstelle' => 890,
-        'placeLeistungsart' => 996,
+        'placeLeistungsart' => 998,
         'placeMinuten' => $has890,
     ];
 
